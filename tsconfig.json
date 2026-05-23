@@ -1,0 +1,10 @@
+// Este tsconfig.json estende o gerado pelo Nuxt em .nuxt/tsconfig.json
+// que inclui todos os auto-imports (ref, computed, definePageMeta, etc.)
+// e os tipos do Nitro (defineEventHandler, readBody, useRuntimeConfig, etc.)
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "skipLibCheck": true
+  }
+}
