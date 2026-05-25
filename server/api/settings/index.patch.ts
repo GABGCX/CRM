@@ -1,5 +1,7 @@
+// server/api/settings/index.patch.ts
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import { z } from 'zod'
+import { invalidateTenantCache } from '../../utils/tenantCache'
 
 const schema = z.object({
   name:          z.string().min(2).optional(),
@@ -28,13 +30,32 @@ export default defineEventHandler(async (event) => {
 
   const { name, custom_domain, ...settingsFields } = parsed.data
   const update: Record<string, any> = {}
-  if (name)                          update.name = name
-  if (custom_domain !== undefined)   update.custom_domain = custom_domain
-  if (Object.keys(settingsFields).length) update.settings = settingsFields
+
+  if (name)                        update.name          = name
+  if (custom_domain !== undefined) update.custom_domain = custom_domain
+
+  // ── CORREÇÃO #1: merge de settings em vez de sobrescrever ──────────────
+  if (Object.keys(settingsFields).length) {
+    const { data: current } = await supabaseAdmin
+      .from('organizations')
+      .select('settings')
+      .eq('id', profile.org_id)
+      .single()
+
+    update.settings = { ...(current?.settings ?? {}), ...settingsFields }
+  }
 
   const { data, error } = await supabaseAdmin
-    .from('organizations').update(update).eq('id', profile.org_id).select().single()
+    .from('organizations')
+    .update(update)
+    .eq('id', profile.org_id)
+    .select('*, slug, custom_domain')
+    .single()
 
   if (error) throw createError({ statusCode: 500, message: error.message })
+
+  // ── Invalida cache compartilhado ────────────────────────────────────────
+  invalidateTenantCache(data.slug, data.custom_domain)
+
   return data
 })

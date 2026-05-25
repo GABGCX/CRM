@@ -1,45 +1,37 @@
 // server/middleware/tenant.ts
 // Roda no servidor para cada request SSR.
-// Resolve o tenant e injeta nos headers de resposta
-// para que as pages possam acessar via useRequestHeaders().
+// Usa o cache singleton compartilhado com os outros handlers.
 
 import { createClient } from '@supabase/supabase-js'
+import { getCachedTenant, setCachedTenant, buildTenantKey } from '../utils/tenantCache'
 
-const cache = new Map<string, { org: any; exp: number }>()
-const CACHE_TTL = 60_000
-
-async function resolveOrg(host: string, supabase: any) {
-  const hostname = host.split(':')[0]
+async function resolveOrg(hostname: string, supabase: any): Promise<any | null> {
   const appDomain = process.env.NUXT_PUBLIC_APP_DOMAIN || 'crm.io'
+  const cacheKey = buildTenantKey(hostname, appDomain)
 
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    const cacheHit = cache.get('__dev__')
-    if (cacheHit && Date.now() < cacheHit.exp) return cacheHit.org
+  const cached = getCachedTenant(cacheKey)
+  if (cached) return cached
+
+  let query: any
+  if (cacheKey === '__dev__') {
     const { data } = await supabase.from('organizations').select('*').limit(1).single()
-    if (data) cache.set('__dev__', { org: data, exp: Date.now() + CACHE_TTL })
-    return data
-  }
-
-  if (hostname.endsWith(`.${appDomain}`)) {
-    const slug = hostname.replace(`.${appDomain}`, '')
-    const cacheHit = cache.get(`slug:${slug}`)
-    if (cacheHit && Date.now() < cacheHit.exp) return cacheHit.org
+    query = data
+  } else if (cacheKey.startsWith('slug:')) {
+    const slug = cacheKey.replace('slug:', '')
     const { data } = await supabase.from('organizations').select('*').eq('slug', slug).single()
-    if (data) cache.set(`slug:${slug}`, { org: data, exp: Date.now() + CACHE_TTL })
-    return data
+    query = data
+  } else {
+    const { data } = await supabase.from('organizations').select('*').eq('custom_domain', hostname).single()
+    query = data
   }
 
-  const cacheHit = cache.get(`domain:${hostname}`)
-  if (cacheHit && Date.now() < cacheHit.exp) return cacheHit.org
-  const { data } = await supabase.from('organizations').select('*').eq('custom_domain', hostname).single()
-  if (data) cache.set(`domain:${hostname}`, { org: data, exp: Date.now() + CACHE_TTL })
-  return data
+  if (query) setCachedTenant(cacheKey, query)
+  return query ?? null
 }
 
 export default defineEventHandler(async (event) => {
-  const host = getHeader(event, 'host') || ''
+  const host = (getHeader(event, 'host') || '').split(':')[0]
 
-  // Supabase admin client para buscar org sem RLS
   const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -47,13 +39,11 @@ export default defineEventHandler(async (event) => {
   )
 
   const org = await resolveOrg(host, supabase)
-  if (!org) return // localhost dev sem org criada ainda — não bloqueia
+  if (!org) return
 
-  // Injetar dados do tenant como headers internos
-  // Acessíveis nas pages via useRequestHeaders()
-  setHeader(event, 'x-tenant-id', org.id)
-  setHeader(event, 'x-tenant-slug', org.slug)
-  setHeader(event, 'x-tenant-name', org.name)
-  setHeader(event, 'x-tenant-theme', JSON.stringify(org.theme))
+  setHeader(event, 'x-tenant-id',       org.id)
+  setHeader(event, 'x-tenant-slug',     org.slug)
+  setHeader(event, 'x-tenant-name',     org.name)
+  setHeader(event, 'x-tenant-theme',    JSON.stringify(org.theme))
   setHeader(event, 'x-tenant-settings', JSON.stringify(org.settings))
 })

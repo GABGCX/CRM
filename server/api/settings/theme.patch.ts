@@ -1,5 +1,7 @@
+// server/api/settings/theme.patch.ts
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import { z } from 'zod'
+import { invalidateTenantCache } from '../../utils/tenantCache'
 
 const schema = z.object({
   primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
@@ -8,10 +10,6 @@ const schema = z.object({
   logo_url:      z.string().url().optional().nullable(),
   favicon_url:   z.string().url().optional().nullable(),
 })
-
-// Cache local do servidor (mesmo que server/middleware/tenant.ts)
-// Invalida após salvar para que o próximo request busque o tema atualizado
-const tenantCache = new Map<string, any>()
 
 export default defineEventHandler(async (event) => {
   const supabase      = await serverSupabaseClient(event)
@@ -34,17 +32,13 @@ export default defineEventHandler(async (event) => {
     .from('organizations')
     .update({ theme: parsed.data })
     .eq('id', profile.org_id)
-    .select().single()
+    .select()
+    .single()
 
   if (error) throw createError({ statusCode: 500, message: error.message })
 
-  // Invalidar cache do tenant para o próximo request pegar o tema novo
-  const { data: org } = await supabaseAdmin
-    .from('organizations').select('slug, custom_domain').eq('id', profile.org_id).single()
-  if (org) {
-    tenantCache.delete(`slug:${org.slug}`)
-    if (org.custom_domain) tenantCache.delete(`domain:${org.custom_domain}`)
-  }
+  // ── Invalida cache compartilhado ────────────────────────────────────────
+  invalidateTenantCache(data.slug, data.custom_domain)
 
   return data
 })
