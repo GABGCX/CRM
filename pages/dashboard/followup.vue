@@ -125,8 +125,15 @@ const activeTab = ref<TabId>('urgente')
 const toastMsg  = ref<string|null>(null)
 const showToast = (m: string) => { toastMsg.value = m; setTimeout(() => toastMsg.value = null, 2500) }
 
-// ── useLeads: estado compartilhado, optimistic updates padronizados ─────
-const { leads, pending, activeLeads, toggleFU, patchStatus } = useLeads()
+// ── Busca de dados com await (mesma chave = ref compartilhado) ─────────
+const { data: leads, pending } = await useAsyncData<LeadWithFU[]>(
+  'leads-global',
+  () => $fetch('/api/leads'),
+  { default: () => [] as LeadWithFU[] }
+)
+
+// ── Métodos de mutação via composable ──────────────────────────────────
+const { activeLeads, toggleFU, patchStatus } = useLeads()
 
 const daysUntil = (d: string) => {
   const t = new Date(); t.setHours(0,0,0,0)
