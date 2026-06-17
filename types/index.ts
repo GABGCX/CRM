@@ -55,6 +55,9 @@ export type LeadStatus =
   | 'Sem interesse'
   | 'Não atende'
 
+export type LeadFonte = 'cold_call' | 'linkedin' | 'indicacao' | 'evento' | 'outro'
+export type LeadPorte = 'micro' | 'pequena' | 'media' | 'grande'
+
 export interface Lead {
   id: string
   org_id: string
@@ -71,9 +74,36 @@ export interface Lead {
   turno: string | null
   horario: string | null
   info: string | null
+  // Campos de qualificação (ICP)
+  fonte: LeadFonte | null
+  segmento: string | null
+  cidade: string | null
+  estado: string | null
+  porte: LeadPorte | null
+  // Proposta
+  proposta_url: string | null
+  // Cadencia
+  cadence_id: string | null
+  cadence_started_at: string | null
+  // Perda / Forecast
+  motivo_perda: string | null
+  valor_estimado: number | null
+  // Etiquetas
+  tag_ids: string[]
   created_at: string
   updated_at: string
   followups?: Followup[]
+}
+
+export interface LeadEvent {
+  id: string
+  lead_id: string
+  org_id: string
+  user_id: string | null
+  type: 'created' | 'status_change' | 'field_update' | 'followup' | 'note'
+  payload: Record<string, unknown> | null
+  created_at: string
+  profiles?: { name: string | null; avatar_url: string | null } | null
 }
 
 export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'followups'>
@@ -115,6 +145,70 @@ export interface MonthlySummary {
   total_rr: number
   total_fr: number
   days_recorded: number
+}
+
+// ─── Etiquetas (tags) ─────────────────────────────────────
+
+export interface Tag {
+  id: string
+  org_id: string
+  name: string
+  color: string
+  created_at: string
+}
+
+// ─── Metricas do funil (CE/RM/RR/FR/LD) ──────────────────
+
+export type MetricKey = 'CE' | 'RM' | 'RR' | 'FR' | 'LD'
+
+// ─── Cadences ─────────────────────────────────────────────
+
+export type CadenceChannel = 'Ligacao' | 'Email' | 'LinkedIn' | 'WhatsApp' | 'Outro'
+
+export interface CadenceStep {
+  id: string
+  cadence_id: string
+  step_order: number
+  day_offset: number
+  channel: CadenceChannel
+  instruction: string | null
+  created_at: string
+}
+
+export interface Cadence {
+  id: string
+  org_id: string
+  name: string
+  description: string | null
+  cadence_steps: CadenceStep[]
+  created_at: string
+  updated_at: string
+}
+
+// ─── Lead Notes ──────────────────────────────────────────
+
+export interface LeadNote {
+  id: string
+  lead_id: string
+  org_id: string
+  user_id: string | null
+  content: string
+  created_at: string
+  profiles?: { name: string | null } | null
+}
+
+// ─── Message Templates ────────────────────────────────────
+
+export type TemplateChannel = 'WhatsApp' | 'Email' | 'Ligacao' | 'LinkedIn' | 'Outro'
+
+export interface MessageTemplate {
+  id: string
+  org_id: string
+  name: string
+  channel: TemplateChannel
+  content: string
+  created_at: string
+  updated_at: string
 }
 
 // ─── API responses ────────────────────────────────────────

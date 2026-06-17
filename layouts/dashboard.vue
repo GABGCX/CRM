@@ -1,80 +1,135 @@
 <template>
   <div class="app-shell">
-    <aside class="sidebar">
-      <!-- Logo -->
-      <div style="padding:14px 14px 12px;border-bottom:1px solid #f0f0f0">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:24px;height:24px;border-radius:6px;background:#0a0a0a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <aside class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
+
+      <!-- Header: logo + toggle -->
+      <div class="sb-header">
+        <div v-if="!collapsed" class="sb-logo">
+          <div class="sb-logo-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="4" fill="white"/>
+              <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#0a0a0a">Outbound</div>
-            <div style="font-size:11px;color:#737373">{{ profile?.name || 'BDR' }}</div>
+          <div style="min-width:0">
+            <div class="sb-brand">Prospecta</div>
+            <div class="sb-brand-sub">{{ profile?.name || 'BDR' }}</div>
           </div>
         </div>
+        <button class="sb-toggle" @click="collapsed = !collapsed" :title="collapsed ? 'Expandir menu' : 'Recolher menu'">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            :style="{ transform: collapsed ? 'rotate(180deg)' : '', transition: 'transform .18s' }">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Nav -->
-      <nav style="padding:6px;flex:1;overflow-y:auto">
-        <div style="font-size:10px;font-weight:500;color:#a3a3a3;text-transform:uppercase;letter-spacing:.07em;padding:8px 8px 3px">Hoje</div>
+      <nav class="sb-nav">
+        <!-- Search -->
+        <button class="sb-search" @click="openGlobalSearch" :title="collapsed ? 'Buscar lead (Ctrl+K)' : undefined">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <span v-show="!collapsed" class="sb-label">Buscar lead...</span>
+          <kbd v-show="!collapsed" class="sb-kbd">Ctrl K</kbd>
+        </button>
 
-        <NuxtLink to="/dashboard" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard')">
-            <i class="ti ti-home" style="font-size:14px" aria-hidden="true"></i>Cockpit
+        <div v-show="!collapsed" class="sb-section">Hoje</div>
+
+        <NuxtLink to="/dashboard" custom v-slot="{ isExactActive }">
+          <button class="nav-item" :class="{ active: isExactActive }" @click="navigateTo('/dashboard')" :title="collapsed ? 'Inicio' : undefined">
+            <i class="ti ti-home sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Inicio</span>
           </button>
         </NuxtLink>
 
         <NuxtLink to="/dashboard/diario" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/diario')">
-            <i class="ti ti-calendar" style="font-size:14px" aria-hidden="true"></i>Diário
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/diario')" :title="collapsed ? 'Meu Dia' : undefined">
+            <i class="ti ti-calendar sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Meu Dia</span>
           </button>
         </NuxtLink>
 
-        <div style="font-size:10px;font-weight:500;color:#a3a3a3;text-transform:uppercase;letter-spacing:.07em;padding:8px 8px 3px;margin-top:4px">Leads</div>
+        <div v-show="!collapsed" class="sb-section">Leads</div>
 
         <NuxtLink to="/dashboard/pipeline" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/pipeline')">
-            <i class="ti ti-users" style="font-size:14px" aria-hidden="true"></i>Pipeline
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/pipeline')" :title="collapsed ? `Pipeline (${overdueCount} vencidos)` : undefined">
+            <i class="ti ti-users sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Pipeline</span>
+            <span v-if="overdueCount > 0" class="nav-badge">{{ overdueCount }}</span>
+            <span v-if="overdueCount > 0" class="nav-dot"></span>
           </button>
         </NuxtLink>
 
         <NuxtLink to="/dashboard/followup" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/followup')">
-            <i class="ti ti-repeat" style="font-size:14px" aria-hidden="true"></i>Follow-up
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/followup')" :title="collapsed ? `Follow-up (${overdueCount} vencidos)` : undefined">
+            <i class="ti ti-repeat sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Follow-up</span>
             <span v-if="overdueCount > 0" class="nav-badge">{{ overdueCount }}</span>
+            <span v-if="overdueCount > 0" class="nav-dot"></span>
           </button>
         </NuxtLink>
 
-        <div style="font-size:10px;font-weight:500;color:#a3a3a3;text-transform:uppercase;letter-spacing:.07em;padding:8px 8px 3px;margin-top:4px">Análise</div>
+        <div v-show="!collapsed" class="sb-section">Analise</div>
 
         <NuxtLink to="/dashboard/matematica" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/matematica')">
-            <i class="ti ti-calculator" style="font-size:14px" aria-hidden="true"></i>Matemática
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/matematica')" :title="collapsed ? 'Metas e Ritmo' : undefined">
+            <i class="ti ti-calculator sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Metas e Ritmo</span>
+          </button>
+        </NuxtLink>
+
+        <NuxtLink to="/dashboard/relatorios" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/relatorios')" :title="collapsed ? 'Relatorios' : undefined">
+            <i class="ti ti-chart-bar sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Relatorios</span>
+          </button>
+        </NuxtLink>
+
+        <NuxtLink v-if="isManager" to="/dashboard/gestao" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/gestao')" :title="collapsed ? 'Gestao' : undefined">
+            <i class="ti ti-users-group sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Gestao</span>
           </button>
         </NuxtLink>
 
         <NuxtLink to="/dashboard/configuracoes" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/configuracoes')">
-            <i class="ti ti-settings" style="font-size:14px" aria-hidden="true"></i>Configurações
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/configuracoes')" :title="collapsed ? 'Configuracoes' : undefined">
+            <i class="ti ti-settings sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Configuracoes</span>
           </button>
         </NuxtLink>
+
+        <!-- Dark mode toggle -->
+        <button class="nav-item sb-theme-toggle" @click="toggleTheme" :title="isDark ? 'Mudar para claro' : 'Mudar para escuro'">
+          <svg v-if="isDark" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="sb-icon">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="sb-icon">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <span v-show="!collapsed" class="sb-label">{{ isDark ? 'Tema claro' : 'Tema escuro' }}</span>
+        </button>
       </nav>
 
-      <!-- User -->
-      <div style="padding:10px;border-top:1px solid #f0f0f0">
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 8px">
-          <div style="width:26px;height:26px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#525252;flex-shrink:0">
-            {{ (profile?.name || 'U')[0].toUpperCase() }}
-          </div>
-          <div style="min-width:0;flex:1">
-            <div style="font-size:12px;font-weight:500;color:#0a0a0a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ profile?.name || 'Usuário' }}</div>
-            <div style="font-size:11px;color:#737373;text-transform:capitalize">{{ profile?.role }}</div>
-          </div>
+      <!-- User footer -->
+      <div class="sb-footer">
+        <div class="sb-user">
+          <div class="sb-avatar">{{ (profile?.name || 'U')[0].toUpperCase() }}</div>
+          <template v-if="!collapsed">
+            <div class="sb-user-info">
+              <div class="sb-user-name">{{ profile?.name || 'Usuario' }}</div>
+              <div class="sb-user-role">{{ profile?.role }}</div>
+            </div>
+            <button class="sb-logout" @click="logout" title="Sair">
+              <i class="ti ti-logout" style="font-size:14px" aria-hidden="true"></i>
+            </button>
+          </template>
         </div>
-        <button @click="logout" style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;border:none;background:transparent;color:#a3a3a3;font-size:12px;font-family:inherit;cursor:pointer;width:100%;margin-top:2px" onmouseenter="this.style.color='#dc2626'" onmouseleave="this.style.color='#a3a3a3'">
-          <i class="ti ti-logout" style="font-size:13px" aria-hidden="true"></i>Sair
-        </button>
       </div>
+
     </aside>
 
     <main class="main-content">
@@ -82,29 +137,300 @@
         <slot />
       </div>
     </main>
+
+    <UiGlobalSearch @select="onSearchSelect" />
+    <UiOnboardingTour />
+
+    <Transition name="toast">
+      <div v-if="errorToast" class="layout-toast layout-toast-error">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        {{ errorToast }}
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const { profile, fetchProfile } = useProfile()
+const { overdueCount } = useLeads()
+const { isDark, init: initDark, toggle: toggleTheme } = useDarkMode()
 
-const overdueLeads = useState<number>('overdue-count', () => 0)
-const overdueCount = computed(() => overdueLeads.value)
+const isManager = computed(() => ['owner', 'admin'].includes(profile.value?.role || ''))
 
-onMounted(async () => {
-  await fetchProfile()
-  const today = new Date().toISOString().slice(0, 10)
-  const { count } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .lte('data_retorno', today)
-    .not('resultado', 'in', '("Fechado","Recusado","Sem interesse")')
-  overdueLeads.value = count || 0
+// Carrega o perfil assim que o usuario de auth estiver disponivel (robusto a timing).
+watch(user, (u) => { if (u && !profile.value) fetchProfile() }, { immediate: true })
+
+useHead(computed(() => ({
+  title: overdueCount.value > 0 ? `(${overdueCount.value}) Prospecta` : 'Prospecta',
+})))
+
+const collapsed = ref(false)
+
+onMounted(() => {
+  collapsed.value = localStorage.getItem('sidebar-collapsed') === '1'
+  initDark()
+  fetchProfile()
+  window.addEventListener('crm:toast-error', onCrmToastError)
 })
+
+watch(collapsed, v => localStorage.setItem('sidebar-collapsed', v ? '1' : '0'))
+
+const errorToast = ref<string | null>(null)
+let errorToastTimer: ReturnType<typeof setTimeout> | null = null
+
+function showErrorToast(msg: string) {
+  errorToast.value = msg
+  if (errorToastTimer) clearTimeout(errorToastTimer)
+  errorToastTimer = setTimeout(() => (errorToast.value = null), 3000)
+}
+
+function onCrmToastError(e: Event) {
+  showErrorToast((e as CustomEvent).detail?.message || 'Ocorreu um erro.')
+}
+
+onUnmounted(() => window.removeEventListener('crm:toast-error', onCrmToastError))
 
 async function logout() {
   await supabase.auth.signOut()
   navigateTo('/login')
 }
+
+function onSearchSelect(leadId: string) {
+  navigateTo(`/dashboard/pipeline?highlight=${leadId}`)
+}
+
+function openGlobalSearch() {
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))
+}
 </script>
+
+<style scoped>
+/* ── Sidebar header ─────────────────────────────────── */
+.sb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 10px 11px;
+  border-bottom: 1px solid var(--sb-border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.sb-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sb-logo-icon {
+  width: 27px;
+  height: 27px;
+  border-radius: 7px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sb-brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Geist', sans-serif;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+
+.sb-brand-sub {
+  font-size: 11px;
+  color: var(--sb-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--sb-toggle-border);
+  background: transparent;
+  color: var(--sb-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .1s;
+}
+.sb-toggle:hover { border-color: #555; color: var(--sb-text-hover); background: var(--sb-hover); }
+
+/* ── Nav ────────────────────────────────────────────── */
+.sb-nav {
+  padding: 8px 7px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sb-section {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sb-section);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 8px 10px 3px;
+  white-space: nowrap;
+}
+
+.sb-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--sb-search-border);
+  background: var(--sb-search-bg);
+  color: var(--sb-text);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 6px;
+  text-align: left;
+  transition: all .12s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sb-search:hover { border-color: var(--sb-toggle-border); color: var(--sb-text-hover); }
+
+.sb-label {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-kbd {
+  font-size: 10px;
+  border: 1px solid var(--sb-kbd-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  background: var(--sb-kbd-bg);
+  color: var(--sb-section);
+  flex-shrink: 0;
+}
+
+.sb-icon { font-size: 15px; flex-shrink: 0; }
+
+/* ── Collapsed overrides ────────────────────────────── */
+.sidebar--collapsed .sb-header  { justify-content: center; padding: 11px 0; }
+.sidebar--collapsed .sb-toggle  { border: none; background: transparent; color: var(--sb-text); width: 36px; height: 36px; border-radius: 8px; }
+.sidebar--collapsed .sb-toggle:hover { background: var(--sb-hover); color: var(--sb-text-hover); }
+.sidebar--collapsed .sb-nav     { padding: 8px 5px; }
+.sidebar--collapsed .sb-search  { padding: 9px; justify-content: center; width: 42px; margin: 0 auto 6px; }
+.sidebar--collapsed .nav-item   { padding: 9px; justify-content: center; gap: 0; position: relative; }
+.sidebar--collapsed .nav-badge  { display: none; }
+
+/* Notificacao de vencidos: ponto pulsante visivel quando recolhido */
+.nav-dot { display: none; }
+.sidebar--collapsed .nav-dot {
+  display: block;
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dc2626;
+  border: 1.5px solid var(--sb-bg);
+  animation: nav-pulse 2s infinite;
+}
+@keyframes nav-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.55); }
+  60%      { box-shadow: 0 0 0 4px rgba(220,38,38,0); }
+}
+.sidebar--collapsed .sb-footer  { padding: 5px 4px; }
+.sidebar--collapsed .sb-user    { padding: 4px; justify-content: center; }
+
+/* ── User footer ────────────────────────────────────── */
+.sb-footer {
+  padding: 7px;
+  border-top: 1px solid var(--sb-border);
+  flex-shrink: 0;
+}
+
+.sb-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  border-radius: 7px;
+}
+
+.sb-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #EDA398;
+  color: #282828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+.sb-user-info { flex: 1; min-width: 0; }
+
+.sb-user-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--sb-text-hover);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-user-role {
+  font-size: 11px;
+  color: var(--sb-text);
+  text-transform: capitalize;
+}
+
+.sb-logout {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--sb-text);
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .1s;
+}
+.sb-logout:hover { background: rgba(220,38,38,.15); color: #ef4444; }
+
+.sb-theme-toggle { margin-top: 4px; }
+
+/* ── Layout toast ───────────────────────────────────── */
+.layout-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:500; padding:9px 16px; border-radius:8px; display:flex; align-items:center; gap:7px; box-shadow:0 2px 8px rgba(0,0,0,.14); z-index:9999; white-space:nowrap; pointer-events:none; letter-spacing:-.01em; }
+.layout-toast-error { background:#dc2626; color:#fff; }
+.toast-enter-active { transition:all .2s cubic-bezier(0.16,1,0.3,1); }
+.toast-leave-active { transition:all .15s ease-in; }
+.toast-enter-from   { opacity:0; transform:translateX(-50%) translateY(8px) scale(.96); }
+.toast-leave-to     { opacity:0; transform:translateX(-50%) translateY(4px) scale(.98); }
+</style>

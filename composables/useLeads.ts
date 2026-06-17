@@ -1,36 +1,53 @@
 // composables/useLeads.ts
-// Estado global de leads compartilhado entre pipeline, follow-up e cockpit.
-//
-// PADRÃO DE USO CORRETO:
-//
-//   ✅ Em PÁGINAS — garante dados antes da primeira renderização:
-//      const { data: leads, pending } = await useAsyncData<LeadWithFU[]>(
-//        'leads-global', () => $fetch('/api/leads'), { default: () => [] }
-//      )
-//      const { toggleFU, patchStatus, ... } = useLeads()  // só os métodos
-//
-//   ✅ Em COMPONENTES FILHOS / outros composables:
-//      const { leads, toggleFU, ... } = useLeads()         // lê o cache
-//
-//   ❌ NUNCA faça isso numa página:
-//      const { leads } = useLeads()   // sem await = `leads` começa vazio
+// Estado global de leads — fonte única de verdade para pipeline, follow-up e cockpit.
+// Gerencia paginação cursor-based e operações otimistas (patch, toggleFU, etc.).
 
 import type { Lead, Followup, LeadStatus } from '~/types'
 
 export type LeadWithFU = Lead & { followups: Followup[] }
 
+interface LeadsPage {
+  leads: LeadWithFU[]
+  nextCursor: string | null
+  total: number
+}
+
 export const useLeads = () => {
-  // useAsyncData com a mesma chave reutiliza o ref já populado pelo
-  // await na página — sem disparar nova requisição.
+  // Paginação: cursors e flags compartilhadas via useState (SSR-safe)
+  const nextCursor  = useState<string | null>('leads-cursor', () => null)
+  const hasMore     = useState<boolean>('leads-has-more', () => false)
+  const leadsTotal  = useState<number>('leads-total', () => 0)
+  const loadingMore = ref(false)
+
   const { data: leads, refresh, pending } = useAsyncData<LeadWithFU[]>(
     'leads-global',
-    () => $fetch('/api/leads'),
+    async () => {
+      const res = await $fetch<LeadsPage>('/api/leads')
+      nextCursor.value = res.nextCursor
+      hasMore.value    = !!res.nextCursor
+      leadsTotal.value = res.total
+      return res.leads
+    },
     { default: () => [] as LeadWithFU[] }
   )
 
   // ── Helpers ────────────────────────────────────────────────────────
   function findLead(id: string) {
     return leads.value?.find(l => l.id === id) ?? null
+  }
+
+  // ── Carregar mais (cursor-based) ───────────────────────────────────
+  async function loadMore() {
+    if (!hasMore.value || loadingMore.value || !nextCursor.value) return
+    loadingMore.value = true
+    try {
+      const res = await $fetch<LeadsPage>(`/api/leads?cursor=${encodeURIComponent(nextCursor.value)}`)
+      leads.value    = [...(leads.value ?? []), ...res.leads]
+      nextCursor.value = res.nextCursor
+      hasMore.value    = !!res.nextCursor
+    } finally {
+      loadingMore.value = false
+    }
   }
 
   // ── Toggle follow-up (optimistic + rollback) ───────────────────────
@@ -62,6 +79,11 @@ export const useLeads = () => {
       await $fetch(`/api/leads/${leadId}`, { method: 'PATCH', body: { resultado } })
     } catch (err) {
       if (lead && prev) lead.resultado = prev
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('crm:toast-error', {
+          detail: { message: 'Erro ao mover lead. Tente novamente.' },
+        }))
+      }
       throw err
     }
   }
@@ -82,14 +104,16 @@ export const useLeads = () => {
   // ── Criar lead ─────────────────────────────────────────────────────
   async function createLead(payload: Partial<Lead>) {
     const data = await $fetch<LeadWithFU>('/api/leads', { method: 'POST', body: payload })
-    leads.value = [data, ...(leads.value ?? [])]
+    leads.value    = [data, ...(leads.value ?? [])]
+    leadsTotal.value = leadsTotal.value + 1
     return data
   }
 
   // ── Remover lead ───────────────────────────────────────────────────
   async function deleteLead(id: string) {
     await $fetch(`/api/leads/${id}`, { method: 'DELETE' })
-    leads.value = leads.value?.filter(l => l.id !== id) ?? []
+    leads.value      = leads.value?.filter(l => l.id !== id) ?? []
+    leadsTotal.value = Math.max(0, leadsTotal.value - 1)
   }
 
   // ── Exportar CSV ───────────────────────────────────────────────────
@@ -116,7 +140,7 @@ export const useLeads = () => {
     ])
     const escape = (v: unknown) => `"${String(v).replace(/"/g, '""')}"`
     const csv    = [headers, ...rows].map(r => r.map(escape).join(',')).join('\n')
-    const blob   = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const blob   = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
     const url    = URL.createObjectURL(blob)
     Object.assign(document.createElement('a'), {
       href: url,
@@ -141,12 +165,19 @@ export const useLeads = () => {
     })
   })
 
+  const overdueCount = computed(() => overdueLeads.value.length)
+
   return {
     leads,
     pending,
     refresh,
+    hasMore,
+    loadingMore,
+    leadsTotal,
+    loadMore,
     activeLeads,
     overdueLeads,
+    overdueCount,
     toggleFU,
     patchStatus,
     patchLead,

@@ -1,102 +1,123 @@
-<template>
+﻿<template>
   <div>
-    <div style="margin-bottom:16px">
-      <div class="page-title">Números de ouro</div>
+    <div style="margin-bottom:20px">
+      <div class="page-title">Metas e Ritmo</div>
       <div class="page-sub">Matemática reversa · da meta ao contato diário</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <!-- Reverse math chain -->
-      <div class="card">
-        <div class="card-label">Meta → contatos necessários</div>
-        <div v-for="(row, i) in mathChain" :key="row.label">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0"
-            :style="{ borderBottom: i < mathChain.length-1 ? '1px solid #f5f5f5' : 'none' }">
-            <div>
-              <div style="font-size:13px;color:#0a0a0a;font-weight:500">{{ row.label }}</div>
-              <div v-if="row.note" style="font-size:11px;color:#a3a3a3;margin-top:1px">{{ row.note }}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-size:22px;font-weight:500;color:#0a0a0a" class="tabular">{{ row.value }}</div>
-              <div v-if="row.perDay" style="font-size:11px;color:#737373" class="tabular">{{ row.perDay }}/dia útil</div>
-            </div>
-          </div>
-          <div v-if="i < mathChain.length-1 && row.rate" style="display:flex;align-items:center;gap:6px;padding:2px 0 2px 12px">
-            <div style="width:1px;height:14px;background:#e5e5e5;margin-left:4px"></div>
-            <span style="font-size:10px;color:#a3a3a3">tx: {{ row.rate }}</span>
-          </div>
-        </div>
+    <!-- Barra de meta (inputs que dirigem tudo) -->
+    <div class="mr-meta">
+      <div class="mr-meta-field">
+        <label class="input-label">Meta de faturamento mensal</label>
+        <div class="mr-meta-input"><span>R$</span><input type="number" v-model.number="localMeta" min="0" step="500" @input="debounceSave" /></div>
       </div>
+      <div class="mr-meta-field">
+        <label class="input-label">Ticket medio</label>
+        <div class="mr-meta-input"><span>R$</span><input type="number" v-model.number="localTicket" min="0" step="100" @input="debounceSave" /></div>
+      </div>
+      <div class="mr-meta-note">Estes dois valores recalculam todos os numeros de ouro em tempo real.</div>
+    </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <!-- Real conversion rates -->
-        <div class="card">
-          <div class="card-label">Taxas reais · {{ MONTH_NAMES[currentMonth-1] }}</div>
-
-          <!-- Loading skeleton -->
-          <div v-if="diaryPending" style="display:flex;flex-direction:column;gap:10px">
-            <div v-for="i in 4" :key="i"
-              style="height:44px;background:#f5f5f5;border-radius:6px;animation:pulse 1.5s infinite" />
+    <!-- Numeros de ouro: funil horizontal -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-label">Numeros de ouro · da meta ao contato diario</div>
+      <div class="mr-chain">
+        <template v-for="(row, i) in mathChain" :key="row.label">
+          <div class="mr-chain-step">
+            <div class="mr-chain-label">{{ row.label }}</div>
+            <div class="mr-chain-value tabular">{{ row.value }}</div>
+            <div v-if="row.perDay" class="mr-chain-perday tabular">{{ row.perDay }}/dia util</div>
+            <div v-else-if="row.note" class="mr-chain-note">{{ row.note }}</div>
           </div>
+          <div v-if="i < mathChain.length-1" class="mr-chain-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <span v-if="row.rate" class="mr-chain-rate">{{ row.rate }}</span>
+          </div>
+        </template>
+      </div>
+    </div>
 
-          <div v-else v-for="r in convRates" :key="r.label"
-            style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5">
-            <div>
-              <div style="font-size:12px;color:#0a0a0a;font-weight:500">{{ r.label }}</div>
-              <div style="font-size:11px;color:#a3a3a3">benchmark: {{ r.benchmark }}</div>
-            </div>
-            <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-              <span style="font-size:18px;font-weight:500" class="tabular"
-                :style="{ color: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
-                {{ r.value }}%
-              </span>
-              <div style="width:80px;height:3px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-                <div style="height:100%;border-radius:2px;transition:width .4s"
-                  :style="{ width: Math.min(100, r.raw / r.benchmarkRaw * 100) + '%',
-                    background: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
-                </div>
+    <!-- Taxas reais + gargalo -->
+    <div class="mr-grid">
+      <div class="card">
+        <div class="card-label">Taxas reais · {{ MONTH_NAMES[currentMonth-1] }}</div>
+        <div v-if="diaryPending" style="display:flex;flex-direction:column;gap:10px">
+          <div v-for="i in 4" :key="i" style="height:44px;background:var(--bg-subtle);border-radius:8px;animation:pulse 1.5s infinite" />
+        </div>
+        <div v-else v-for="r in convRates" :key="r.label"
+          style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft)">
+          <div>
+            <div style="font-size:13px;color:var(--text-1);font-weight:500">{{ r.label }}</div>
+            <div style="font-size:11px;color:var(--text-3)">benchmark: {{ r.benchmark }}</div>
+          </div>
+          <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+            <span style="font-size:20px;font-weight:600" class="tabular"
+              :style="{ color: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
+              {{ r.value }}%
+            </span>
+            <div style="width:120px;height:6px;background:var(--border-soft);border-radius:3px;overflow:hidden">
+              <div style="height:100%;border-radius:3px;transition:width .4s"
+                :style="{ width: Math.min(100, r.raw / r.benchmarkRaw * 100) + '%',
+                  background: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Bottleneck -->
-        <div v-if="bottleneck" :style="bottleneck.style" style="border-radius:8px;padding:14px;border:1px solid">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;opacity:.7">
-            Gargalo identificado
-          </div>
-          <div style="font-size:13px;font-weight:500;margin-bottom:4px">{{ bottleneck.title }}</div>
-          <div style="font-size:12px;opacity:.8;line-height:1.6">{{ bottleneck.body }}</div>
-          <div style="margin-top:10px;font-size:11px;font-weight:600;opacity:.8">💡 {{ bottleneck.action }}</div>
+      <!-- Gargalo -->
+      <div v-if="bottleneck" :style="bottleneck.style" style="border-radius:12px;padding:18px;border:1px solid;align-self:start">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.8" v-html="bottleneck.icon" />
+          <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.7">{{ bottleneck.iconLabel }}</span>
         </div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:5px">{{ bottleneck.title }}</div>
+        <div style="font-size:13px;opacity:.85;line-height:1.6">{{ bottleneck.body }}</div>
+        <div style="margin-top:12px;font-size:12px;font-weight:600;opacity:.85">{{ bottleneck.action }}</div>
+      </div>
+    </div>
 
-        <!-- Settings -->
-        <div class="card">
-          <div class="card-label">Ajustar metas</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div>
-              <div style="font-size:11px;color:#737373;margin-bottom:3px">Meta de faturamento (R$)</div>
-              <input type="number" v-model.number="localMeta" min="0" step="500" @input="debounceSave" />
-            </div>
-            <div>
-              <div style="font-size:11px;color:#737373;margin-bottom:3px">Ticket médio (R$)</div>
-              <input type="number" v-model.number="localTicket" min="0" step="100" @input="debounceSave" />
-            </div>
-            <div style="font-size:11px;color:#a3a3a3;padding:8px;background:#f9f9f9;border-radius:6px">
-              Alterar aqui recalcula todos os números de ouro em tempo real.
-            </div>
+    <!-- Forecasting -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">Previsao de receita</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+        <div style="padding:16px;border-right:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">Pipeline total</div>
+          <div class="metric-value" style="font-size:22px">
+            {{ pipelineTotal > 0 ? 'R$ ' + pipelineTotal.toLocaleString('pt-BR') : '--' }}
           </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">{{ leadsComValor }} leads com valor</div>
         </div>
+        <div style="padding:16px;border-right:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">Pipeline quente</div>
+          <div class="metric-value" style="font-size:22px"
+            :style="{ color: hotPipeline > 0 ? '#16a34a' : 'var(--text-1)' }">
+            {{ hotPipeline > 0 ? 'R$ ' + hotPipeline.toLocaleString('pt-BR') : '--' }}
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Reuniao + Proposta enviada</div>
+        </div>
+        <div style="padding:16px">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">vs. Meta mensal</div>
+          <div class="metric-value" style="font-size:22px"
+            :style="{ color: forecastVsMeta >= 100 ? '#16a34a' : forecastVsMeta >= 60 ? '#d97706' : '#dc2626' }">
+            {{ hotPipeline > 0 ? forecastVsMeta.toFixed(0) + '%' : '--' }}
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Meta: R$ {{ localMeta.toLocaleString('pt-BR') }}</div>
+        </div>
+      </div>
+      <div v-if="leadsComValor === 0" style="margin-top:12px;font-size:12px;color:var(--text-2);text-align:center;padding:8px;background:var(--bg-subtle);border-radius:6px">
+        Adicione um valor estimado nos leads do pipeline para ver a previsao de receita.
       </div>
     </div>
 
     <Transition name="toast">
-      <div v-if="toast" class="toast">✓ {{ toast }}</div>
+      <div v-if="toast" class="toast">{{ toast }}</div>
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+import { isHot, isActive } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const supabase = useSupabaseClient()
@@ -149,35 +170,67 @@ const realRRFR = computed(() => totals.value.rr > 0 ? (totals.value.fr/totals.va
 const convRates = computed(() => [
   { label:'LD → CE', value:'45.0', benchmark:'45%', benchmarkRaw:45, raw:45, status:'ok' as const },
   { label:'CE → RM', value:realCERM.value.toFixed(1), benchmark:'2.7%', benchmarkRaw:2.7, raw:realCERM.value,
-    status: realCERM.value >= 2.5 ? 'ok' : realCERM.value >= 1.5 ? 'warn' : 'bad' as any },
+    status: realCERM.value >= 2.5 ? 'ok' : realCERM.value >= 1.5 ? 'warn' : 'bad' },
   { label:'RM → RR', value:realRMRR.value.toFixed(0), benchmark:'40%', benchmarkRaw:40, raw:realRMRR.value,
-    status: realRMRR.value >= 35 ? 'ok' : realRMRR.value >= 20 ? 'warn' : 'bad' as any },
+    status: realRMRR.value >= 35 ? 'ok' : realRMRR.value >= 20 ? 'warn' : 'bad' },
   { label:'RR → FR', value:realRRFR.value.toFixed(0), benchmark:'40%', benchmarkRaw:40, raw:realRRFR.value,
-    status: realRRFR.value >= 35 ? 'ok' : realRRFR.value >= 20 ? 'warn' : 'bad' as any },
+    status: realRRFR.value >= 35 ? 'ok' : realRRFR.value >= 20 ? 'warn' : 'bad' },
 ])
+
+const ICON_ALERT = '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+const ICON_CHECK = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
 
 const bottleneck = computed(() => {
   const t = totals.value
   if (t.ce === 0) return null
   if (realRRFR.value < 20 && t.rr > 0) return {
-    title: 'Gargalo: conversão de reunião em fechamento (RR→FR)',
-    body:  `Taxa atual: ${realRRFR.value.toFixed(0)}% contra benchmark de 40%.`,
-    action:'Foco: técnica de negociação e fechamento, não em prospecção.',
-    style: 'background:#fef2f2;border-color:#fecaca;color:#7f1d1d',
+    title:     'Gargalo: conversão de reunião em fechamento (RR→FR)',
+    body:      `Taxa atual: ${realRRFR.value.toFixed(0)}% contra benchmark de 40%.`,
+    action:    'Foco: técnica de negociação e fechamento, não em prospecção.',
+    style:     'background:#fef2f2;border-color:#fecaca;color:#7f1d1d',
+    icon:      ICON_ALERT,
+    iconLabel: 'Gargalo identificado',
   }
   if (realCERM.value < 1.5 && t.ce > 20) return {
-    title: 'Gargalo: conversão de contato em reunião (CE→RM)',
-    body:  `Taxa CE→RM atual: ${realCERM.value.toFixed(1)}% contra benchmark de 2.7%.`,
-    action:'Foco: script de abertura e geração de interesse.',
-    style: 'background:#fffbeb;border-color:#fde68a;color:#78350f',
+    title:     'Gargalo: conversão de contato em reunião (CE→RM)',
+    body:      `Taxa CE→RM atual: ${realCERM.value.toFixed(1)}% contra benchmark de 2.7%.`,
+    action:    'Foco: script de abertura e geração de interesse.',
+    style:     'background:#fffbeb;border-color:#fde68a;color:#78350f',
+    icon:      ICON_ALERT,
+    iconLabel: 'Gargalo identificado',
   }
   return {
-    title: 'Taxas dentro do benchmark',
-    body:  `CE→RM: ${realCERM.value.toFixed(1)}% · RM→RR: ${realRMRR.value.toFixed(0)}%. Continue no ritmo.`,
-    action:'Mantenha o volume diário de contatos.',
-    style: 'background:#f0fdf4;border-color:#bbf7d0;color:#14532d',
+    title:     'Taxas dentro do benchmark',
+    body:      `CE→RM: ${realCERM.value.toFixed(1)}% · RM→RR: ${realRMRR.value.toFixed(0)}%. Continue no ritmo.`,
+    action:    'Mantenha o volume diário de contatos.',
+    style:     'background:#f0fdf4;border-color:#bbf7d0;color:#14532d',
+    icon:      ICON_CHECK,
+    iconLabel: 'No ritmo certo',
   }
 })
+
+// ── Forecasting ────────────────────────────────────────────
+const { leads: allLeads } = useLeads()
+
+const leadsComValor = computed(() =>
+  (allLeads.value ?? []).filter(l => l.valor_estimado && l.valor_estimado > 0 && isActive(l)).length
+)
+
+const pipelineTotal = computed(() =>
+  (allLeads.value ?? [])
+    .filter(l => l.valor_estimado && isActive(l))
+    .reduce((s, l) => s + (l.valor_estimado ?? 0), 0)
+)
+
+const hotPipeline = computed(() =>
+  (allLeads.value ?? [])
+    .filter(l => l.valor_estimado && isHot(l))
+    .reduce((s, l) => s + (l.valor_estimado ?? 0), 0)
+)
+
+const forecastVsMeta = computed(() =>
+  localMeta.value > 0 ? (hotPipeline.value / localMeta.value) * 100 : 0
+)
 
 let saveTimer: ReturnType<typeof setTimeout>
 async function debounceSave() {
@@ -200,4 +253,29 @@ async function debounceSave() {
   0%, 100% { opacity: 1; }
   50%       { opacity: .4; }
 }
+</style>
+
+<style scoped>
+/* ── Barra de meta ───────────────────────────────────────── */
+.mr-meta { display:flex;align-items:flex-end;gap:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;flex-wrap:wrap }
+.mr-meta-field { display:flex;flex-direction:column;gap:4px }
+.mr-meta-input { display:flex;align-items:center;gap:6px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:0 10px }
+.mr-meta-input span { font-size:13px;color:var(--text-3);font-weight:500 }
+.mr-meta-input input { border:none;background:transparent;padding:8px 0;width:120px;font-size:15px;font-weight:600;color:var(--text-1) }
+.mr-meta-input input:focus { outline:none;box-shadow:none }
+.mr-meta-note { flex:1;min-width:180px;font-size:12px;color:var(--text-3);line-height:1.5 }
+
+/* ── Funil horizontal de numeros de ouro ─────────────────── */
+.mr-chain { display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0 }
+.mr-chain-step { flex:1;min-width:110px;text-align:center;padding:10px 8px;border:1px solid var(--border-soft);border-radius:10px;background:var(--bg-subtle);display:flex;flex-direction:column;gap:3px;justify-content:center }
+.mr-chain-label { font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap }
+.mr-chain-value { font-size:26px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;line-height:1.1 }
+.mr-chain-perday { font-size:11px;color:var(--accent);font-weight:600 }
+.mr-chain-note { font-size:10px;color:var(--text-3) }
+.mr-chain-arrow { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-3);flex-shrink:0;padding:0 4px }
+.mr-chain-rate { font-size:9px;font-weight:600;color:var(--text-3);white-space:nowrap }
+
+/* ── Grid taxas + gargalo ────────────────────────────────── */
+.mr-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px }
+@media (max-width:820px){ .mr-grid{ grid-template-columns:1fr } }
 </style>

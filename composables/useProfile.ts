@@ -23,13 +23,15 @@ export const useProfile = () => {
         .single()
 
       if (data) {
-        profile.value = data as Profile
-        org.value = (data as any).organizations as Organization
+        profile.value = data as unknown as Profile
+        org.value = data.organizations as unknown as Organization
       }
     } finally {
       loading.value = false
     }
   }
 
-  return { profile, org, loading, fetchProfile }
+  const needsOnboarding = computed(() => profile.value !== null && profile.value.name === null)
+
+  return { profile, org, loading, fetchProfile, needsOnboarding }
 }

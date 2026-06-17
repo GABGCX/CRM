@@ -2,7 +2,9 @@
 // Composable que resolve o tenant atual a partir do host.
 // Usado tanto no middleware (server) quanto nos componentes (client).
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Organization, TenantContext } from '~/types'
+import type { Database } from '~/types/database'
 
 // Cache simples em memória — TTL 60s
 const cache = new Map<string, { org: Organization; exp: number }>()
@@ -10,7 +12,7 @@ const CACHE_TTL = 60_000
 
 export async function resolveTenant(
   host: string,
-  supabase: ReturnType<typeof useSupabaseClient>
+  supabase: SupabaseClient<Database>
 ): Promise<TenantContext | null> {
   const hostname = host.split(':')[0]
   const config = useRuntimeConfig()
@@ -28,8 +30,8 @@ export async function resolveTenant(
       .single()
 
     if (!data) return null
-    cache.set('__dev__', { org: data as Organization, exp: Date.now() + CACHE_TTL })
-    return { org: data as Organization, subdomain: data.slug }
+    cache.set('__dev__', { org: data as unknown as Organization, exp: Date.now() + CACHE_TTL })
+    return { org: data as unknown as Organization, subdomain: (data as unknown as Organization).slug }
   }
 
   // ── Subdomínio: slug.crm.io ───────────────────────────────
@@ -48,8 +50,8 @@ export async function resolveTenant(
       .single()
 
     if (!data) return null
-    cache.set(cacheKey, { org: data as Organization, exp: Date.now() + CACHE_TTL })
-    return { org: data as Organization, subdomain }
+    cache.set(cacheKey, { org: data as unknown as Organization, exp: Date.now() + CACHE_TTL })
+    return { org: data as unknown as Organization, subdomain }
   }
 
   // ── Custom domain ─────────────────────────────────────────
@@ -64,8 +66,8 @@ export async function resolveTenant(
     .single()
 
   if (!data) return null
-  cache.set(cacheKey, { org: data as Organization, exp: Date.now() + CACHE_TTL })
-  return { org: data as Organization, subdomain: data.slug }
+  cache.set(cacheKey, { org: data as unknown as Organization, exp: Date.now() + CACHE_TTL })
+  return { org: data as unknown as Organization, subdomain: (data as unknown as Organization).slug }
 }
 
 export function invalidateTenantCache(key: string) {

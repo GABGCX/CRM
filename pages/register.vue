@@ -1,23 +1,29 @@
-<template>
-  <div class="min-h-screen bg-surface-0 flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
+﻿<template>
+  <div style="min-height:100vh;background:#f9f6ef;display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="width:100%;max-width:420px">
 
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-12 h-12 brand-bg rounded-xl mb-4">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      <!-- Brand -->
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:#193497;border-radius:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(25,52,151,.3)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" fill="white"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 class="text-2xl font-extrabold text-ink tracking-tight">Criar sua organização</h1>
-        <p class="text-sm text-ink-subtle mt-1">Configure seu CRM em menos de 2 minutos</p>
+        <h1 style="font-size:22px;font-weight:700;color:#282828;letter-spacing:-.02em;margin:0 0 6px">Criar conta no Prospecta</h1>
+        <p style="font-size:14px;color:#64748b;margin:0">Configure sua prospecção em minutos</p>
       </div>
 
-      <form @submit.prevent="handleRegister" class="card flex flex-col gap-4">
-        <div v-if="error" class="bg-red-950 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3 animate-fade-in">
+      <form @submit.prevent="handleRegister"
+        style="background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:14px">
+
+        <div v-if="error"
+          style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
           {{ error }}
         </div>
 
-        <p class="card-title mb-0">Sua conta</p>
+        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Sua conta</div>
 
         <div class="form-field">
           <label class="input-label">Seu nome</label>
@@ -32,8 +38,8 @@
           <input v-model="form.password" type="password" required placeholder="Mínimo 8 caracteres" minlength="8" />
         </div>
 
-        <div class="divider mb-0" />
-        <p class="card-title mb-0">Sua organização</p>
+        <div class="divider" style="margin:2px 0"></div>
+        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Sua organização</div>
 
         <div class="form-field">
           <label class="input-label">Nome da empresa</label>
@@ -43,41 +49,39 @@
         <div class="form-field">
           <label class="input-label">
             Subdomínio
-            <span class="text-ink-ghost ml-1 font-normal text-xs">(seu endereço único)</span>
+            <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">(seu endereço único)</span>
           </label>
-          <div class="flex">
+          <div style="display:flex">
             <input
               v-model="form.slug"
               type="text" required
               placeholder="agencia-xyz"
-              class="rounded-r-none border-r-0"
-              style="border-radius:.5rem 0 0 .5rem"
+              style="border-radius:8px 0 0 8px;border-right:none"
               @input="form.slug = form.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')"
             />
             <span
-              class="flex items-center px-3 bg-surface-3 border border-[#334155] text-ink-subtle text-sm whitespace-nowrap"
-              style="border-radius:0 .5rem .5rem 0; height:38px"
-            >
+              style="display:flex;align-items:center;padding:0 12px;background:#f9f6ef;border:1px solid #e2e8f0;border-radius:0 8px 8px 0;font-size:13px;color:#64748b;white-space:nowrap;height:auto">
               .{{ appDomain }}
             </span>
           </div>
-          <p v-if="form.slug" class="text-xs brand-text mt-1">
-            ✓ Acesso em: <strong>{{ form.slug }}.{{ appDomain }}</strong>
+          <p v-if="form.slug" style="font-size:12px;color:#193497;margin:4px 0 0;font-weight:500">
+            Acesso em: <strong>{{ form.slug }}.{{ appDomain }}</strong>
           </p>
         </div>
 
-        <button type="submit" :disabled="loading" class="btn-primary w-full justify-center mt-1 disabled:opacity-60">
-          <span v-if="loading" class="flex items-center gap-2">
-            <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <button type="submit" :disabled="loading" class="btn btn-primary"
+          style="justify-content:center;width:100%;padding:10px 14px;font-size:14px;margin-top:4px">
+          <span v-if="loading" style="display:flex;align-items:center;gap:8px">
+            <span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .6s linear infinite" />
             Criando organização...
           </span>
           <span v-else>Criar e entrar</span>
         </button>
       </form>
 
-      <p class="text-center text-sm text-ink-subtle mt-6">
+      <p style="text-align:center;font-size:13px;color:#64748b;margin-top:20px">
         Já tem conta?
-        <NuxtLink to="/login" class="brand-text hover:brightness-125 transition-all ml-1">Entrar</NuxtLink>
+        <NuxtLink to="/login" style="color:#193497;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
       </p>
     </div>
   </div>
@@ -100,7 +104,7 @@ const form = reactive({
 function generateSlug() {
   form.slug = form.orgName
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim().replace(/\s+/g, '-')
 }
@@ -120,7 +124,6 @@ async function handleRegister() {
       },
     })
     if (res.error) { error.value = res.error; return }
-    // Login automático
     const supabase = useSupabaseClient()
     await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     await navigateTo('/dashboard')
@@ -131,3 +134,7 @@ async function handleRegister() {
   }
 }
 </script>
+
+<style scoped>
+@keyframes spin { to { transform: rotate(360deg) } }
+</style>

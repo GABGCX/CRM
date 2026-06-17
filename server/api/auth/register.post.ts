@@ -1,7 +1,7 @@
 // server/api/auth/register.post.ts
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import { rateLimit, rateLimitRetryAfter } from '../../utils/rateLimit'
+import { checkRateLimit } from '../../utils/rateLimit'
 
 const schema = z.object({
   name:     z.string().min(2),
@@ -12,14 +12,20 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const admin = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+
   // ── Rate limit: 5 registros por IP por hora ─────────────────────────────
   const ip = getHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
     ?? getHeader(event, 'x-real-ip')
     ?? 'unknown'
 
-  if (!rateLimit(`register:${ip}`, 5, 60 * 60 * 1000)) {
-    const retryAfter = Math.ceil(rateLimitRetryAfter(`register:${ip}`) / 1000)
-    setHeader(event, 'Retry-After', String(retryAfter))
+  const { allowed, retryAfterSecs } = await checkRateLimit(admin, `register:${ip}`, 5, 3600)
+  if (!allowed) {
+    setHeader(event, 'Retry-After', retryAfterSecs)
     throw createError({ statusCode: 429, message: 'Muitas tentativas. Tente novamente mais tarde.' })
   }
 
@@ -31,12 +37,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { name, email, password, org_name, org_slug } = parsed.data
-
-  const admin = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
 
   const { data: existing } = await admin
     .from('organizations').select('id').eq('slug', org_slug).single()
