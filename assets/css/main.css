@@ -7,6 +7,7 @@
 
 /* ── Design tokens ──────────────────────────────────────── */
 :root {
+  color-scheme: light;
   --bg:          #f9f6ef;
   --bg-card:     #ffffff;
   --bg-input:    #ffffff;
@@ -45,6 +46,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   /* cinza neutro (nao preto); cards levantados = elevacao visivel */
   --bg:          #1a1a1d;
   --bg-card:     #222226;
@@ -100,6 +102,8 @@
 
   input[type="text"], input[type="number"], input[type="email"],
   input[type="password"], input[type="date"], input[type="url"],
+  input[type="search"], input[type="tel"], input[type="time"],
+  input[type="datetime-local"], input[type="month"],
   textarea, select {
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -114,11 +118,36 @@
   }
   input:focus, textarea:focus, select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(25,52,151,.07);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
   input::placeholder, textarea::placeholder { color: var(--text-3); }
   select option { background: var(--bg-input); color: var(--text-1); }
   textarea { resize: vertical; line-height: 1.5; }
+
+  /* Autofill: o Chrome forca fundo claro com texto escuro; reverte via box-shadow inset */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--text-1);
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset;
+    caret-color: var(--text-1);
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  /* Scrollbars tokenizadas (adaptam ao tema) */
+  * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 6px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; }
+  ::-webkit-scrollbar-corner { background: transparent; }
 }
 
 @layer components {
