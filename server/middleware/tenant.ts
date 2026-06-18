@@ -2,31 +2,27 @@
 // Roda no servidor para cada request SSR.
 // Usa o cache singleton compartilhado com os outros handlers.
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../../types/database'
+import type { Organization } from '../../types'
 import { getCachedTenant, setCachedTenant, buildTenantKey } from '../utils/tenantCache'
 
-async function resolveOrg(hostname: string, supabase: any): Promise<any | null> {
+async function resolveOrg(hostname: string, supabase: SupabaseClient<Database>): Promise<Organization | null> {
   const appDomain = process.env.NUXT_PUBLIC_APP_DOMAIN || 'crm.io'
   const cacheKey = buildTenantKey(hostname, appDomain)
 
   const cached = getCachedTenant(cacheKey)
   if (cached) return cached
 
-  let query: any
-  if (cacheKey === '__dev__') {
-    const { data } = await supabase.from('organizations').select('*').limit(1).single()
-    query = data
-  } else if (cacheKey.startsWith('slug:')) {
-    const slug = cacheKey.replace('slug:', '')
-    const { data } = await supabase.from('organizations').select('*').eq('slug', slug).single()
-    query = data
-  } else {
-    const { data } = await supabase.from('organizations').select('*').eq('custom_domain', hostname).single()
-    query = data
-  }
+  const base = supabase.from('organizations').select('*')
+  const { data } =
+    cacheKey === '__dev__'        ? await base.limit(1).single()
+    : cacheKey.startsWith('slug:') ? await base.eq('slug', cacheKey.replace('slug:', '')).single()
+    :                                await base.eq('custom_domain', hostname).single()
 
-  if (query) setCachedTenant(cacheKey, query)
-  return query ?? null
+  const org = data ? (data as unknown as Organization) : null
+  if (org) setCachedTenant(cacheKey, org)
+  return org
 }
 
 export default defineEventHandler(async (event) => {

@@ -16,7 +16,7 @@ const productName = headers['x-tenant-name'] || theme.product_name || 'Outbound 
 
 useHead({
   title: productName,
-  titleTemplate: t => t ? `${t} — ${productName}` : productName,
+  titleTemplate: t => t ? `${t} | ${productName}` : productName,
   link: [
     { rel:'preconnect', href:'https://fonts.googleapis.com' },
     {

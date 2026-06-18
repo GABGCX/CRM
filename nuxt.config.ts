@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
+  app: {
+    head: { title: 'Prospecta' },
+  },
 
   modules: [
     '@nuxtjs/supabase',
@@ -10,6 +13,7 @@ export default defineNuxtConfig({
   // @nuxtjs/supabase config
   // Rotas que NÃO precisam de autenticação
   supabase: {
+    types: '~/types/database.ts',
     redirect: true,
     redirectOptions: {
       login: '/login',
@@ -44,6 +48,27 @@ export default defineNuxtConfig({
       supabase: {
         url: process.env.SUPABASE_URL,
         key: process.env.SUPABASE_KEY,
+      },
+    },
+  },
+
+  // Security headers for all routes
+  routeRules: {
+    '/**': {
+      headers: {
+        'X-Frame-Options': 'DENY',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+        'Content-Security-Policy': [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline'",
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: https:",
+          "font-src 'self' data:",
+          "connect-src 'self' *.supabase.co wss://*.supabase.co",
+          "frame-ancestors 'none'",
+        ].join('; '),
       },
     },
   },

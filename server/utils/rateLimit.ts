@@ -1,40 +1,56 @@
 // server/utils/rateLimit.ts
-// Rate limiter em memória simples.
-// Para produção, substituir por Redis (unstorage/ioredis já são dependências do projeto).
+// Rate limiter persistente via tabela do Supabase.
+// Funciona em deploys serverless e multi-instância.
+// Trade-off: race conditions de ±1 request são aceitáveis para rate limiting.
 
-interface Bucket {
-  count: number
-  reset: number
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+export interface RateLimitResult {
+  allowed: boolean
+  retryAfterSecs: number
 }
-
-const _buckets = new Map<string, Bucket>()
 
 /**
- * Verifica se a chave está dentro do limite.
- * @returns true  — requisição permitida
- * @returns false — limite excedido
+ * Verifica e incrementa o bucket de rate limit para a chave dada.
+ * @param admin  - cliente service role (bypass de RLS)
+ * @param key    - identificador único do bucket (ex: `register:1.2.3.4`)
+ * @param max    - máximo de requisições na janela
+ * @param windowSecs - tamanho da janela em segundos
  */
-export function rateLimit(
+export async function checkRateLimit(
+  admin: SupabaseClient,
   key: string,
-  limit: number,
-  windowMs: number = 60_000
-): boolean {
-  const now = Date.now()
-  const bucket = _buckets.get(key)
+  max: number,
+  windowSecs: number
+): Promise<RateLimitResult> {
+  const now = new Date()
 
-  if (!bucket || now > bucket.reset) {
-    _buckets.set(key, { count: 1, reset: now + windowMs })
-    return true
+  const { data: bucket } = await admin
+    .from('rate_limit_buckets')
+    .select('count, window_start')
+    .eq('key', key)
+    .single()
+
+  const windowExpired = !bucket ||
+    new Date(bucket.window_start).getTime() < now.getTime() - windowSecs * 1000
+
+  if (windowExpired) {
+    await admin
+      .from('rate_limit_buckets')
+      .upsert({ key, count: 1, window_start: now.toISOString() }, { onConflict: 'key' })
+    return { allowed: true, retryAfterSecs: 0 }
   }
 
-  if (bucket.count >= limit) return false
-  bucket.count++
-  return true
-}
+  if (bucket.count >= max) {
+    const resetAt = new Date(new Date(bucket.window_start).getTime() + windowSecs * 1000)
+    const retryAfterSecs = Math.max(0, Math.ceil((resetAt.getTime() - now.getTime()) / 1000))
+    return { allowed: false, retryAfterSecs }
+  }
 
-/** Retorna quantos ms faltam para reset da janela (0 se não há bucket). */
-export function rateLimitRetryAfter(key: string): number {
-  const bucket = _buckets.get(key)
-  if (!bucket) return 0
-  return Math.max(0, bucket.reset - Date.now())
+  await admin
+    .from('rate_limit_buckets')
+    .update({ count: bucket.count + 1 })
+    .eq('key', key)
+
+  return { allowed: true, retryAfterSecs: 0 }
 }

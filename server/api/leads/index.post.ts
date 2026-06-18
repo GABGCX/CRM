@@ -1,5 +1,7 @@
 import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import { z } from 'zod'
+import { insertLeadEvent } from '../../utils/leadEvents'
+import { throwApiError } from '../../utils/apiError'
 
 const schema = z.object({
   decisor:          z.string().min(1),
@@ -14,6 +16,16 @@ const schema = z.object({
   turno:            z.string().optional().nullable(),
   horario:          z.string().optional().nullable(),
   info:             z.string().optional().nullable(),
+  fonte:            z.enum(['cold_call','linkedin','indicacao','evento','outro']).optional().nullable(),
+  segmento:         z.string().optional().nullable(),
+  cidade:           z.string().optional().nullable(),
+  estado:           z.string().max(2).optional().nullable(),
+  porte:              z.enum(['micro','pequena','media','grande']).optional().nullable(),
+  cadence_id:         z.string().uuid().optional().nullable(),
+  cadence_started_at: z.string().optional().nullable(),
+  motivo_perda:       z.string().optional().nullable(),
+  valor_estimado:     z.number().optional().nullable(),
+  tag_ids:            z.array(z.string().uuid()).optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -23,33 +35,53 @@ export default defineEventHandler(async (event) => {
 
   const parsed = schema.safeParse(body)
   if (!parsed.success)
-    throw createError({ statusCode: 400, message: parsed.error.errors[0].message })
+    throwApiError('VALIDATION', parsed.error.errors[0].message)
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw createError({ statusCode: 401, message: 'Não autenticado' })
+  if (!user) throwApiError('UNAUTHENTICATED')
 
-  // Service role ignora RLS — seguro para lookup interno de perfil
   const { data: profile } = await supabaseAdmin
-    .from('profiles').select('id, org_id').eq('id', user.id).single()
-  if (!profile) throw createError({ statusCode: 403, message: 'Perfil não encontrado' })
+    .from('profiles').select('id, org_id').eq('id', user!.id).single()
+  if (!profile) throwApiError('FORBIDDEN', 'Perfil não encontrado')
 
   const { data: lead, error } = await supabase
     .from('leads')
-    .insert({ ...parsed.data, org_id: profile.org_id, owner_id: profile.id })
+    .insert({ ...parsed.data!, org_id: profile!.org_id, owner_id: profile!.id })
     .select()
     .single()
 
-  if (error) throw createError({ statusCode: 500, message: error.message })
+  if (error) {
+    if (error.code === '23505') {
+      const { data: existing } = await supabaseAdmin
+        .from('leads')
+        .select('id, decisor')
+        .eq('org_id', profile!.org_id)
+        .eq('telefone', parsed.data!.telefone!)
+        .single()
+      throwApiError('DUPLICATE_PHONE', 'Já existe um lead com este telefone.', {
+        existingId: existing?.id,
+        existingName: existing?.decisor,
+      })
+    }
+    throwApiError('INTERNAL', error.message)
+  }
 
-  // Criar 10 slots de follow-up
   await supabaseAdmin.from('followups').insert(
     Array.from({ length: 10 }, (_, i) => ({
-      lead_id: lead.id,
-      org_id:  profile.org_id,
+      lead_id: lead!.id,
+      org_id:  profile!.org_id,
       attempt_index: i,
       completed_at:  null,
     }))
   )
+
+  await insertLeadEvent(event, {
+    lead_id: lead!.id,
+    org_id:  profile!.org_id,
+    user_id: profile!.id,
+    type:    'created',
+    payload: { decisor: lead!.decisor },
+  })
 
   return lead
 })
