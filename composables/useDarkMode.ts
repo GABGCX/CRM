@@ -3,9 +3,9 @@ const isDark = ref(false)
 export const useDarkMode = () => {
   function init() {
     if (!import.meta.client) return
+    // Tema claro e o padrao; so vai pro escuro se o usuario escolheu explicitamente.
     const stored = localStorage.getItem('color-scheme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    isDark.value = stored ? stored === 'dark' : prefersDark
+    isDark.value = stored === 'dark'
     apply(isDark.value)
   }
 
