@@ -1,5 +1,5 @@
 ﻿<template>
-  <div style="min-height:100vh;background:#f9f6ef;display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="min-height:100vh;background:var(--bg-subtle);display:flex;align-items:center;justify-content:center;padding:16px">
     <div style="width:100%;max-width:380px">
 
       <!-- Brand -->
@@ -11,16 +11,16 @@
             <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 style="font-size:22px;font-weight:700;color:#282828;letter-spacing:-.02em;margin:0 0 6px">Entrar no Prospecta</h1>
-        <p style="font-size:14px;color:#64748b;margin:0">Bem-vindo de volta. Acesse sua conta.</p>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin:0 0 6px">Entrar no Prospecta</h1>
+        <p style="font-size:14px;color:var(--text-2);margin:0">Bem-vindo de volta. Acesse sua conta.</p>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="handleLogin"
-        style="background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:16px">
+        style="background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:16px">
 
         <div v-if="error"
-          style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
+          style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
           {{ error }}
         </div>
 
@@ -42,7 +42,7 @@
             <input v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password"
               :required="!forgotOpen" placeholder="••••••••" style="padding-right:40px;width:100%;box-sizing:border-box" />
             <button type="button" @click="showPassword = !showPassword"
-              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:0;display:flex;align-items:center">
+              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);padding:0;display:flex;align-items:center">
               <svg v-if="!showPassword" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -57,7 +57,7 @@
         <!-- Forgot password inline -->
         <Transition name="slide-down">
           <div v-if="forgotOpen"
-            style="background:#eaefff;border:1px solid #b8cafd;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
+            style="background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
             <div style="font-size:13px;color:#0f2480;font-weight:600">Recuperar senha</div>
             <div v-if="forgotSuccess" style="font-size:13px;color:#16a34a">
               Verifique seu e-mail para redefinir a senha.
@@ -84,7 +84,7 @@
         </button>
       </form>
 
-      <p style="text-align:center;font-size:13px;color:#64748b;margin-top:20px">
+      <p style="text-align:center;font-size:13px;color:var(--text-2);margin-top:20px">
         Não tem conta?
         <NuxtLink to="/register" style="color:#193497;font-weight:500;text-decoration:none;margin-left:3px">
           Criar organização

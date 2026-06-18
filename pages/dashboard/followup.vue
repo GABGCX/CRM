@@ -185,7 +185,7 @@
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
           <div v-for="d in weekForecast" :key="d.date"
             style="text-align:center;padding:10px 4px;border-radius:8px;border:1px solid"
-            :style="d.isToday ? 'background:#eaefff;border-color:#b8cafd' : 'background:var(--bg-subtle);border-color:var(--border-soft)'"
+            :style="d.isToday ? 'background:var(--accent-soft);border-color:var(--accent-bd)' : 'background:var(--bg-subtle);border-color:var(--border-soft)'"
             :title="d.count > 0 ? d.names : undefined">
             <div style="font-size:10px;margin-bottom:4px;font-weight:500" :style="{ color: d.isToday ? '#193497' : 'var(--text-3)' }">
               {{ d.isToday ? 'Hoje' : d.label }}
@@ -204,13 +204,13 @@
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px">
+          <div style="background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:10px;padding:14px">
             <div style="font-size:26px;font-weight:600;color:#d97706" class="tabular">44%</div>
-            <div style="font-size:13px;color:#92400e;margin-top:4px">dos vendedores desistem na <strong>1ª tentativa</strong></div>
+            <div style="font-size:13px;color:var(--warn);margin-top:4px">dos vendedores desistem na <strong>1ª tentativa</strong></div>
           </div>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+          <div style="background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:14px">
             <div style="font-size:26px;font-weight:600;color:#16a34a" class="tabular">80%</div>
-            <div style="font-size:13px;color:#14532d;margin-top:4px">das vendas fecham com <strong>8+ contatos</strong></div>
+            <div style="font-size:13px;color:var(--ok);margin-top:4px">das vendas fecham com <strong>8+ contatos</strong></div>
           </div>
         </div>
       </div>
@@ -446,16 +446,16 @@ const weekForecast = computed(() =>
 .fu-work-name { font-size:17px;font-weight:600;color:var(--text-1);letter-spacing:-.01em }
 .fu-work-company { font-size:13px;color:var(--text-2);margin-top:2px }
 .fu-actions { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px }
-.fu-call { color:#16a34a;border-color:#bbf7d0;background:#f0fdf4 }
-.fu-wa { color:#16a34a;border-color:#bbf7d0;background:#f0fdf4 }
+.fu-call { color:#16a34a;border-color:var(--ok-bd);background:var(--ok-bg) }
+.fu-wa { color:#16a34a;border-color:var(--ok-bd);background:var(--ok-bg) }
 .fu-nophone { font-size:12px;color:var(--text-3) }
-.fu-cadence { display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:8px 12px;margin-bottom:14px }
+.fu-cadence { display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:8px;padding:8px 12px;margin-bottom:14px }
 .fu-cadence-tag { font-size:11px;font-weight:600;color:#3730a3;white-space:nowrap }
-.fu-cadence-text { font-size:12px;color:#475569 }
+.fu-cadence-text { font-size:12px;color:var(--text-2) }
 .fu-block-label { font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin:14px 0 7px }
 .fu-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:5px }
 .fu-cell { border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;border:1px solid var(--border);background:var(--bg-subtle);transition:all .12s;font-family:inherit;display:flex;flex-direction:column;gap:2px }
-.fu-cell--done { background:#f0fdf4;border-color:#bbf7d0 }
+.fu-cell--done { background:var(--ok-bg);border-color:var(--ok-bd) }
 .fu-cell-n { font-size:12px;font-weight:500;color:var(--text-2) }
 .fu-cell--done .fu-cell-n { color:#16a34a }
 .fu-cell-d { font-size:10px;color:var(--text-3) }

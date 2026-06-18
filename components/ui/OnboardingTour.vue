@@ -107,7 +107,7 @@ function finish() {
 }
 
 .tour-card {
-  background: #fff;
+  background:var(--bg-card);
   border-radius: 16px;
   padding: 32px 28px 24px;
   max-width: 440px;
@@ -129,7 +129,7 @@ function finish() {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #e2e8f0;
+  background: var(--border);
   transition: background 0.2s, transform 0.2s;
 }
 
@@ -141,14 +141,14 @@ function finish() {
 .tour-title {
   font-size: 20px;
   font-weight: 600;
-  color: #282828;
+  color: var(--text-1);
   margin-bottom: 14px;
   line-height: 1.3;
 }
 
 .tour-body {
   font-size: 14px;
-  color: #475569;
+  color: var(--text-2);
   line-height: 1.7;
   margin-bottom: 28px;
 }
@@ -162,10 +162,10 @@ function finish() {
 .tour-skip {
   flex: 1;
   padding: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #64748b;
+  background:var(--bg-card);
+  color: var(--text-2);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -174,7 +174,7 @@ function finish() {
 }
 
 .tour-skip:hover {
-  background: #f9f6ef;
+  background: var(--bg-subtle);
 }
 
 .tour-next {

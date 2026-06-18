@@ -7,15 +7,15 @@
 
     <!-- Filtros -->
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
-      <div style="display:flex;gap:2px;background:#f1f5f9;border-radius:10px;padding:3px">
+      <div style="display:flex;gap:2px;background:var(--border-soft);border-radius:10px;padding:3px">
         <button v-for="opt in [{ value: 3, label: '3 meses' }, { value: 6, label: '6 meses' }, { value: 12, label: '1 ano' }]"
           :key="opt.value"
           type="button"
           @click="months = opt.value"
           style="padding:5px 14px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .12s"
           :style="months === opt.value
-            ? 'background:#fff;color:#282828;box-shadow:0 1px 3px rgba(0,0,0,.08)'
-            : 'background:transparent;color:#64748b'">
+            ? 'background:var(--bg-card);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08)'
+            : 'background:transparent;color:var(--text-2)'">
           {{ opt.label }}
         </button>
       </div>
@@ -41,26 +41,26 @@
       <!-- Funil por mês (barras horizontais) -->
       <div class="card">
         <div class="card-label">Funil por mes: CE &gt; RM &gt; RR &gt; FR</div>
-        <div v-if="funnelLoading" style="height:160px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px">
+        <div v-if="funnelLoading" style="height:160px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">
           Carregando...
         </div>
-        <div v-else-if="!funnelData.length" style="height:160px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px">
+        <div v-else-if="!funnelData.length" style="height:160px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">
           Sem dados no período.
         </div>
         <div v-else style="overflow-x:auto">
           <div style="display:flex;flex-direction:column;gap:10px;min-width:240px">
             <div v-for="row in funnelData" :key="row.month">
-              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-weight:500">
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:4px;font-weight:500">
                 {{ formatMonth(row.month) }}
               </div>
               <div v-for="(bar, label) in funnelBars(row)" :key="label"
                 style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                <div style="width:24px;font-size:10px;color:#64748b;text-align:right;flex-shrink:0">{{ label }}</div>
-                <div style="flex:1;height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden">
+                <div style="width:24px;font-size:10px;color:var(--text-2);text-align:right;flex-shrink:0">{{ label }}</div>
+                <div style="flex:1;height:8px;background:var(--border-soft);border-radius:99px;overflow:hidden">
                   <div :style="{ width: bar.pct + '%', background: bar.color, height:'100%', borderRadius:'99px', transition:'width .3s' }" />
                 </div>
-                <div style="width:28px;font-size:11px;color:#282828;text-align:right;flex-shrink:0;font-weight:500">{{ bar.value }}</div>
-                <div v-if="label !== 'CE'" style="width:36px;font-size:10px;color:#94a3b8;flex-shrink:0">
+                <div style="width:28px;font-size:11px;color:var(--text-1);text-align:right;flex-shrink:0;font-weight:500">{{ bar.value }}</div>
+                <div v-if="label !== 'CE'" style="width:36px;font-size:10px;color:var(--text-3);flex-shrink:0">
                   {{ row.ce > 0 ? (bar.value / row.ce * 100).toFixed(1) + '%' : '-' }}
                 </div>
               </div>
@@ -72,10 +72,10 @@
       <!-- Leads por status (donut via SVG) -->
       <div class="card">
         <div class="card-label">Leads por status</div>
-        <div v-if="statusLoading" style="height:160px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px">
+        <div v-if="statusLoading" style="height:160px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">
           Carregando...
         </div>
-        <div v-else-if="!statusData.length" style="height:160px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px">
+        <div v-else-if="!statusData.length" style="height:160px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">
           Sem dados.
         </div>
         <div v-else style="display:flex;gap:12px;align-items:flex-start">
@@ -98,9 +98,9 @@
             <div v-for="s in statusData.slice(0,6)" :key="s.status"
               style="display:flex;align-items:center;gap:6px;font-size:12px">
               <div :style="{ width:'8px', height:'8px', borderRadius:'50%', background: statusColor(s.status), flexShrink:0 }"/>
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#475569">{{ s.status }}</span>
-              <span style="margin-left:auto;font-weight:600;color:#282828;flex-shrink:0">{{ s.count }}</span>
-              <span style="font-size:10px;color:#94a3b8;flex-shrink:0">
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2)">{{ s.status }}</span>
+              <span style="margin-left:auto;font-weight:600;color:var(--text-1);flex-shrink:0">{{ s.count }}</span>
+              <span style="font-size:10px;color:var(--text-3);flex-shrink:0">
                 {{ statusData.reduce((a,b) => a + b.count, 0) > 0 ? (s.count / statusData.reduce((a,b) => a + b.count, 0) * 100).toFixed(0) + '%' : '' }}
               </span>
             </div>
@@ -115,17 +115,17 @@
     <!-- Motivos de perda -->
     <div class="card">
       <div class="card-label">Motivos de perda</div>
-      <div v-if="lossLoading" style="height:120px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px">
+      <div v-if="lossLoading" style="height:120px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:13px">
         Carregando...
       </div>
       <div v-else-if="!lossData.length" style="height:120px;display:flex;align-items:center;justify-content:center;text-align:center">
         <div>
-          <div style="font-size:13px;color:#94a3b8">Nenhum lead com motivo de perda registrado.</div>
-          <div style="font-size:11px;color:#b0a898;margin-top:4px">Registre um motivo ao mover um lead para Recusado ou Sem interesse.</div>
+          <div style="font-size:13px;color:var(--text-3)">Nenhum lead com motivo de perda registrado.</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Registre um motivo ao mover um lead para Recusado ou Sem interesse.</div>
         </div>
       </div>
       <div v-else>
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">
           Total: {{ lossTotal }} leads com motivo registrado
         </div>
         <div style="display:flex;flex-direction:column;gap:7px">
@@ -154,7 +154,7 @@
     <!-- Evolução de CE ao longo do tempo (linha simplificada) -->
     <div class="card">
       <div class="card-label">Contatos Efetivos (CE) por mês</div>
-      <div v-if="!funnelData.length" style="padding:24px;text-align:center;color:#94a3b8;font-size:12px">
+      <div v-if="!funnelData.length" style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">
         Sem dados.
       </div>
       <div v-else style="overflow-x:auto">

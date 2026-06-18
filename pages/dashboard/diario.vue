@@ -20,7 +20,7 @@
         </button>
         <button v-if="currentMonth !== now.getMonth() + 1 || currentYear !== now.getFullYear()"
           class="btn" @click="goToCurrentMonth"
-          style="font-size:11px;padding:4px 10px;color:#193497;border-color:#b8cafd;background:#eaefff">
+          style="font-size:11px;padding:4px 10px;color:#193497;border-color:var(--accent-bd);background:var(--accent-soft)">
           Mês atual
         </button>
       </div>
@@ -73,9 +73,9 @@
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="card-label" style="margin-bottom:0">{{ entries.length }} dias registrados</div>
-          <div style="display:flex;gap:12px;font-size:11px;color:#64748b">
-            <span>CE→RM: <strong style="color:#282828">{{ monthCERMRate }}%</strong></span>
-            <span>RM→RR: <strong style="color:#282828">{{ monthRMRRRate }}%</strong></span>
+          <div style="display:flex;gap:12px;font-size:11px;color:var(--text-2)">
+            <span>CE→RM: <strong style="color:var(--text-1)">{{ monthCERMRate }}%</strong></span>
+            <span>RM→RR: <strong style="color:var(--text-1)">{{ monthRMRRRate }}%</strong></span>
           </div>
         </div>
 
@@ -87,16 +87,16 @@
             <line x1="8" y1="2" x2="8" y2="6"/>
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-          <div style="font-size:14px;font-weight:500;color:#475569;margin-bottom:4px">Nenhum dia registrado</div>
-          <div style="font-size:12px;color:#94a3b8">Selecione uma data e preencha as métricas.</div>
+          <div style="font-size:14px;font-weight:500;color:var(--text-2);margin-bottom:4px">Nenhum dia registrado</div>
+          <div style="font-size:12px;color:var(--text-3)">Selecione uma data e preencha as métricas.</div>
         </div>
 
         <table v-else style="width:100%;border-collapse:collapse;font-size:13px">
           <thead>
-            <tr style="border-bottom:1px solid #f1f5f9">
-              <th style="text-align:left;font-size:10px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">Dia</th>
-              <th v-for="f in FIELDS" :key="f.key" style="text-align:right;font-size:10px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">{{ f.key.toUpperCase() }}</th>
-              <th style="text-align:center;font-size:10px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;padding:0 0 8px">vs meta</th>
+            <tr style="border-bottom:1px solid var(--border-soft)">
+              <th style="text-align:left;font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">Dia</th>
+              <th v-for="f in FIELDS" :key="f.key" style="text-align:right;font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">{{ f.key.toUpperCase() }}</th>
+              <th style="text-align:center;font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:0 0 8px">vs meta</th>
               <th style="width:32px"></th>
             </tr>
           </thead>
@@ -104,10 +104,10 @@
             <tr v-for="e in entries" :key="e.id"
               @click="selectEntry(e)"
               style="cursor:pointer;transition:background .1s"
-              :style="{ background: form.date === e.date ? '#eaefff' : 'transparent' }"
-              onmouseenter="this.style.background='#f9f6ef'"
+              :style="{ background: form.date === e.date ? 'var(--accent-soft)' : 'transparent' }"
+              onmouseenter="this.style.background='var(--bg-subtle)'"
               onmouseleave="this.style.background=''">
-              <td style="padding:8px 8px 8px 0;color:#282828;font-weight:500;white-space:nowrap"
+              <td style="padding:8px 8px 8px 0;color:var(--text-1);font-weight:500;white-space:nowrap"
                 :style="{ borderLeft: form.date === e.date ? '2px solid #193497' : '2px solid transparent', paddingLeft: '6px' }">
                 {{ fmtDateBr(e.date) }}
                 <span v-if="e.date === todayStr" style="font-size:10px;color:#193497;margin-left:4px">hoje</span>
@@ -122,7 +122,7 @@
               </td>
               <td style="text-align:center;padding:4px">
                 <button @click.stop="remove(e.id)"
-                  style="border:none;background:none;color:#cbd5e1;cursor:pointer;padding:4px;border-radius:4px;font-size:13px"
+                  style="border:none;background:none;color:var(--text-3);cursor:pointer;padding:4px;border-radius:4px;font-size:13px"
                   onmouseenter="this.style.color='#dc2626'"
                   onmouseleave="this.style.color='#cbd5e1'">
                   <i class="ti ti-trash" aria-hidden="true"></i>
@@ -131,8 +131,8 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr style="border-top:1px solid #e2e8f0">
-              <td style="padding:10px 8px 0 0;font-size:12px;font-weight:500;color:#64748b">Total</td>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 8px 0 0;font-size:12px;font-weight:500;color:var(--text-2)">Total</td>
               <td v-for="f in FIELDS" :key="f.key"
                 style="text-align:right;padding:10px 8px 0;font-weight:600;font-variant-numeric:tabular-nums"
                 :style="{ color: f.color }">

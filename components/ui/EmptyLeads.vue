@@ -44,12 +44,12 @@ defineEmits<{ create: [] }>()
 .empty-title {
   font-size: 16px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-2);
 }
 
 .empty-sub {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-3);
   max-width: 340px;
   line-height: 1.6;
 }

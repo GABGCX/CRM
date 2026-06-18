@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="fu-list">
     <div class="fu-list-header">
-      <span class="fu-list-header-title" :style="{ color: titleColor || '#64748b' }">{{ title }}</span>
+      <span class="fu-list-header-title" :style="{ color: titleColor || 'var(--text-2)' }">{{ title }}</span>
       <span class="fu-list-header-count">{{ leads.length }}</span>
     </div>
 
@@ -21,7 +21,7 @@
         <div class="fu-dots">
           <div v-for="fu in sortedFU(lead.followups)" :key="fu.attempt_index"
             class="fu-dot-sm"
-            :style="{ background: fu.completed_at ? '#16a34a' : '#e2e8f0' }" />
+            :style="{ background: fu.completed_at ? '#16a34a' : 'var(--border)' }" />
         </div>
 
         <span v-if="lead.data_retorno"
@@ -30,7 +30,7 @@
           {{ retLabel(lead.data_retorno) }}
         </span>
 
-        <span style="font-size:11px;background:#f1f5f9;color:#475569;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0">
+        <span style="font-size:11px;background:var(--border-soft);color:var(--text-2);padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0">
           {{ lead.resultado }}
         </span>
 
@@ -59,11 +59,11 @@
             @click.stop="$emit('toggle', lead, fu.attempt_index)"
             style="padding:7px 4px;border-radius:6px;border:1px solid;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s"
             :style="fu.completed_at
-              ? 'background:#f0fdf4;border-color:#bbf7d0'
-              : 'background:var(--bg-subtle);border-color:#e2e8f0'">
+              ? 'background:var(--ok-bg);border-color:var(--ok-bd)'
+              : 'background:var(--bg-subtle);border-color:var(--border)'">
             <div style="font-size:12px;font-weight:500"
-              :style="{ color: fu.completed_at ? '#16a34a' : '#475569' }">{{ fu.attempt_index+1 }}º</div>
-            <div style="font-size:10px;color:#94a3b8">{{ FU_DAYS[fu.attempt_index] }}d</div>
+              :style="{ color: fu.completed_at ? '#16a34a' : 'var(--text-2)' }">{{ fu.attempt_index+1 }}º</div>
+            <div style="font-size:10px;color:var(--text-3)">{{ FU_DAYS[fu.attempt_index] }}d</div>
           </button>
         </div>
 
@@ -71,7 +71,7 @@
           <a v-if="lead.telefone && nextCadenceStep(lead)?.channel === 'WhatsApp'"
             :href="`https://wa.me/55${lead.telefone.replace(/\D/g,'')}`"
             target="_blank" rel="noopener" @click.stop
-            style="display:flex;align-items:center;gap:4px;font-size:12px;color:#16a34a;text-decoration:none;font-weight:500;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:3px 8px">
+            style="display:flex;align-items:center;gap:4px;font-size:12px;color:#16a34a;text-decoration:none;font-weight:500;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:4px;padding:3px 8px">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
             </svg>
@@ -82,22 +82,22 @@
             style="font-size:12px;padding:5px 8px;height:auto;width:auto;border-radius:6px">
             <option v-for="s in STATUSES" :key="s" :value="s">{{ s }}</option>
           </select>
-          <span style="font-size:11px;color:#94a3b8;margin-left:auto">{{ daysIn(lead.created_at) }}d no funil</span>
+          <span style="font-size:11px;color:var(--text-3);margin-left:auto">{{ daysIn(lead.created_at) }}d no funil</span>
         </div>
 
         <div v-if="nextCadenceStep(lead)"
-          style="font-size:12px;background:#eaefff;border:1px solid #b8cafd;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          style="font-size:12px;background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0f2480" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" v-html="channelIconHtml(nextCadenceStep(lead)!.channel)" />
           <div>
             <span style="font-weight:600;color:#0f2480">Dia {{ nextCadenceStep(lead)!.day_offset }} via {{ nextCadenceStep(lead)!.channel }}</span>
             <template v-if="nextCadenceStep(lead)!.instruction">
-              <span style="color:#64748b;margin-left:5px">· {{ nextCadenceStep(lead)!.instruction }}</span>
+              <span style="color:var(--text-2);margin-left:5px">· {{ nextCadenceStep(lead)!.instruction }}</span>
             </template>
           </div>
         </div>
 
         <div v-if="lead.info"
-          style="font-size:12px;color:#64748b;background:var(--bg-subtle);border-radius:6px;padding:8px 12px;font-style:italic">
+          style="font-size:12px;color:var(--text-2);background:var(--bg-subtle);border-radius:6px;padding:8px 12px;font-style:italic">
           "{{ lead.info }}"
         </div>
       </div>
@@ -193,21 +193,21 @@ function retLabel(d: string): string {
 </script>
 
 <style scoped>
-.fu-list { border: 1px solid #f1f5f9; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+.fu-list { border: 1px solid var(--border-soft); border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
 
 .fu-list-header { display:flex; align-items:center; justify-content:space-between; padding: 8px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border-soft); }
 .fu-list-header-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-.fu-list-header-count { font-size: 11px; font-weight: 600; color: #94a3b8; background: #f1f5f9; border-radius: 4px; padding: 1px 7px; }
+.fu-list-header-count { font-size: 11px; font-weight: 600; color: var(--text-3); background: var(--border-soft); border-radius: 4px; padding: 1px 7px; }
 
-.fu-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background .08s; position: relative; }
+.fu-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border-soft); cursor: pointer; transition: background .08s; position: relative; }
 .fu-row:last-child { border-bottom: none; }
 .fu-row:hover { background: rgba(0,0,0,.018); }
 
 .fu-urgency { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
 .fu-initial { width: 26px; height: 26px; border-radius: 6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; }
 .fu-main { flex:1; min-width:0; }
-.fu-name { font-size: 13px; font-weight: 500; color: #282828; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fu-company { font-size: 12px; color: #64748b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fu-name { font-size: 13px; font-weight: 500; color: var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fu-company { font-size: 12px; color: var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .fu-dots { display: flex; gap: 2px; flex-shrink: 0; }
 .fu-dot-sm { width: 6px; height: 6px; border-radius: 2px; }
@@ -215,8 +215,8 @@ function retLabel(d: string): string {
 .fu-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .1s; flex-shrink: 0; }
 .fu-row:hover .fu-actions { opacity: 1; }
 .fu-action-btn { display:flex; align-items:center; gap:3px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); font-size: 11px; font-weight: 500; color: var(--text-2); cursor: pointer; font-family: inherit; white-space: nowrap; text-decoration: none; }
-.fu-action-btn:hover { background: var(--bg-subtle); border-color: #d1d5db; }
-.fu-action-btn--phone { color: #16a34a; border-color: #bbf7d0; background: #f0fdf4; }
+.fu-action-btn:hover { background: var(--bg-subtle); border-color: var(--border); }
+.fu-action-btn--phone { color: #16a34a; border-color: var(--ok-bd); background: var(--ok-bg); }
 
-.fu-expanded { padding: 10px 14px 12px; border-bottom: 1px solid #f1f5f9; background: #fafafa; padding-left: 27px; }
+.fu-expanded { padding: 10px 14px 12px; border-bottom: 1px solid var(--border-soft); background: var(--bg-subtle); padding-left: 27px; }
 </style>

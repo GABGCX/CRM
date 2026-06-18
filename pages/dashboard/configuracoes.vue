@@ -15,7 +15,7 @@
     <div v-if="loading" class="loading-state">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div v-for="i in 3" :key="i"
-          style="height:200px;background:#fff;border:1px solid #f1f5f9;border-radius:10px;animation:pulse 1.5s infinite" />
+          style="height:200px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:10px;animation:pulse 1.5s infinite" />
       </div>
     </div>
 
@@ -187,7 +187,7 @@
           </svg>
           Exportar dados
         </div>
-        <p style="font-size:12px;color:#64748b;line-height:1.6;margin:0">
+        <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin:0">
           Baixe todos os dados da sua organização (leads, follow-ups, diário e membros) em formato JSON.
         </p>
         <a :href="exportUrl" download class="btn" style="text-decoration:none;text-align:center">
@@ -264,7 +264,7 @@
                 Editar
               </button>
               <button @click="deleteTpl(tpl.id, tpl.name)"
-                style="padding:3px 9px;font-size:11px;font-weight:500;border:1px solid #fecaca;background:transparent;color:#dc2626;border-radius:5px;cursor:pointer;font-family:inherit">
+                style="padding:3px 9px;font-size:11px;font-weight:500;border:1px solid var(--bad-bd);background:transparent;color:#dc2626;border-radius:5px;cursor:pointer;font-family:inherit">
                 X
               </button>
             </div>
@@ -332,7 +332,7 @@
         <!-- Loading skeleton -->
         <div v-if="membersLoading" style="display:flex;flex-direction:column;gap:6px">
           <div v-for="i in 3" :key="i"
-            style="height:40px;background:#f1f5f9;border-radius:8px;animation:pulse 1.5s infinite" />
+            style="height:40px;background:var(--border-soft);border-radius:8px;animation:pulse 1.5s infinite" />
         </div>
 
         <div v-else class="members-list">
@@ -342,7 +342,7 @@
               <div class="member-name">
                 {{ m.name || '' }}
                 <span v-if="m.id === profile?.id"
-                  style="font-size:10px;background:#f1f5f9;color:#64748b;padding:1px 5px;border-radius:4px;margin-left:4px">
+                  style="font-size:10px;background:var(--border-soft);color:var(--text-2);padding:1px 5px;border-radius:4px;margin-left:4px">
                   Você
                 </span>
               </div>
@@ -354,7 +354,7 @@
               v-if="profile?.role === 'owner' && m.role !== 'owner' && m.id !== profile?.id"
               :value="m.role"
               @change="changeMemberRole(m.id, ($event.target as HTMLSelectElement).value)"
-              style="font-size:11px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:5px;background:#fff;color:#475569;cursor:pointer">
+              style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg-card);color:var(--text-2);cursor:pointer">
               <option value="bdr">BDR</option>
               <option value="admin">Admin</option>
             </select>
@@ -376,7 +376,7 @@
             <button
               v-if="profile?.role === 'owner' && m.role !== 'owner' && m.id !== profile?.id"
               @click="removeMember(m.id, m.name || m.id)"
-              style="padding:3px 8px;border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:5px;font-size:11px;cursor:pointer;flex-shrink:0"
+              style="padding:3px 8px;border:1px solid var(--bad-bd);background:var(--bg-card);color:#dc2626;border-radius:5px;font-size:11px;cursor:pointer;flex-shrink:0"
               title="Remover membro">
               X
             </button>
@@ -420,10 +420,10 @@
 
         <div v-if="auditLoading" style="display:flex;flex-direction:column;gap:6px">
           <div v-for="i in 5" :key="i"
-            style="height:36px;background:#f1f5f9;border-radius:8px;animation:pulse 1.5s infinite" />
+            style="height:36px;background:var(--border-soft);border-radius:8px;animation:pulse 1.5s infinite" />
         </div>
 
-        <div v-else-if="auditLogs.length === 0" style="font-size:12px;color:#94a3b8;padding:4px 0">
+        <div v-else-if="auditLogs.length === 0" style="font-size:12px;color:var(--text-3);padding:4px 0">
           Nenhuma ação registrada ainda.
         </div>
 
@@ -441,13 +441,13 @@
             <tbody>
               <tr v-for="entry in auditLogs" :key="entry.id">
                 <td><span class="audit-action">{{ entry.action }}</span></td>
-                <td style="color:#64748b;font-size:11px">
+                <td style="color:var(--text-2);font-size:11px">
                   {{ entry.resource_type }}
-                  <span v-if="entry.resource_id" style="color:#94a3b8"> ({{ entry.resource_id.slice(0,8) }})</span>
+                  <span v-if="entry.resource_id" style="color:var(--text-3)"> ({{ entry.resource_id.slice(0,8) }})</span>
                 </td>
-                <td style="font-size:11px;color:#475569">{{ entry.profiles?.name || '' }}</td>
-                <td style="font-size:11px;color:#94a3b8;font-family:monospace">{{ entry.ip || '' }}</td>
-                <td style="font-size:11px;color:#94a3b8;white-space:nowrap">{{ formatAuditDate(entry.created_at) }}</td>
+                <td style="font-size:11px;color:var(--text-2)">{{ entry.profiles?.name || '' }}</td>
+                <td style="font-size:11px;color:var(--text-3);font-family:monospace">{{ entry.ip || '' }}</td>
+                <td style="font-size:11px;color:var(--text-3);white-space:nowrap">{{ formatAuditDate(entry.created_at) }}</td>
               </tr>
             </tbody>
           </table>
@@ -816,9 +816,9 @@ async function sendInvite() {
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
 .settings-page {
-  --bg:#f9f6ef; --surface:#ffffff; --border:#e2e8f0; --border-soft:#f1f5f9;
-  --text-1:#282828; --text-2:#475569; --text-3:#94a3b8;
-  --accent:#16a34a; --danger:#dc2626; --danger-bg:#fef2f2; --danger-bdr:#fecaca;
+  --bg:var(--bg-subtle); --surface:#ffffff; --border:var(--border); --border-soft:var(--border-soft);
+  --text-1:var(--text-1); --text-2:var(--text-2); --text-3:var(--text-3);
+  --accent:#16a34a; --danger:#dc2626; --danger-bg:var(--bad-bg); --danger-bdr:var(--bad-bd);
   --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
   --transition:140ms cubic-bezier(0.16,1,0.3,1);
   font-family:'Geist',-apple-system,sans-serif;
@@ -834,7 +834,7 @@ async function sendInvite() {
 .page-sub      { font-size:13px;color:var(--text-3);margin-top:2px }
 .loading-state { padding:56px 0 }
 
-.cfg-tabs { display:flex;gap:3px;background:var(--bg-subtle,#f1f5f9);border-radius:10px;padding:3px;width:fit-content;margin-bottom:18px }
+.cfg-tabs { display:flex;gap:3px;background:var(--bg-subtle,var(--border-soft));border-radius:10px;padding:3px;width:fit-content;margin-bottom:18px }
 .cfg-tab { padding:6px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:transparent;color:var(--text-2);transition:all .12s }
 .cfg-tab.active { background:var(--surface);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08) }
 .settings-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px }
@@ -894,20 +894,20 @@ async function sendInvite() {
 .members-list  { display:flex;flex-direction:column;gap:2px }
 .member-row    { display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--radius-md);transition:background var(--transition);cursor:default }
 .member-row:hover { background:var(--bg) }
-.avatar        { width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-2);flex-shrink:0 }
+.avatar        { width:28px;height:28px;border-radius:50%;background:var(--border-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-2);flex-shrink:0 }
 .member-info   { flex:1;min-width:0 }
 .member-name   { font-size:13px;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .member-email  { font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .members-empty { font-size:12px;color:var(--text-3);padding:6px 10px }
 .role-tag      { font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;letter-spacing:.03em;flex-shrink:0 }
-.role-owner    { background:#eaefff;color:#193497;border:1px solid #b8cafd }
+.role-owner    { background:var(--accent-soft);color:#193497;border:1px solid var(--accent-bd) }
 .role-default  { background:var(--bg);color:var(--text-3);border:1px solid var(--border) }
 
 .invite-box   { border-top:1px solid var(--border-soft);padding-top:16px;display:flex;flex-direction:column;gap:10px }
 .invite-title { font-size:12px;font-weight:500;color:var(--text-1) }
 
 .btn { display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border-radius:var(--radius-md);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-1);width:100%;font-family:inherit;letter-spacing:-.01em;transition:background var(--transition),border-color var(--transition),transform var(--transition) }
-.btn:hover:not(:disabled) { background:var(--bg);border-color:#d4d4d4 }
+.btn:hover:not(:disabled) { background:var(--bg);border-color:var(--border) }
 .btn:active:not(:disabled) { transform:scale(.99) }
 .btn:disabled { opacity:.45;cursor:not-allowed }
 .btn-primary  { background:#193497;color:#fff;border-color:transparent }
@@ -940,9 +940,9 @@ async function sendInvite() {
 .tag-mgr-create { display:flex;align-items:center;gap:8px;border-top:1px solid var(--border-soft);padding-top:12px }
 
 .tpl-channel-tag { font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0;letter-spacing:.03em }
-.tpl-ch-whatsapp { background:#dcfce7;color:#15803d }
-.tpl-ch-email    { background:#dbeafe;color:#1d4ed8 }
-.tpl-ch-ligacao  { background:#fef9c3;color:#a16207 }
-.tpl-ch-linkedin { background:#e0e7ff;color:#3730a3 }
+.tpl-ch-whatsapp { background:var(--ok-bg);color:var(--ok) }
+.tpl-ch-email    { background:var(--info-bg);color:var(--info) }
+.tpl-ch-ligacao  { background:var(--warn-bg);color:var(--warn) }
+.tpl-ch-linkedin { background:var(--info-bg);color:#3730a3 }
 .tpl-ch-outro    { background:var(--bg);color:var(--text-3);border:1px solid var(--border) }
 </style>
