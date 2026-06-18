@@ -45,19 +45,19 @@
 }
 
 [data-theme="dark"] {
-  /* superficies levantadas e dessaturadas (nao preto puro); elevacao sutil */
-  --bg:          #1a1816;
-  --bg-card:     #232120;
-  --bg-input:    #1f1d1b;
-  --bg-subtle:   #272523;
-  --bg-elevated: #2d2a27;
-  /* texto off-white suave (sem halacao de branco puro) */
-  --text-1:      #e4ded3;
-  --text-2:      #9c9488;
-  --text-3:      #6a635a;
-  /* bordas quase invisiveis (baixo contraste) */
-  --border:      #332f2b;
-  --border-soft: #2a2724;
+  /* cinza neutro (nao preto); cards levantados = elevacao visivel */
+  --bg:          #1a1a1d;
+  --bg-card:     #222226;
+  --bg-input:    #1e1e22;
+  --bg-subtle:   #27272c;
+  --bg-elevated: #2d2d33;
+  /* texto cinza-claro (nao branco) pra tirar o brilho agressivo */
+  --text-1:      #d4d3da;
+  --text-2:      #93939c;
+  --text-3:      #65656d;
+  /* bordas sutis, neutras */
+  --border:      #323239;
+  --border-soft: #27272c;
   --accent-text: #8aa2f0;
   --accent-soft: rgba(138,162,240,.10);
   --accent-bd:   rgba(138,162,240,.24);
@@ -68,19 +68,19 @@
   --bad:  #e09595; --bad-bg:  rgba(224,149,149,.12); --bad-bd:  rgba(224,149,149,.22);
   --info: #8fb0e8; --info-bg: rgba(143,176,232,.12); --info-bd: rgba(143,176,232,.22);
 
-  --sb-bg:          #0d0c0b;
-  --sb-border:      #1c1a18;
-  --sb-hover:       #1c1a18;
-  --sb-active:      #242220;
-  --sb-text:        #4a4540;
-  --sb-text-hover:  #8a857d;
-  --sb-text-active: #e8e4dc;
-  --sb-section:     #333333;
-  --sb-search-bg:   #181614;
-  --sb-search-border: #2a2826;
-  --sb-kbd-bg:      #131210;
-  --sb-kbd-border:  #2a2826;
-  --sb-toggle-border: #2a2826;
+  --sb-bg:          #161619;
+  --sb-border:      #26262b;
+  --sb-hover:       #26262b;
+  --sb-active:      #2d2d33;
+  --sb-text:        #6b6b73;
+  --sb-text-hover:  #b0b0b8;
+  --sb-text-active: #e4e3ea;
+  --sb-section:     #4a4a52;
+  --sb-search-bg:   #1e1e22;
+  --sb-search-border: #2d2d33;
+  --sb-kbd-bg:      #161619;
+  --sb-kbd-border:  #2d2d33;
+  --sb-toggle-border: #2d2d33;
 }
 
 @tailwind base;
