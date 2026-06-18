@@ -217,7 +217,6 @@ function goBdr(id: string) { navigateTo(`/dashboard/gestao/${id}`) }
 
 .gm-alerts { display:flex;flex-direction:column;gap:6px;margin-bottom:14px }
 .gm-alert { display:flex;align-items:flex-start;gap:8px;background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.5 }
-[data-theme="dark"] .gm-alert { background:#231a06;border-color:#3d2f0a;color:#e0b34a }
 .gm-days { font-weight:600;font-variant-numeric:tabular-nums }
 .gm-legend { font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.5 }
 </style>

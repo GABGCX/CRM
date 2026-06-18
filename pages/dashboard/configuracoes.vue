@@ -825,9 +825,9 @@ async function sendInvite() {
   -webkit-font-smoothing:antialiased;
 }
 [data-theme="dark"] .settings-page {
-  --bg:#131210; --surface:#1c1a18; --border:#2e2c28; --border-soft:#242220;
-  --text-1:#e8e4dc; --text-2:#8a857d; --text-3:#5a544c;
-  --danger-bg:#2a1515; --danger-bdr:#4a2020;
+  --bg:#1a1816; --surface:#232120; --border:#332f2b; --border-soft:#2a2724;
+  --text-1:#e4ded3; --text-2:#9c9488; --text-3:#6a635a;
+  --danger-bg:rgba(224,149,149,.12); --danger-bdr:rgba(224,149,149,.25);
 }
 .page-header   { margin-bottom:16px }
 .page-title    { font-size:18px;font-weight:600;color:var(--text-1);letter-spacing:-.02em }
