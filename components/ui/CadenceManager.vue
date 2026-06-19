@@ -7,27 +7,27 @@
     </div>
 
     <!-- Lista de cadencias -->
-    <div v-if="loading" style="color:#94a3b8;font-size:12px;padding:16px 0">Carregando...</div>
-    <div v-else-if="!cadences.length" style="color:#94a3b8;font-size:12px;padding:16px 0;text-align:center">
+    <div v-if="loading" style="color:var(--text-3);font-size:12px;padding:16px 0">Carregando...</div>
+    <div v-else-if="!cadences.length" style="color:var(--text-3);font-size:12px;padding:16px 0;text-align:center">
       Nenhuma cadencia criada.<br>Crie uma para atribuir a seus leads.
     </div>
     <div v-else style="display:flex;flex-direction:column;gap:6px">
       <div v-for="c in cadences" :key="c.id"
-        style="border:1px solid #f1f5f9;border-radius:10px;padding:12px;background:#f9f6ef">
+        style="border:1px solid var(--border-soft);border-radius:10px;padding:12px;background:var(--bg-subtle)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div>
-            <div style="font-size:13px;font-weight:600;color:#282828">{{ c.name }}</div>
-            <div v-if="c.description" style="font-size:11px;color:#64748b;margin-top:2px">{{ c.description }}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-1)">{{ c.name }}</div>
+            <div v-if="c.description" style="font-size:11px;color:var(--text-2);margin-top:2px">{{ c.description }}</div>
           </div>
           <div style="display:flex;gap:4px">
             <button class="btn" style="font-size:11px;padding:3px 8px" @click="openEdit(c)">Editar</button>
-            <button class="btn" style="font-size:11px;padding:3px 8px;color:#dc2626;border-color:#fecaca"
+            <button class="btn" style="font-size:11px;padding:3px 8px;color:#dc2626;border-color:var(--bad-bd)"
               @click="remove(c.id)">Remover</button>
           </div>
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
           <span v-for="s in c.cadence_steps" :key="s.id"
-            style="font-size:10px;padding:2px 8px;border-radius:99px;background:#eaefff;color:#0f2480;border:1px solid #b8cafd;display:inline-flex;align-items:center;gap:3px">
+            style="font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:#0f2480;border:1px solid var(--accent-bd);display:inline-flex;align-items:center;gap:3px">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" v-html="channelIconHtml(s.channel)" />
             Dia {{ s.day_offset }}: {{ s.channel }}
           </span>
@@ -63,11 +63,11 @@
             <div v-for="(s, i) in form.steps" :key="i"
               style="display:grid;grid-template-columns:70px 1fr 1fr auto;gap:6px;align-items:start">
               <div>
-                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">Dia</div>
+                <div style="font-size:10px;color:var(--text-3);margin-bottom:2px">Dia</div>
                 <input type="number" v-model.number="s.day_offset" min="0" style="font-size:12px;text-align:center" />
               </div>
               <div>
-                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">Canal</div>
+                <div style="font-size:10px;color:var(--text-3);margin-bottom:2px">Canal</div>
                 <div style="display:flex;gap:3px;flex-wrap:wrap">
                   <button
                     v-for="ch in CHANNELS" :key="ch"
@@ -75,19 +75,19 @@
                     @click="s.channel = ch as CadenceChannel"
                     style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border-radius:7px;border:1px solid;cursor:pointer;font-family:inherit;font-size:9px;font-weight:500;transition:all .1s"
                     :style="s.channel === ch
-                      ? 'background:#eaefff;border-color:#193497;color:#193497'
-                      : 'background:#f9f6ef;border-color:#e2e8f0;color:#64748b'">
+                      ? 'background:var(--accent-soft);border-color:#193497;color:#193497'
+                      : 'background:var(--bg-subtle);border-color:var(--border);color:var(--text-2)'">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="channelIconHtml(ch)" />
                     {{ CHANNEL_LABEL[ch] }}
                   </button>
                 </div>
               </div>
               <div>
-                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">Instrucao (opcional)</div>
+                <div style="font-size:10px;color:var(--text-3);margin-bottom:2px">Instrucao (opcional)</div>
                 <input v-model="s.instruction" placeholder="O que fazer neste passo" style="font-size:12px" />
               </div>
               <button @click="removeStep(i)"
-                style="border:none;background:none;color:#cbd5e1;cursor:pointer;font-size:13px;padding:4px;margin-top:14px"
+                style="border:none;background:none;color:var(--text-3);cursor:pointer;font-size:13px;padding:4px;margin-top:14px"
                 onmouseenter="this.style.color='#dc2626'"
                 onmouseleave="this.style.color='#cbd5e1'">X</button>
             </div>

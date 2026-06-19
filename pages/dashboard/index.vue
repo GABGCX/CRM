@@ -10,11 +10,11 @@
         <select
           v-if="canFilterUsers && orgMembers?.length"
           v-model="selectedUserId"
-          style="font-size:13px;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;cursor:pointer;max-width:160px">
+          style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-2);cursor:pointer;max-width:160px">
           <option :value="null">Toda equipe</option>
           <option v-for="m in orgMembers" :key="m.id" :value="m.id">{{ m.name || m.id.slice(0,8) }}</option>
         </select>
-        <div style="font-size:12px;color:#94a3b8;text-align:right;line-height:1.5">
+        <div style="font-size:12px;color:var(--text-3);text-align:right;line-height:1.5">
           <div>{{ workdaysLeft }} dias úteis restantes</div>
           <div>{{ totalWorkdays }} dias úteis no mês</div>
         </div>
@@ -484,9 +484,9 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 <style>
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-.pace-ok   { background:#f0fdf4; border-color:#bbf7d0 !important; color:#14532d; }
-.pace-warn { background:#fffbeb; border-color:#fde68a !important; color:#78350f; }
-.pace-bad  { background:#fef2f2; border-color:#fecaca !important; color:#7f1d1d; }
+.pace-ok   { background:var(--ok-bg); border-color:var(--ok-bd) !important; color:var(--ok); }
+.pace-warn { background:var(--warn-bg); border-color:var(--warn-bd) !important; color:var(--warn); }
+.pace-bad  { background:var(--bad-bg); border-color:var(--bad-bd) !important; color:var(--bad); }
 
 .ck-label { font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px; }
 .ck-head  { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px; }
@@ -538,17 +538,17 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 /* Tom por urgencia: borda esquerda + cor do dot/cta */
 .focus-hero--urgent { border-left: 3px solid #dc2626; }
 .focus-hero--urgent .focus-dot, .focus-hero--urgent .focus-cta { background: #dc2626; }
-.focus-hero--urgent .focus-cta:hover { background: #b91c1c; }
+.focus-hero--urgent .focus-cta:hover { background: var(--bad); }
 .focus-hero--today  { border-left: 3px solid #d97706; }
 .focus-hero--today .focus-dot, .focus-hero--today .focus-cta { background: #d97706; }
-.focus-hero--today .focus-cta:hover { background: #b45309; }
+.focus-hero--today .focus-cta:hover { background: var(--warn); }
 .focus-hero--pace   { border-left: 3px solid #d97706; }
 .focus-hero--pace .focus-dot, .focus-hero--pace .focus-cta { background: #d97706; }
-.focus-hero--pace .focus-cta:hover { background: #b45309; }
+.focus-hero--pace .focus-cta:hover { background: var(--warn); }
 .focus-hero--hot    { border-left: 3px solid var(--accent); }
 .focus-hero--clear  { border-left: 3px solid #16a34a; }
 .focus-hero--clear .focus-dot, .focus-hero--clear .focus-cta { background: #16a34a; }
-.focus-hero--clear .focus-cta:hover { background: #15803d; }
+.focus-hero--clear .focus-cta:hover { background: var(--ok); }
 
 /* Card do lead mais quente */
 .focus-hot {

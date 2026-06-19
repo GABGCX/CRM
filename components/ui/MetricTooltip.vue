@@ -71,8 +71,8 @@ const show  = ref(false)
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #e2e8f0;
-  color: #64748b;
+  background: var(--border);
+  color: var(--text-2);
   font-size: 9px;
   font-weight: 600;
   cursor: help;
@@ -82,7 +82,7 @@ const show  = ref(false)
 }
 .metric-tip-trigger:hover,
 .metric-tip-trigger:focus {
-  background: #b8cafd;
+  background: var(--accent-bd);
   color: #193497;
 }
 
@@ -91,7 +91,7 @@ const show  = ref(false)
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #282828;
+  background: var(--text-1);
   color: #fff;
   border-radius: 8px;
   padding: 9px 12px;
@@ -107,7 +107,7 @@ const show  = ref(false)
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: #282828;
+  border-top-color: var(--text-1);
 }
 
 .metric-tip-full {
@@ -118,7 +118,7 @@ const show  = ref(false)
 }
 .metric-tip-desc {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--text-3);
   line-height: 1.5;
 }
 

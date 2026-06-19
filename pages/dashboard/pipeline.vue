@@ -155,7 +155,7 @@
               </div>
               <div class="drawer-sub">{{ selectedLead.negocio }} · {{ daysIn(selectedLead.created_at) }} dias no funil</div>
               <div v-if="selectedLead.motivo_perda" style="margin-top:6px">
-                <span style="font-size:11px;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:2px 7px;font-weight:500">
+                <span style="font-size:11px;color:#dc2626;background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:4px;padding:2px 7px;font-weight:500">
                   Perda: {{ selectedLead.motivo_perda }}
                 </span>
               </div>
@@ -189,7 +189,7 @@
               </div>
               <div v-if="i < FUNNEL_STAGES.length - 1"
                 style="width:16px;height:2px;flex-shrink:0"
-                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#193497' : '#e2e8f0' }" />
+                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#193497' : 'var(--border)' }" />
             </template>
           </div>
 
@@ -224,7 +224,7 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 2 2 0 012 1.84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
               Ligar
             </a>
-            <a v-if="selectedLead.telefone" :href="`https://wa.me/55${selectedLead.telefone.replace(/\D/g,'')}`" target="_blank" class="btn" style="color:#16a34a;border-color:#bbf7d0;background:#f0fdf4">
+            <a v-if="selectedLead.telefone" :href="`https://wa.me/55${selectedLead.telefone.replace(/\D/g,'')}`" target="_blank" class="btn" style="color:#16a34a;border-color:var(--ok-bd);background:var(--ok-bg)">
               WhatsApp
             </a>
           </div>
@@ -260,11 +260,11 @@
               @click="handleToggleFU(selectedLead.id, fu.attempt_index)"
               style="border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;border:1px solid;transition:all .12s;font-family:inherit"
               :style="fu.completed_at
-                ? 'background:#f0fdf4;border-color:#bbf7d0'
-                : 'background:var(--bg-subtle);border-color:#e2e8f0'">
+                ? 'background:var(--ok-bg);border-color:var(--ok-bd)'
+                : 'background:var(--bg-subtle);border-color:var(--border)'">
               <div style="font-size:12px;font-weight:500"
-                :style="{ color: fu.completed_at ? '#16a34a' : '#475569' }">{{ fu.attempt_index + 1 }}º</div>
-              <div style="font-size:10px;color:#94a3b8">{{ FU_DAYS[fu.attempt_index] }}d</div>
+                :style="{ color: fu.completed_at ? '#16a34a' : 'var(--text-2)' }">{{ fu.attempt_index + 1 }}º</div>
+              <div style="font-size:10px;color:var(--text-3)">{{ FU_DAYS[fu.attempt_index] }}d</div>
             </button>
           </div>
 
@@ -274,9 +274,9 @@
               <textarea v-model="newNote" rows="2" placeholder="Adicionar nota..."
                 style="resize:vertical" @keydown.ctrl.enter="submitNote" maxlength="2000" />
               <div style="display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:11px;color:#94a3b8">Ctrl+Enter para salvar</span>
-                <span style="font-size:11px;color:#94a3b8"
-                  :style="{ color: newNote.length > 1900 ? '#d97706' : '#94a3b8' }">
+                <span style="font-size:11px;color:var(--text-3)">Ctrl+Enter para salvar</span>
+                <span style="font-size:11px;color:var(--text-3)"
+                  :style="{ color: newNote.length > 1900 ? '#d97706' : 'var(--text-3)' }">
                   {{ newNote.length }} / 2000
                 </span>
               </div>
@@ -285,20 +285,20 @@
                 {{ noteSaving ? 'Salvando...' : 'Adicionar nota' }}
               </button>
             </div>
-            <div v-if="notesLoading" style="text-align:center;padding:16px;color:#94a3b8;font-size:13px">Carregando...</div>
-            <div v-else-if="!leadNotes.length" style="text-align:center;padding:16px;color:#94a3b8;font-size:13px">
+            <div v-if="notesLoading" style="text-align:center;padding:16px;color:var(--text-3);font-size:13px">Carregando...</div>
+            <div v-else-if="!leadNotes.length" style="text-align:center;padding:16px;color:var(--text-3);font-size:13px">
               Nenhuma nota registrada.
             </div>
             <div v-else style="display:flex;flex-direction:column;gap:8px">
               <div v-for="note in leadNotes" :key="note.id"
                 style="background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:8px;padding:12px;font-size:13px">
-                <div style="color:#282828;line-height:1.6;white-space:pre-wrap">{{ note.content }}</div>
+                <div style="color:var(--text-1);line-height:1.6;white-space:pre-wrap">{{ note.content }}</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-                  <span style="font-size:11px;color:#94a3b8">
+                  <span style="font-size:11px;color:var(--text-3)">
                     {{ note.profiles?.name || 'Usuario' }} &middot; {{ formatEventDate(note.created_at) }}
                   </span>
                   <button @click="deleteNote(note.id)"
-                    style="border:none;background:none;color:#cbd5e1;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .1s"
+                    style="border:none;background:none;color:var(--text-3);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .1s"
                     onmouseenter="this.style.color='#dc2626'"
                     onmouseleave="this.style.color='#cbd5e1'">
                     Remover
@@ -310,8 +310,8 @@
 
           <!-- Histórico tab -->
           <div v-if="detailTab === 'histórico'" style="margin-top:12px">
-            <div v-if="eventsLoading" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Carregando...</div>
-            <div v-else-if="!leadEvents.length" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">
+            <div v-if="eventsLoading" style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">Carregando...</div>
+            <div v-else-if="!leadEvents.length" style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">
               Nenhuma atividade registrada.
             </div>
             <div v-else style="display:flex;flex-direction:column;gap:8px">
@@ -320,8 +320,8 @@
                   {{ eventIcon(ev.type) }}
                 </div>
                 <div style="flex:1;min-width:0;padding-top:5px">
-                  <div style="color:#282828">{{ eventLabel(ev) }}</div>
-                  <div style="color:#94a3b8;font-size:11px;margin-top:2px">
+                  <div style="color:var(--text-1)">{{ eventLabel(ev) }}</div>
+                  <div style="color:var(--text-3);font-size:11px;margin-top:2px">
                     {{ ev.profiles?.name || 'Usuário' }} · {{ formatEventDate(ev.created_at) }}
                   </div>
                 </div>
@@ -340,12 +340,12 @@
         @click.self="showModal = false">
         <div style="background:var(--bg-card);border-radius:14px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15),0 8px 24px rgba(0,0,0,.08)">
           <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:16px;font-weight:600;color:#282828">Novo lead</div>
+            <div style="font-size:16px;font-weight:600;color:var(--text-1)">Novo lead</div>
             <button class="btn" @click="showModal = false" style="padding:4px 10px">X</button>
           </div>
           <div style="padding:20px 24px">
             <div v-if="createError"
-              style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px">
+              style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px">
               {{ createError }}
               <span v-if="duplicateLeadId">
                 &nbsp;
@@ -359,12 +359,12 @@
               <div style="grid-column:span 2" class="form-field">
                 <label class="input-label">Decisor *</label>
                 <input v-model="newForm.decisor" placeholder="João Silva" />
-                <div style="font-size:11px;color:#94a3b8">Nome de quem decide a compra</div>
+                <div style="font-size:11px;color:var(--text-3)">Nome de quem decide a compra</div>
               </div>
               <div class="form-field">
                 <label class="input-label">Telefone</label>
                 <input v-model="newForm.telefone" placeholder="(85) 9 9999-9999" />
-                <div style="font-size:11px;color:#94a3b8">Usado para detectar duplicatas</div>
+                <div style="font-size:11px;color:var(--text-3)">Usado para detectar duplicatas</div>
               </div>
               <div class="form-field">
                 <label class="input-label">Empresa</label>
@@ -381,7 +381,7 @@
               <div style="grid-column:span 2" class="form-field">
                 <label class="input-label">Indicação / Ponte</label>
                 <input v-model="newForm.nome_ponte" placeholder="Ex: Maria do RH que te apresentou" />
-                <div style="font-size:11px;color:#94a3b8">Quem te apresentou este lead? (opcional)</div>
+                <div style="font-size:11px;color:var(--text-3)">Quem te apresentou este lead? (opcional)</div>
               </div>
               <div class="form-field">
                 <label class="input-label">Resultado</label>
@@ -410,7 +410,7 @@
                   <option value="">Nenhuma</option>
                   <option v-for="c in cadences" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
-                <div style="font-size:11px;color:#94a3b8">Sequencia de passos que guia o follow-up</div>
+                <div style="font-size:11px;color:var(--text-3)">Sequencia de passos que guia o follow-up</div>
               </div>
 
               <div style="grid-column:span 2">
@@ -855,7 +855,7 @@ async function handleCreateLead() {
   align-items: stretch;
   gap: 0;
   background: var(--bg-card, #fff);
-  border: 1px solid var(--border, #f1f5f9);
+  border: 1px solid var(--border, var(--border-soft));
   border-radius: 10px;
   padding: 12px 4px;
   margin-bottom: 12px;
@@ -874,23 +874,23 @@ async function handleCreateLead() {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: var(--text-3, #94a3b8);
+  color: var(--text-3, var(--text-3));
 }
 .pipe-summary-value {
   font-size: 19px;
   font-weight: 600;
-  color: var(--text-1, #282828);
+  color: var(--text-1, var(--text-1));
   letter-spacing: -.02em;
   line-height: 1.1;
 }
-.pipe-summary-hint { font-size: 11px; color: var(--text-3, #94a3b8); }
-.pipe-summary-divider { width: 1px; background: var(--border-soft, #f1f5f9); align-self: stretch; }
+.pipe-summary-hint { font-size: 11px; color: var(--text-3, var(--text-3)); }
+.pipe-summary-divider { width: 1px; background: var(--border-soft, var(--border-soft)); align-self: stretch; }
 
 .lead-value {
   font-weight: 600;
   color: #16a34a;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: var(--ok-bg);
+  border: 1px solid var(--ok-bd);
   border-radius: 4px;
   padding: 0 5px;
 }
@@ -907,7 +907,7 @@ async function handleCreateLead() {
 .pipe-views {
   display: flex;
   gap: 3px;
-  background: var(--bg-subtle, #f1f5f9);
+  background: var(--bg-subtle, var(--border-soft));
   border-radius: 9px;
   padding: 3px;
   flex-shrink: 0;
@@ -967,7 +967,7 @@ async function handleCreateLead() {
   max-width: 480px;
   height: 100%;
   background: var(--bg-card, #fff);
-  border-left: 1px solid var(--border, #e2e8f0);
+  border-left: 1px solid var(--border, var(--border));
   display: flex;
   flex-direction: column;
   box-shadow: -8px 0 32px rgba(0, 0, 0, .14);
@@ -978,12 +978,12 @@ async function handleCreateLead() {
   justify-content: space-between;
   gap: 10px;
   padding: 18px 20px 14px;
-  border-bottom: 1px solid var(--border-soft, #f1f5f9);
+  border-bottom: 1px solid var(--border-soft, var(--border-soft));
   flex-shrink: 0;
 }
 .drawer-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.drawer-title { font-size: 17px; font-weight: 600; color: var(--text-1, #282828); letter-spacing: -.01em; }
-.drawer-sub { font-size: 13px; color: var(--text-2, #64748b); margin-top: 2px; }
+.drawer-title { font-size: 17px; font-weight: 600; color: var(--text-1, var(--text-1)); letter-spacing: -.01em; }
+.drawer-sub { font-size: 13px; color: var(--text-2, var(--text-2)); margin-top: 2px; }
 .drawer-body { flex: 1; overflow-y: auto; padding: 18px 20px; }
 
 .drawer-enter-active, .drawer-leave-active { transition: opacity .2s ease; }
@@ -993,7 +993,7 @@ async function handleCreateLead() {
 
 .view-toggle {
   display: flex;
-  background: #f1f5f9;
+  background: var(--border-soft);
   border-radius: 8px;
   padding: 3px;
   gap: 2px;
@@ -1006,7 +1006,7 @@ async function handleCreateLead() {
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--text-2);
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -1014,10 +1014,10 @@ async function handleCreateLead() {
   transition: all .12s;
   white-space: nowrap;
 }
-.view-toggle-btn:hover { color: #282828 }
+.view-toggle-btn:hover { color: var(--text-1) }
 .view-toggle-btn.active {
-  background: #fff;
-  color: #282828;
+  background:var(--bg-card);
+  color: var(--text-1);
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 

@@ -32,20 +32,20 @@
           @click="select(lead)"
         >
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:28px;height:28px;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#475569;flex-shrink:0">
+            <div style="width:28px;height:28px;border-radius:6px;background:var(--border-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-2);flex-shrink:0">
               {{ (lead.negocio || lead.decisor || '?')[0].toUpperCase() }}
             </div>
             <div style="min-width:0;flex:1">
               <div class="gs-item-name">{{ lead.decisor }}</div>
               <div class="gs-item-sub" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
                 <span v-if="lead.negocio">{{ lead.negocio }}</span>
-                <span v-if="lead.negocio" style="color:#e2e8f0">·</span>
+                <span v-if="lead.negocio" style="color:var(--border)">·</span>
                 <span style="display:inline-flex;align-items:center;gap:3px">
                   <span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block"
                     :style="{ background: statusDotColor(lead.resultado) }"></span>
                   {{ lead.resultado }}
                 </span>
-                <span v-if="lead.telefone" style="color:#e2e8f0">·</span>
+                <span v-if="lead.telefone" style="color:var(--border)">·</span>
                 <span v-if="lead.telefone">{{ lead.telefone }}</span>
               </div>
             </div>
@@ -148,21 +148,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 <style scoped>
 .gs-wrap { position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding-top:80px }
 .gs-backdrop { position:absolute;inset:0;background:rgba(40,40,40,.5);backdrop-filter:blur(3px) }
-.gs-modal { position:relative;width:100%;max-width:540px;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;border:1px solid #f1f5f9 }
+.gs-modal { position:relative;width:100%;max-width:540px;background:var(--bg-card);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--border-soft) }
 
-.gs-input-row { display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #f1f5f9 }
-.gs-icon { flex-shrink:0;color:#94a3b8 }
-.gs-input { flex:1;border:none;outline:none;font-size:15px;color:#282828;background:transparent;font-family:inherit }
-.gs-input::placeholder { color:#94a3b8 }
-.gs-esc { font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-family:inherit;cursor:default;background:#f9f6ef }
+.gs-input-row { display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border-soft) }
+.gs-icon { flex-shrink:0;color:var(--text-3) }
+.gs-input { flex:1;border:none;outline:none;font-size:15px;color:var(--text-1);background:transparent;font-family:inherit }
+.gs-input::placeholder { color:var(--text-3) }
+.gs-esc { font-size:10px;color:var(--text-3);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:inherit;cursor:default;background:var(--bg-subtle) }
 
-.gs-status { font-size:13px;color:#94a3b8;padding:16px;text-align:center }
+.gs-status { font-size:13px;color:var(--text-3);padding:16px;text-align:center }
 
 .gs-list { list-style:none;margin:0;padding:6px 0;max-height:340px;overflow-y:auto }
 .gs-item { padding:10px 16px;cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:background .1s }
-.gs-item-active { background:#f9f6ef }
-.gs-item-name { font-size:14px;font-weight:500;color:#282828 }
-.gs-item-sub { font-size:12px;color:#94a3b8 }
+.gs-item-active { background:var(--bg-subtle) }
+.gs-item-name { font-size:14px;font-weight:500;color:var(--text-1) }
+.gs-item-sub { font-size:12px;color:var(--text-3) }
 
-.gs-footer { display:flex;gap:14px;padding:9px 16px;border-top:1px solid #f1f5f9;font-size:11px;color:#94a3b8 }
+.gs-footer { display:flex;gap:14px;padding:9px 16px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--text-3) }
 </style>

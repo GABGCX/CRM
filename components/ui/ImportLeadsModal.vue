@@ -10,7 +10,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
             <div style="font-size:15px;font-weight:600">Importar leads via CSV</div>
-            <div style="font-size:12px;color:#64748b;margin-top:2px">Maximo 500 leads por importacao</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:2px">Maximo 500 leads por importacao</div>
           </div>
           <button class="btn" @click="$emit('close')" style="padding:4px 8px">X</button>
         </div>
@@ -28,13 +28,13 @@
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
             </svg>
-            <div style="font-size:13px;color:#475569;margin-top:8px">Arraste um arquivo .csv ou clique para selecionar</div>
-            <div style="font-size:11px;color:#94a3b8;margin-top:4px">Colunas suportadas: decisor*, telefone, negocio, instagram, nome_ponte, segmento, cidade, porte, fonte</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:8px">Arraste um arquivo .csv ou clique para selecionar</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:4px">Colunas suportadas: decisor*, telefone, negocio, instagram, nome_ponte, segmento, cidade, porte, fonte</div>
           </div>
           <input ref="fileInput" type="file" accept=".csv,text/csv" style="display:none" @change="onFileSelect" />
 
-          <div style="margin-top:12px;background:#f9f6ef;border-radius:8px;padding:12px;font-size:11px;color:#64748b">
-            <div style="font-weight:600;margin-bottom:6px;color:#475569">Exemplo de CSV:</div>
+          <div style="margin-top:12px;background:var(--bg-subtle);border-radius:8px;padding:12px;font-size:11px;color:var(--text-2)">
+            <div style="font-weight:600;margin-bottom:6px;color:var(--text-2)">Exemplo de CSV:</div>
             <code style="white-space:pre;font-family:monospace;font-size:10px;line-height:1.6">decisor,telefone,negocio,porte,fonte
 Joao Silva,11999999999,Empresa ABC,media,cold_call
 Maria Santos,11888888888,Tech XYZ,grande,linkedin</code>
@@ -49,7 +49,7 @@ Maria Santos,11888888888,Tech XYZ,grande,linkedin</code>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
             <div v-for="field in FIELDS" :key="field.key">
-              <div style="font-size:11px;color:#64748b;font-weight:500;margin-bottom:3px">
+              <div style="font-size:11px;color:var(--text-2);font-weight:500;margin-bottom:3px">
                 {{ field.label }}{{ field.required ? ' *' : '' }}
               </div>
               <select v-model="mapping[field.key]" style="font-size:12px">
@@ -76,18 +76,18 @@ Maria Santos,11888888888,Tech XYZ,grande,linkedin</code>
           <div style="overflow-x:auto;margin-bottom:14px">
             <table style="width:100%;border-collapse:collapse;font-size:11px">
               <thead>
-                <tr style="border-bottom:1px solid #f1f5f9">
+                <tr style="border-bottom:1px solid var(--border-soft)">
                   <th v-for="col in visibleCols" :key="col"
-                    style="text-align:left;padding:4px 8px;font-weight:500;color:#94a3b8;text-transform:uppercase;font-size:10px">
+                    style="text-align:left;padding:4px 8px;font-weight:500;color:var(--text-3);text-transform:uppercase;font-size:10px">
                     {{ col }}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(row, i) in mappedRows.slice(0, 5)" :key="i"
-                  style="border-bottom:1px solid #f9f6ef">
+                  style="border-bottom:1px solid var(--bg-subtle)">
                   <td v-for="col in visibleCols" :key="col"
-                    style="padding:5px 8px;color:#475569;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    style="padding:5px 8px;color:var(--text-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                     {{ row[col] || '' }}
                   </td>
                 </tr>
@@ -97,15 +97,15 @@ Maria Santos,11888888888,Tech XYZ,grande,linkedin</code>
 
           <div v-if="importResult" style="padding:12px;border-radius:8px;font-size:13px;margin-bottom:12px"
             :style="importResult.skipped > 0
-              ? 'background:#fffbeb;border:1px solid #fde68a;color:#78350f'
-              : 'background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d'">
+              ? 'background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn)'
+              : 'background:var(--ok-bg);border:1px solid var(--ok-bd);color:var(--ok)'">
             <strong>{{ importResult.created }}</strong> leads criados.
             <span v-if="importResult.skipped > 0">
               <strong>{{ importResult.skipped }}</strong> ignorados (telefone duplicado).
             </span>
           </div>
 
-          <div v-if="importError" style="padding:10px;border-radius:8px;font-size:12px;margin-bottom:12px;background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d">
+          <div v-if="importError" style="padding:10px;border-radius:8px;font-size:12px;margin-bottom:12px;background:var(--bad-bg);border:1px solid var(--bad-bd);color:var(--bad)">
             {{ importError }}
           </div>
 
@@ -228,7 +228,7 @@ async function runImport() {
 
 <style scoped>
 .drop-zone {
-  border: 2px dashed #b8cafd;
+  border: 2px dashed var(--accent-bd);
   border-radius: 10px;
   padding: 32px;
   text-align: center;
@@ -237,12 +237,12 @@ async function runImport() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #fafcff;
+  background: var(--bg-subtle);
 }
 
 .drop-zone:hover,
 .drop-zone--over {
   border-color: #193497;
-  background: #eaefff;
+  background: var(--accent-soft);
 }
 </style>

@@ -13,8 +13,8 @@ defineProps<{ value: number | null | undefined; compact?: boolean }>()
   font-size: 11px;
   font-weight: 600;
   color: #16a34a;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: var(--ok-bg);
+  border: 1px solid var(--ok-bd);
   border-radius: 4px;
   padding: 0 5px;
   white-space: nowrap;

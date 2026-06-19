@@ -13,7 +13,7 @@
         <div class="flex gap-0.5">
           <div v-for="fu in sortedFU" :key="fu.attempt_index"
             class="w-2 h-2 rounded-sm"
-            :style="{ background: fu.completed_at ? '#3b82f6' : '#1e293b', border: '1px solid #334155' }"
+            :style="{ background: fu.completed_at ? '#3b82f6' : 'var(--text-1)', border: '1px solid var(--text-2)' }"
           />
         </div>
         <span class="text-[10px] text-ink-subtle">{{ fuDone }}/10</span>
@@ -43,8 +43,8 @@
             class="flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border transition-all text-center"
             style="min-width:48px"
             :style="{
-              background: fu.completed_at ? '#1d4ed822' : '#1e293b',
-              borderColor: fu.completed_at ? '#3b82f6' : '#334155',
+              background: fu.completed_at ? '#1d4ed822' : 'var(--text-1)',
+              borderColor: fu.completed_at ? '#3b82f6' : 'var(--text-2)',
             }"
           >
             <span class="text-xs font-bold" :class="fu.completed_at ? 'text-blue-400' : 'text-ink-ghost'">{{ fu.attempt_index+1 }}º</span>

@@ -1,5 +1,5 @@
 ﻿<template>
-  <div style="min-height:100vh;background:#f9f6ef;display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="min-height:100vh;background:var(--bg-subtle);display:flex;align-items:center;justify-content:center;padding:16px">
     <div style="width:100%;max-width:420px">
 
       <!-- Brand -->
@@ -11,19 +11,19 @@
             <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 style="font-size:22px;font-weight:700;color:#282828;letter-spacing:-.02em;margin:0 0 6px">Criar conta no Prospecta</h1>
-        <p style="font-size:14px;color:#64748b;margin:0">Configure sua prospecção em minutos</p>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin:0 0 6px">Criar conta no Prospecta</h1>
+        <p style="font-size:14px;color:var(--text-2);margin:0">Configure sua prospecção em minutos</p>
       </div>
 
       <form @submit.prevent="handleRegister"
-        style="background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:14px">
+        style="background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:14px">
 
         <div v-if="error"
-          style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
+          style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
           {{ error }}
         </div>
 
-        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Sua conta</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em">Sua conta</div>
 
         <div class="form-field">
           <label class="input-label">Seu nome</label>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="divider" style="margin:2px 0"></div>
-        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Sua organização</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em">Sua organização</div>
 
         <div class="form-field">
           <label class="input-label">Nome da empresa</label>
@@ -49,7 +49,7 @@
         <div class="form-field">
           <label class="input-label">
             Subdomínio
-            <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">(seu endereço único)</span>
+            <span style="font-size:11px;color:var(--text-3);font-weight:400;margin-left:4px">(seu endereço único)</span>
           </label>
           <div style="display:flex">
             <input
@@ -60,7 +60,7 @@
               @input="form.slug = form.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')"
             />
             <span
-              style="display:flex;align-items:center;padding:0 12px;background:#f9f6ef;border:1px solid #e2e8f0;border-radius:0 8px 8px 0;font-size:13px;color:#64748b;white-space:nowrap;height:auto">
+              style="display:flex;align-items:center;padding:0 12px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-2);white-space:nowrap;height:auto">
               .{{ appDomain }}
             </span>
           </div>
@@ -79,7 +79,7 @@
         </button>
       </form>
 
-      <p style="text-align:center;font-size:13px;color:#64748b;margin-top:20px">
+      <p style="text-align:center;font-size:13px;color:var(--text-2);margin-top:20px">
         Já tem conta?
         <NuxtLink to="/login" style="color:#193497;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
       </p>
