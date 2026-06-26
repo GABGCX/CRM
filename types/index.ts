@@ -100,7 +100,7 @@ export interface LeadEvent {
   lead_id: string
   org_id: string
   user_id: string | null
-  type: 'created' | 'status_change' | 'field_update' | 'followup' | 'note'
+  type: 'created' | 'status_change' | 'field_update' | 'followup' | 'note' | 'activity'
   payload: Record<string, unknown> | null
   created_at: string
   profiles?: { name: string | null; avatar_url: string | null } | null
@@ -126,6 +126,7 @@ export interface DiaryEntry {
   org_id: string
   user_id: string
   date: string
+  ld: number
   ce: number
   rm: number
   rr: number

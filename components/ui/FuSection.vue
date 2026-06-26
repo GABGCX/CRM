@@ -6,7 +6,7 @@
     </div>
 
     <div v-for="lead in leads" :key="lead.id">
-      <div class="fu-row" @click="expanded[lead.id] = !expanded[lead.id]">
+      <div class="fu-row" @click="toggleOpen(lead.id)">
         <div class="fu-urgency" :style="{ background: urgencyColor(lead) }" />
 
         <div class="fu-initial" :style="initialStyle(lead)">
@@ -47,13 +47,13 @@
           </button>
         </div>
 
-        <svg :style="{ transform: expanded[lead.id] ? 'rotate(180deg)' : '', transition:'transform .15s', flexShrink:0 }"
+        <svg :style="{ transform: isOpen(lead.id) ? 'rotate(180deg)' : '', transition:'transform .15s', flexShrink:0 }"
           width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
 
-      <div v-if="expanded[lead.id] || showAll" class="fu-expanded">
+      <div v-if="isOpen(lead.id)" class="fu-expanded">
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px">
           <button v-for="fu in sortedFU(lead.followups)" :key="fu.attempt_index"
             @click.stop="$emit('toggle', lead, fu.attempt_index)"
@@ -140,7 +140,10 @@ const STATUSES: LeadStatus[] = [
   'Enviar proposta','Proposta enviada','Fechado','Recusado','Sem interesse','Não atende',
 ]
 
+// showAll define apenas o estado inicial; o chevron pode recolher cada linha.
 const expanded = reactive<Record<string,boolean>>({})
+const isOpen     = (id: string) => expanded[id] ?? !!props.showAll
+const toggleOpen = (id: string) => { expanded[id] = !isOpen(id) }
 
 function nextCadenceStep(lead: LeadWithFU) {
   if (!lead.cadence_id || !props.cadences) return null

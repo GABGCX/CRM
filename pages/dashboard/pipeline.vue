@@ -54,6 +54,16 @@
           <option value="">Todas etiquetas</option>
           <option v-for="t in tags" :key="t.id" :value="t.id">{{ t.name }}</option>
         </select>
+        <select v-model="filterCreated" class="pipe-filter-select" title="Filtrar por data de criacao">
+          <option value="">Qualquer criacao</option>
+          <option value="7">Criados: 7 dias</option>
+          <option value="30">Criados: 30 dias</option>
+          <option value="month">Criados: este mes</option>
+        </select>
+        <button class="pipe-toggle" :class="{ active: filterOverdue }"
+          @click="filterOverdue = !filterOverdue" title="Apenas leads com retorno atrasado">
+          Atrasados
+        </button>
         <select v-if="viewMode === 'list'" v-model="filterStatus" class="pipe-filter-select" title="Filtrar por status">
           <option value="Todos">Todos os status ({{ totalLeads }})</option>
           <option v-for="s in STATUSES" :key="s" :value="s">{{ s }} ({{ countByStatus[s] || 0 }})</option>
@@ -249,7 +259,7 @@
               @click="detailTab = t"
               class="detail-tab-btn"
               :class="{ active: detailTab === t }">
-              {{ t === 'follow-ups' ? `FU (${fuDone(selectedLead)}/10)` : t === 'notas' ? `Notas${leadNotes.length ? ` (${leadNotes.length})` : ''}` : 'Historico' }}
+              {{ t === 'follow-ups' ? `FU (${fuDone(selectedLead)}/10)` : t === 'notas' ? `Notas${leadNotes.length ? ` (${leadNotes.length})` : ''}` : 'Atividades' }}
             </button>
           </div>
 
@@ -308,8 +318,16 @@
             </div>
           </div>
 
-          <!-- Histórico tab -->
+          <!-- Atividades / Histórico tab -->
           <div v-if="detailTab === 'histórico'" style="margin-top:12px">
+            <!-- Registro rapido de atividade -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+              <button v-for="a in ACTIVITY_KINDS" :key="a.kind" class="btn"
+                style="padding:5px 11px;font-size:12px" :disabled="activitySaving"
+                @click="logActivity(a.kind)">
+                {{ a.label }}
+              </button>
+            </div>
             <div v-if="eventsLoading" style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">Carregando...</div>
             <div v-else-if="!leadEvents.length" style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">
               Nenhuma atividade registrada.
@@ -505,8 +523,29 @@ const {
 
 const filterStatus       = ref('Todos')
 const filterTag          = ref('')
+const filterCreated      = ref<''|'7'|'30'|'month'>('')
+const filterOverdue      = ref(false)
 const searchQ            = ref('')
 const sortBy             = ref<'created_at'|'data_retorno'|'fu_done'|'score'>('created_at')
+
+const todayISO = new Date().toISOString().slice(0, 10)
+const monthStartISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)
+
+function matchesCreated(l: LeadWithFU): boolean {
+  if (!filterCreated.value) return true
+  const created = (l.created_at || '').slice(0, 10)
+  if (!created) return false
+  if (filterCreated.value === 'month') return created >= monthStartISO
+  const d = new Date(); d.setDate(d.getDate() - Number(filterCreated.value))
+  return created >= d.toISOString().slice(0, 10)
+}
+
+// Filtros que valem tanto na lista quanto no kanban: etiqueta, atrasados, data de criacao.
+function passesExtra(l: LeadWithFU): boolean {
+  const mt = !filterTag.value || (l.tag_ids || []).includes(filterTag.value)
+  const mo = !filterOverdue.value || (!!l.data_retorno && l.data_retorno < todayISO)
+  return mt && mo && matchesCreated(l)
+}
 
 const { tags, fetchTags, resolve: resolveTags } = useTags()
 const { prefs: cardPrefs, init: initCardPrefs } = useCardPrefs()
@@ -562,12 +601,11 @@ const avgTicket = computed(() =>
 const filtered = computed(() => {
   let list = (leads.value||[]).filter(l => {
     const ms = filterStatus.value === 'Todos' || l.resultado === filterStatus.value
-    const mt = !filterTag.value || (l.tag_ids || []).includes(filterTag.value)
     const q  = searchQ.value.toLowerCase()
     const mq = !q || l.decisor.toLowerCase().includes(q) ||
                (l.negocio||'').toLowerCase().includes(q) ||
                (l.telefone||'').includes(q)
-    return ms && mt && mq
+    return ms && mq && passesExtra(l)
   })
   if (sortBy.value === 'data_retorno') {
     list = [...list].sort((a, b) => {
@@ -587,10 +625,9 @@ const filtered = computed(() => {
 // No Kanban as colunas ja representam os status, entao so busca e etiqueta filtram.
 const filteredForKanban = computed(() =>
   (leads.value||[]).filter(l => {
-    const mt = !filterTag.value || (l.tag_ids || []).includes(filterTag.value)
     const q  = searchQ.value.toLowerCase()
     const mq = !q || l.decisor.toLowerCase().includes(q) || (l.negocio||'').toLowerCase().includes(q)
-    return mt && mq
+    return mq && passesExtra(l)
   })
 )
 
@@ -655,8 +692,37 @@ async function deleteNote(noteId: string) {
   } catch { showToast('Erro ao remover nota.') }
 }
 
+const ACTIVITY_KINDS = [
+  { kind: 'ligacao',  label: 'Ligacao'  },
+  { kind: 'whatsapp', label: 'WhatsApp' },
+  { kind: 'reuniao',  label: 'Reuniao'  },
+  { kind: 'email',    label: 'Email'    },
+] as const
+
+const ACTIVITY_LABELS: Record<string, string> = {
+  ligacao: 'Ligacao registrada', whatsapp: 'WhatsApp registrado',
+  reuniao: 'Reuniao registrada', email: 'Email registrado', outro: 'Atividade registrada',
+}
+
+const activitySaving = ref(false)
+async function logActivity(kind: string) {
+  if (!selectedId.value) return
+  activitySaving.value = true
+  try {
+    const ev = await $fetch<LeadEvent>(`/api/leads/${selectedId.value}/events`, {
+      method: 'POST', body: { kind },
+    })
+    if (ev) leadEvents.value.unshift(ev)
+    showToast('Atividade registrada')
+  } catch {
+    showToast('Erro ao registrar atividade.')
+  } finally {
+    activitySaving.value = false
+  }
+}
+
 const EVENT_ICONS: Record<string, string> = {
-  created: '+', status_change: '>', field_update: '~', followup: 'v', note: '@',
+  created: '+', status_change: '>', field_update: '~', followup: 'v', note: '@', activity: '*',
 }
 function eventIcon(type: string) { return EVENT_ICONS[type] ?? '·' }
 
@@ -669,6 +735,10 @@ function eventLabel(ev: LeadEvent): string {
     case 'followup':      return p.completed
       ? `Follow-up ${p.attempt_index + 1} concluído`
       : `Follow-up ${p.attempt_index + 1} reaberto`
+    case 'activity': {
+      const base = ACTIVITY_LABELS[p.kind] ?? 'Atividade registrada'
+      return p.note ? `${base}: ${p.note}` : base
+    }
     default: return ev.type
   }
 }
@@ -944,6 +1014,20 @@ async function handleCreateLead() {
 }
 .pipe-search { width: 220px; max-width: 100%; }
 .pipe-filter-select { width: auto; flex-shrink: 0; }
+.pipe-toggle {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-2);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .12s;
+}
+.pipe-toggle:hover { border-color: var(--bad); color: var(--bad); }
+.pipe-toggle.active { background: var(--bad-bg); border-color: var(--bad-bd); color: var(--bad); font-weight: 500; }
 
 /* ── Lista (largura total) ───────────────────────────────── */
 .lead-list {

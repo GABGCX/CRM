@@ -1,5 +1,5 @@
 <template>
-  <div style="position:relative">
+  <div data-template-selector style="position:relative">
     <button
       class="btn"
       :title="`Templates de ${channel || 'mensagem'}`"

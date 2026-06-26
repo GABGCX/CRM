@@ -5,7 +5,7 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 import type { H3Event } from 'h3'
 
-type EventType = 'created' | 'status_change' | 'field_update' | 'followup' | 'note'
+type EventType = 'created' | 'status_change' | 'field_update' | 'followup' | 'note' | 'activity'
 
 export async function insertLeadEvent(
   event: H3Event,
