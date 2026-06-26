@@ -1,6 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server'
 import { getReportRange } from '../../utils/reportRange'
 
+// Serie diaria de atividade (somada na org, ou por usuario). Base para tendencias,
+// ritmo de meta, ligacoes/dia, taxa CE/LD e heatmap.
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event)
   const query = getQuery(event)
@@ -18,17 +20,16 @@ export default defineEventHandler(async (event) => {
   const { data, error } = await q
   if (error) throw createError({ statusCode: 500, message: error.message })
 
-  // Agrega por mes (somando todos os usuarios quando user_id nao filtrado)
-  const byMonth: Record<string, { month: string; ld: number; ce: number; rm: number; rr: number; fr: number }> = {}
+  const byDate: Record<string, { date: string; ld: number; ce: number; rm: number; rr: number; fr: number }> = {}
   for (const row of data ?? []) {
-    const month = `${row.date.slice(0, 7)}-01`
-    if (!byMonth[month]) byMonth[month] = { month, ld: 0, ce: 0, rm: 0, rr: 0, fr: 0 }
-    byMonth[month].ld += row.ld ?? 0
-    byMonth[month].ce += row.ce
-    byMonth[month].rm += row.rm
-    byMonth[month].rr += row.rr
-    byMonth[month].fr += row.fr
+    const d = row.date
+    if (!byDate[d]) byDate[d] = { date: d, ld: 0, ce: 0, rm: 0, rr: 0, fr: 0 }
+    byDate[d].ld += row.ld ?? 0
+    byDate[d].ce += row.ce
+    byDate[d].rm += row.rm
+    byDate[d].rr += row.rr
+    byDate[d].fr += row.fr
   }
 
-  return Object.values(byMonth).sort((a, b) => a.month.localeCompare(b.month))
+  return Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date))
 })
