@@ -857,16 +857,30 @@ const detailFields = [
   { key:'proposta_url',   label:'URL da proposta', type:'url', wide:true },
 ]
 
+// Campos opcionais que, vazios (''), devem virar null antes de salvar.
+// Sem isso, data_retorno='' quebra a coluna date e o patch inteiro falha (nada salva).
+const SAVE_NULLABLE = [
+  'telefone','negocio','instagram','nome_ponte','data_retorno','info',
+  'turno','horario','proposta_url','motivo_perda','valor_estimado','num_vendedores',
+]
+
 async function saveLead() {
   if (!selectedLead.value) return
   detailSaving.value = true
   try {
     // tag_ids salva separado (onTagsChange, instantaneo); fora do payload generico.
-    const payload = { ...editForm }
+    const payload: Record<string, any> = { ...editForm }
     delete payload.tag_ids
+    for (const k of SAVE_NULLABLE) if (payload[k] === '') payload[k] = null
+    // mantem so os campos personalizados preenchidos
+    payload.custom_fields = Object.fromEntries(
+      Object.entries(payload.custom_fields || {}).filter(([, v]) => v !== '' && v != null)
+    )
     await patchLead(selectedLead.value.id, payload)
     hasUnsavedChanges.value = false
     showToast('Salvo!')
+  } catch {
+    showToast('Erro ao salvar. Verifique os campos.')
   } finally {
     detailSaving.value = false
   }

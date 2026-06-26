@@ -11,14 +11,28 @@
         <button v-for="opt in [{ value: 3, label: '3 meses' }, { value: 6, label: '6 meses' }, { value: 12, label: '1 ano' }]"
           :key="opt.value"
           type="button"
-          @click="months = opt.value"
+          @click="setPreset(opt.value)"
           style="padding:5px 14px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .12s"
-          :style="months === opt.value
+          :style="mode === 'preset' && months === opt.value
             ? 'background:var(--bg-card);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08)'
             : 'background:transparent;color:var(--text-2)'">
           {{ opt.label }}
         </button>
+        <button type="button" @click="mode = 'custom'"
+          style="padding:5px 14px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .12s"
+          :style="mode === 'custom'
+            ? 'background:var(--bg-card);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08)'
+            : 'background:transparent;color:var(--text-2)'">
+          Personalizado
+        </button>
       </div>
+
+      <div v-if="mode === 'custom'" style="display:flex;align-items:center;gap:6px">
+        <input type="month" v-model="customFrom" :max="customTo || todayMonth" style="width:auto" />
+        <span style="font-size:12px;color:var(--text-3)">ate</span>
+        <input type="month" v-model="customTo" :min="customFrom" :max="todayMonth" style="width:auto" />
+      </div>
+
       <select v-if="profile?.role !== 'bdr'" v-model="selectedUser" style="width:auto">
         <option value="">Toda a equipe</option>
         <option v-for="m in membersList" :key="m.id" :value="m.id">{{ m.name || m.email }}</option>
@@ -227,7 +241,21 @@ const cePerRM = Math.round(1 / OUTBOUND_BENCHMARKS.TX_CE_RM)                    
 const ldPerRM = Math.round(1 / OUTBOUND_BENCHMARKS.TX_CE_RM / OUTBOUND_BENCHMARKS.TX_LD_CE) // ~82 ligacoes
 
 const months      = ref(6)
+const mode         = ref<'preset' | 'custom'>('preset')
+const _now         = new Date()
+const todayMonth   = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}`
+const customFrom   = ref('')
+const customTo     = ref(todayMonth)
 const selectedUser = ref('')
+
+function setPreset(v: number) { months.value = v; mode.value = 'preset' }
+
+// Rotulo do periodo (usado nos KPIs) conforme preset ou range personalizado.
+const periodLabel = computed(() =>
+  mode.value === 'custom' && customFrom.value && customTo.value
+    ? `${customFrom.value} a ${customTo.value}`
+    : months.value === 12 ? '1 ano' : `${months.value} meses`
+)
 
 // ── Membros para filtro (owner/admin) ──────────────────────────────────
 const membersList = ref<(Profile & { email: string })[]>([])
@@ -247,7 +275,13 @@ const funnelLoading = ref(false)
 async function loadFunnel() {
   funnelLoading.value = true
   try {
-    const params = new URLSearchParams({ months: String(months.value) })
+    const params = new URLSearchParams()
+    if (mode.value === 'custom' && customFrom.value && customTo.value) {
+      params.set('from', customFrom.value)
+      params.set('to', customTo.value)
+    } else {
+      params.set('months', String(months.value))
+    }
     if (selectedUser.value) params.set('user_id', selectedUser.value)
     funnelData.value = await $fetch<FunnelRow[]>(`/api/reports/funnel?${params}`)
   } finally {
@@ -286,7 +320,7 @@ async function loadLossReasons() {
 
 const lossTotal = computed(() => lossData.value.reduce((s, r) => s + r.count, 0))
 
-watch([months, selectedUser], () => loadFunnel(), { immediate: true })
+watch([months, selectedUser, mode, customFrom, customTo], () => loadFunnel(), { immediate: true })
 onMounted(() => { loadStatus(); loadLossReasons() })
 
 // ── Totais do periodo ──────────────────────────────────────────────────
@@ -305,7 +339,7 @@ const kpis = computed(() => {
   const txCeRm = tot.ce ? ((tot.rm / tot.ce) * 100).toFixed(1) : '0'
   const txRrFr = tot.rr ? ((tot.fr / tot.rr) * 100).toFixed(1) : '0'
   return [
-    { label: 'Contatos efetivos',  metric: 'CE' as const, value: tot.ce, sub: `${months.value} meses`, subClass: '' },
+    { label: 'Contatos efetivos',  metric: 'CE' as const, value: tot.ce, sub: periodLabel.value, subClass: '' },
     { label: 'Reunioes marcadas',  metric: 'RM' as const, value: tot.rm, sub: `TX ${txCeRm}% de CE`,  subClass: '' },
     { label: 'Reunioes realizadas',metric: 'RR' as const, value: tot.rr, sub: '',                      subClass: '' },
     { label: 'Fechamentos',        metric: 'FR' as const, value: tot.fr, sub: `TX ${txRrFr}% de RR`,  subClass: tot.fr > 0 ? 'metric-ok' : '' },

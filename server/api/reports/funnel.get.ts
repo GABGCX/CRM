@@ -4,12 +4,23 @@ export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event)
   const query = getQuery(event)
 
-  // Padrão: últimos 6 meses
-  const months = Math.min(Number(query.months ?? 6), 12)
-  const cutoff = new Date()
-  cutoff.setMonth(cutoff.getMonth() - months + 1)
-  cutoff.setDate(1)
-  const since = cutoff.toISOString().slice(0, 10)
+  // Normaliza 'YYYY-MM' ou 'YYYY-MM-DD' para o primeiro dia do mes.
+  const monthStart = (v?: string) => v && /^\d{4}-\d{2}/.test(v) ? `${v.slice(0, 7)}-01` : null
+
+  // Periodo: range personalizado (from/to) tem prioridade; senao, ultimos N meses.
+  const from = monthStart(query.from as string | undefined)
+  const to   = monthStart(query.to as string | undefined)
+
+  let since: string
+  if (from) {
+    since = from
+  } else {
+    const months = Math.min(Number(query.months ?? 6), 24)
+    const cutoff = new Date()
+    cutoff.setMonth(cutoff.getMonth() - months + 1)
+    cutoff.setDate(1)
+    since = cutoff.toISOString().slice(0, 10)
+  }
 
   let q = supabase
     .from('monthly_summary')
@@ -17,6 +28,7 @@ export default defineEventHandler(async (event) => {
     .gte('month', since)
     .order('month', { ascending: true })
 
+  if (to) q = q.lte('month', to)
   if (query.user_id) {
     q = q.eq('user_id', query.user_id as string)
   }
