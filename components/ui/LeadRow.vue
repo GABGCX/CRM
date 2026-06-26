@@ -97,11 +97,13 @@ const open = ref(false)
 
 const FU_DAYS = [2,4,6,8,10,12,14,16,18,20]
 const STATUS_COLORS: Record<string,string> = {
+  'Novo':'#64748B','Prospecção':'#6366F1','Qualificação':'#0EA5E9',
   'Aguardando retorno':'#F59E0B','Follow-up':'#3B82F6','De molho':'#8B5CF6',
   'Reunião agendada':'#10B981','Enviar proposta':'#F97316','Proposta enviada':'#06B6D4',
   'Fechado':'#22C55E','Recusado':'#EF4444','Sem interesse':'#6B7280','Não atende':'#9CA3AF',
 }
 const STATUSES: LeadStatus[] = [
+  'Novo','Prospecção','Qualificação',
   'Aguardando retorno','Follow-up','De molho','Reunião agendada',
   'Enviar proposta','Proposta enviada','Fechado','Recusado','Sem interesse','Não atende',
 ]

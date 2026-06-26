@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
   const TERMINAL = ['Fechado', 'Recusado', 'Sem interesse']
   // Probabilidade de fechamento por estagio (forecast ponderado)
   const STAGE_PROB: Record<string, number> = {
+    'Novo': 0.02, 'Prospecção': 0.05, 'Qualificação': 0.08,
     'Aguardando retorno': 0.10, 'Follow-up': 0.15, 'De molho': 0.05, 'Não atende': 0.05,
     'Reunião agendada': 0.40, 'Enviar proposta': 0.55, 'Proposta enviada': 0.70,
   }

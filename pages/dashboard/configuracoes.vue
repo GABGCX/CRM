@@ -171,6 +171,11 @@
         </form>
       </div>
 
+      <!-- ── Campos personalizados ─────────────────────── -->
+      <div class="card">
+        <UiCustomFieldsManager />
+      </div>
+
       </template>
 
       <template v-if="tab === 'prospeccao'">

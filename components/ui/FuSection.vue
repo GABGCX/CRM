@@ -42,9 +42,7 @@
             </svg>
             Ligar
           </a>
-          <button v-if="fuDone(lead) < 10" class="fu-action-btn" @click.stop="$emit('toggle', lead, fuDone(lead))">
-            FU feito
-          </button>
+          <UiLeadQuickActions :lead="lead" @fu="$emit('toggle', lead, fuDone(lead))" />
         </div>
 
         <svg :style="{ transform: isOpen(lead.id) ? 'rotate(180deg)' : '', transition:'transform .15s', flexShrink:0 }"
@@ -136,6 +134,7 @@ const CHANNEL_ICON: Record<string, string> = {
 function channelIconHtml(ch: string): string { return CHANNEL_ICON[ch] || '' }
 
 const STATUSES: LeadStatus[] = [
+  'Novo','Prospecção','Qualificação',
   'Aguardando retorno','Follow-up','De molho','Reunião agendada',
   'Enviar proposta','Proposta enviada','Fechado','Recusado','Sem interesse','Não atende',
 ]

@@ -28,6 +28,7 @@ const schema = z.object({
   motivo_perda:       z.string().optional().nullable(),
   valor_estimado:     numericOptional,
   tag_ids:            z.array(z.string().uuid()).optional(),
+  custom_fields:      z.record(z.union([z.string(), z.number(), z.null()])).optional(),
 })
 
 export default defineEventHandler(async (event) => {

@@ -10,6 +10,7 @@ type LeadLike = Lead & { followups?: Followup[] }
 
 // ── Status ──────────────────────────────────────────────────────────────
 export const STATUSES: LeadStatus[] = [
+  'Novo', 'Prospecção', 'Qualificação',
   'Aguardando retorno', 'Follow-up', 'De molho', 'Reunião agendada',
   'Enviar proposta', 'Proposta enviada', 'Fechado', 'Recusado', 'Sem interesse', 'Não atende',
 ]
@@ -26,6 +27,7 @@ export const isHot      = (l: Pick<Lead, 'resultado'>) => HOT_STATUSES.includes(
 
 // Probabilidade de fechamento por estagio (previsao ponderada)
 export const STAGE_PROBABILITY: Record<string, number> = {
+  'Novo': 0.02, 'Prospecção': 0.05, 'Qualificação': 0.08,
   'Aguardando retorno': 0.10, 'Follow-up': 0.15, 'De molho': 0.05, 'Não atende': 0.05,
   'Reunião agendada': 0.40, 'Enviar proposta': 0.55, 'Proposta enviada': 0.70,
 }
@@ -84,6 +86,7 @@ export const FUNNEL_STAGES = [
 ] as const
 
 const STATUS_TO_STAGE: Record<string, number> = {
+  'Novo': 0, 'Prospecção': 0, 'Qualificação': 0,
   'Aguardando retorno': 0, 'Follow-up': 0, 'De molho': 0, 'Não atende': 0,
   'Reunião agendada': 1,
   'Enviar proposta': 2, 'Proposta enviada': 2, 'Sem interesse': 2, 'Recusado': 2,
@@ -104,6 +107,7 @@ export const funnelStagePassed = (resultado: string, idx: number) => idx < funne
 
 // ── Cores e icones de status ────────────────────────────────────────────
 const STATUS_TAG: Record<string, string> = {
+  'Novo': 'tag-gray', 'Prospecção': 'tag-indigo', 'Qualificação': 'tag-teal',
   'Aguardando retorno': 'tag-amber', 'Follow-up': 'tag-blue', 'De molho': 'tag-purple',
   'Reunião agendada': 'tag-teal', 'Enviar proposta': 'tag-amber', 'Proposta enviada': 'tag-blue',
   'Fechado': 'tag-green', 'Recusado': 'tag-red', 'Sem interesse': 'tag-gray', 'Não atende': 'tag-gray',
@@ -111,6 +115,9 @@ const STATUS_TAG: Record<string, string> = {
 export const statusTagClass = (s: string) => STATUS_TAG[s] || 'tag-gray'
 
 const STATUS_ICON: Record<string, string> = {
+  'Novo':               '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+  'Prospecção':         '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  'Qualificação':       '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
   'Aguardando retorno': '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
   'Follow-up':          '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-9.49"/>',
   'De molho':           '<circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/>',

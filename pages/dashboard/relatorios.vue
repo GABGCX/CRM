@@ -327,6 +327,7 @@ function funnelBars(row: FunnelRow) {
 
 // ── Donut ──────────────────────────────────────────────────────────────
 const STATUS_COLORS: Record<string, string> = {
+  'Novo': '#64748b', 'Prospecção': '#6366f1', 'Qualificação': '#0ea5e9',
   'Aguardando retorno': '#f59e0b', 'Follow-up': '#3b82f6', 'De molho': '#8b5cf6',
   'Reunião agendada': '#14b8a6', 'Enviar proposta': '#f97316', 'Proposta enviada': '#6366f1',
   'Fechado': '#22c55e', 'Recusado': '#ef4444', 'Sem interesse': '#94a3b8', 'Não atende': '#cbd5e1',

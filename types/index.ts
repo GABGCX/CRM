@@ -44,6 +44,9 @@ export interface Profile {
 // ─── Leads ───────────────────────────────────────────────
 
 export type LeadStatus =
+  | 'Novo'
+  | 'Prospecção'
+  | 'Qualificação'
   | 'Aguardando retorno'
   | 'Follow-up'
   | 'De molho'
@@ -90,9 +93,22 @@ export interface Lead {
   valor_estimado: number | null
   // Etiquetas
   tag_ids: string[]
+  // Campos personalizados (valores por chave de definicao)
+  custom_fields?: Record<string, string | number | null> | null
   created_at: string
   updated_at: string
   followups?: Followup[]
+}
+
+export type CustomFieldType = 'text' | 'number' | 'date' | 'select'
+
+export interface CustomFieldDef {
+  id: string
+  key: string
+  label: string
+  field_type: CustomFieldType
+  options: string[] | null
+  sort_order: number
 }
 
 export interface LeadEvent {

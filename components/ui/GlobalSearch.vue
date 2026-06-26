@@ -75,6 +75,9 @@ const loading  = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
 const STATUS_DOT_COLOR: Record<string, string> = {
+  'Novo':               '#64748b',
+  'Prospecção':         '#6366f1',
+  'Qualificação':       '#0ea5e9',
   'Aguardando retorno': '#f59e0b',
   'Follow-up':          '#3b82f6',
   'De molho':           '#8b5cf6',

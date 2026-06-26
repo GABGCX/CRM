@@ -11,7 +11,7 @@ const schema = z.object({
   instagram:        z.string().optional().nullable(),
   num_vendedores:   numericOptional,
   nome_ponte:       z.string().optional().nullable(),
-  resultado:        z.string().default('Aguardando retorno'),
+  resultado:        z.string().default('Novo'),
   data_retorno:     z.string().optional().nullable(),
   reuniao_agendada: z.boolean().default(false),
   turno:            z.string().optional().nullable(),
@@ -27,6 +27,7 @@ const schema = z.object({
   motivo_perda:       z.string().optional().nullable(),
   valor_estimado:     numericOptional,
   tag_ids:            z.array(z.string().uuid()).optional(),
+  custom_fields:      z.record(z.union([z.string(), z.number(), z.null()])).optional(),
 })
 
 export default defineEventHandler(async (event) => {
