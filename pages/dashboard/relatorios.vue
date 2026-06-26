@@ -36,6 +36,31 @@
       </UiMetricCard>
     </div>
 
+    <!-- Volume de esforço por agendamento -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-label">Volume por agendamento (RM)</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:14px">
+        Quanto esforço, em media, gera 1 reuniao marcada. Meta pelos benchmarks de outbound; real do periodo selecionado.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+        <div class="vol-item">
+          <div class="vol-label">Ligacoes / agendamento</div>
+          <div class="vol-value">~{{ ldPerRM }}</div>
+          <div class="vol-hint">meta (taxa LD&rarr;CE {{ (OUTBOUND_BENCHMARKS.TX_LD_CE*100).toFixed(0) }}% &middot; CE&rarr;RM {{ (OUTBOUND_BENCHMARKS.TX_CE_RM*100).toFixed(1) }}%)</div>
+        </div>
+        <div class="vol-item">
+          <div class="vol-label">Contatos efetivos / agendamento</div>
+          <div class="vol-value">~{{ cePerRM }}</div>
+          <div class="vol-hint">meta de CE para 1 RM</div>
+        </div>
+        <div class="vol-item">
+          <div class="vol-label">Seu CE / agendamento</div>
+          <div class="vol-value" :style="{ color: actualCePerRM !== '--' && Number(actualCePerRM) <= cePerRM ? 'var(--ok)' : 'var(--text-1)' }">{{ actualCePerRM }}</div>
+          <div class="vol-hint">real do periodo ({{ periodTotals.ce }} CE &middot; {{ periodTotals.rm }} RM)</div>
+        </div>
+      </div>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 
       <!-- Funil por mês (barras horizontais) -->
@@ -192,9 +217,14 @@
 
 <script setup lang="ts">
 import type { Profile } from '~/types'
+import { OUTBOUND_BENCHMARKS } from '~/composables/useOutboundMath'
 definePageMeta({ layout: 'dashboard' })
 
 const { profile } = useProfile()
+
+// Volume de esforço por 1 agendamento (RM), pelos benchmarks de outbound.
+const cePerRM = Math.round(1 / OUTBOUND_BENCHMARKS.TX_CE_RM)                         // ~37 contatos efetivos
+const ldPerRM = Math.round(1 / OUTBOUND_BENCHMARKS.TX_CE_RM / OUTBOUND_BENCHMARKS.TX_LD_CE) // ~82 ligacoes
 
 const months      = ref(6)
 const selectedUser = ref('')
@@ -259,11 +289,19 @@ const lossTotal = computed(() => lossData.value.reduce((s, r) => s + r.count, 0)
 watch([months, selectedUser], () => loadFunnel(), { immediate: true })
 onMounted(() => { loadStatus(); loadLossReasons() })
 
+// ── Totais do periodo ──────────────────────────────────────────────────
+const periodTotals = computed(() => funnelData.value.reduce((a, r) => ({
+  ce: a.ce + r.ce, rm: a.rm + r.rm, rr: a.rr + r.rr, fr: a.fr + r.fr
+}), { ce: 0, rm: 0, rr: 0, fr: 0 }))
+
+// CE real por agendamento no periodo (compara com a meta cePerRM).
+const actualCePerRM = computed(() =>
+  periodTotals.value.rm > 0 ? (periodTotals.value.ce / periodTotals.value.rm).toFixed(0) : '--'
+)
+
 // ── KPIs ───────────────────────────────────────────────────────────────
 const kpis = computed(() => {
-  const tot = funnelData.value.reduce((a, r) => ({
-    ce: a.ce + r.ce, rm: a.rm + r.rm, rr: a.rr + r.rr, fr: a.fr + r.fr
-  }), { ce: 0, rm: 0, rr: 0, fr: 0 })
+  const tot = periodTotals.value
   const txCeRm = tot.ce ? ((tot.rm / tot.ce) * 100).toFixed(1) : '0'
   const txRrFr = tot.rr ? ((tot.fr / tot.rr) * 100).toFixed(1) : '0'
   return [
@@ -328,10 +366,23 @@ const ceLinePoints = computed(() =>
 )
 
 // ── Formatadores ───────────────────────────────────────────────────────
+// month pode vir como 'YYYY-MM' ou 'YYYY-MM-DD' (monthly_summary). Extrai ano/mes
+// de forma tolerante e usa data local pra nao desviar por fuso (evita "Invalid Date").
+function monthDate(m: string): Date {
+  const match = /^(\d{4})-(\d{2})/.exec(String(m))
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, 1) : new Date(m)
+}
 function formatMonth(m: string) {
-  return new Date(m + '-02').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  return monthDate(m).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
 }
 function formatMonthShort(m: string) {
-  return new Date(m + '-02').toLocaleDateString('pt-BR', { month: 'short' })
+  return monthDate(m).toLocaleDateString('pt-BR', { month: 'short' })
 }
 </script>
+
+<style scoped>
+.vol-item  { background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:10px;padding:12px 14px }
+.vol-label { font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:6px }
+.vol-value { font-size:26px;font-weight:700;color:var(--text-1);font-variant-numeric:tabular-nums;line-height:1 }
+.vol-hint  { font-size:11px;color:var(--text-3);margin-top:5px }
+</style>

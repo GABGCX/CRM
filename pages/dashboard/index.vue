@@ -65,10 +65,10 @@
             <span v-if="alreadySaved" style="font-size:12px;color:#16a34a;font-weight:500">Salvo</span>
           </div>
         </div>
-        <div class="cockpit-quick-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+        <div class="cockpit-quick-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
           <div v-for="f in quickFields" :key="f.key" style="text-align:center">
             <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center">
-              <UiMetricTooltip v-if="['CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
+              <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
               <span v-else>{{ f.label }}</span>
             </div>
             <input type="number" v-model.number="quickForm[f.key]" min="0"
@@ -283,13 +283,14 @@ const monthTotals = computed(() => (diaryRows.value||[]).reduce(
 ))
 
 const todayEntry = computed(() => (diaryRows.value||[]).find(e => e.date === todayStr))
-const quickForm  = reactive<Record<string,number>>({ ce:0, rm:0, rr:0, fr:0 })
+const quickForm  = reactive<Record<string,number>>({ ld:0, ce:0, rm:0, rr:0, fr:0 })
 
 watch(todayEntry, e => {
-  if (e) { quickForm.ce=e.ce; quickForm.rm=e.rm; quickForm.rr=e.rr; quickForm.fr=e.fr; alreadySaved.value=true }
+  if (e) { quickForm.ld=e.ld||0; quickForm.ce=e.ce; quickForm.rm=e.rm; quickForm.rr=e.rr; quickForm.fr=e.fr; alreadySaved.value=true }
 }, { immediate: true })
 
 const quickFields = computed(() => [
+  { key:'ld', label:'LD', meta: 'N/A' },
   { key:'ce', label:'CE', meta: String(cePerDay.value) },
   { key:'rm', label:'RM', meta: String(rmPerDay.value) },
   { key:'rr', label:'RR', meta: 'N/A' },

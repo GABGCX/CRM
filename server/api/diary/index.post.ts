@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 const schema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  ld:   z.number().min(0).max(9999).optional().default(0),
   ce:   z.number().min(0).max(9999),
   rm:   z.number().min(0).max(9999),
   rr:   z.number().min(0).max(9999),

@@ -2,13 +2,14 @@ import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/serve
 import { z } from 'zod'
 import { insertLeadEvent } from '../../utils/leadEvents'
 import { throwApiError } from '../../utils/apiError'
+import { numericOptional } from '../../utils/zodHelpers'
 
 const schema = z.object({
   decisor:          z.string().min(1),
   telefone:         z.string().optional().nullable(),
   negocio:          z.string().optional().nullable(),
   instagram:        z.string().optional().nullable(),
-  num_vendedores:   z.number().optional().nullable(),
+  num_vendedores:   numericOptional,
   nome_ponte:       z.string().optional().nullable(),
   resultado:        z.string().default('Aguardando retorno'),
   data_retorno:     z.string().optional().nullable(),
@@ -24,7 +25,7 @@ const schema = z.object({
   cadence_id:         z.string().uuid().optional().nullable(),
   cadence_started_at: z.string().optional().nullable(),
   motivo_perda:       z.string().optional().nullable(),
-  valor_estimado:     z.number().optional().nullable(),
+  valor_estimado:     numericOptional,
   tag_ids:            z.array(z.string().uuid()).optional(),
 })
 

@@ -243,8 +243,9 @@ const { leads, pending, activeLeads, toggleFU, patchStatus, patchLead } = useLea
 // Log rapido do dia
 const { day, saving, load: loadDiary, bump } = useDiaryToday()
 const qlFields = [
-  { key: 'ce' as const, label: 'CE' }, { key: 'rm' as const, label: 'RM' },
-  { key: 'rr' as const, label: 'RR' }, { key: 'fr' as const, label: 'FR' },
+  { key: 'ld' as const, label: 'LD' }, { key: 'ce' as const, label: 'CE' },
+  { key: 'rm' as const, label: 'RM' }, { key: 'rr' as const, label: 'RR' },
+  { key: 'fr' as const, label: 'FR' },
 ]
 
 const cadences = ref<Cadence[]>([])

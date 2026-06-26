@@ -193,6 +193,7 @@ const cePerDay = computed(() => {
 const rmPerDay = computed(() => Math.max(1, Math.ceil(cePerDay.value * 0.027)))
 
 const FIELDS = computed(() => [
+  { key:'ld', label:'Ligações',          color:'#0ea5e9', meta: 'N/A' },
   { key:'ce', label:'Contatos efetivos', color:'#193497', meta: String(cePerDay.value) },
   { key:'rm', label:'Reuniões marcadas', color:'#7c3aed', meta: String(rmPerDay.value) },
   { key:'rr', label:'Reuniões realizadas',color:'#0d9488', meta: 'N/A' },
@@ -207,8 +208,8 @@ const { data: entries, refresh } = await useAsyncData<DiaryEntry[]>(
 )
 
 const monthTotals = computed(() => (entries.value||[]).reduce(
-  (a,e) => ({ ce:a.ce+e.ce, rm:a.rm+e.rm, rr:a.rr+e.rr, fr:a.fr+e.fr }),
-  { ce:0, rm:0, rr:0, fr:0 }
+  (a,e) => ({ ld:a.ld+(e.ld||0), ce:a.ce+e.ce, rm:a.rm+e.rm, rr:a.rr+e.rr, fr:a.fr+e.fr }),
+  { ld:0, ce:0, rm:0, rr:0, fr:0 }
 ))
 
 const monthCERMRate = computed(() => monthTotals.value.ce > 0 ? ((monthTotals.value.rm/monthTotals.value.ce)*100).toFixed(1) : '0.0')
@@ -227,18 +228,18 @@ const totalCards = computed(() => {
 })
 
 // Form
-const form = reactive<Record<string,any>>({ date: todayStr, ce:0, rm:0, rr:0, fr:0 })
+const form = reactive<Record<string,any>>({ date: todayStr, ld:0, ce:0, rm:0, rr:0, fr:0 })
 const selectedEntry = computed(() => (entries.value||[]).find((e:any) => e.date === form.date) || null)
 
 const isToday = computed(() => form.date === todayStr)
 
 function onDateChange() {
   const e = selectedEntry.value
-  if (e) { form.ce=e.ce; form.rm=e.rm; form.rr=e.rr; form.fr=e.fr }
-  else   { form.ce=0; form.rm=0; form.rr=0; form.fr=0 }
+  if (e) { form.ld=e.ld||0; form.ce=e.ce; form.rm=e.rm; form.rr=e.rr; form.fr=e.fr }
+  else   { form.ld=0; form.ce=0; form.rm=0; form.rr=0; form.fr=0 }
 }
 
-function step(key: 'ce'|'rm'|'rr'|'fr', delta: number) {
+function step(key: 'ld'|'ce'|'rm'|'rr'|'fr', delta: number) {
   const v = (form[key] || 0) + delta
   if (v >= 0) form[key] = v
 }
@@ -249,13 +250,13 @@ function pct(value: number, meta: string) {
 }
 
 function selectEntry(e: DiaryEntry) {
-  form.date=e.date; form.ce=e.ce; form.rm=e.rm; form.rr=e.rr; form.fr=e.fr
+  form.date=e.date; form.ld=e.ld||0; form.ce=e.ce; form.rm=e.rm; form.rr=e.rr; form.fr=e.fr
 }
 
 async function save() {
   saving.value = true
   try {
-    await $fetch('/api/diary', { method:'POST', body:{ date:form.date, ce:form.ce||0, rm:form.rm||0, rr:form.rr||0, fr:form.fr||0 } })
+    await $fetch('/api/diary', { method:'POST', body:{ date:form.date, ld:form.ld||0, ce:form.ce||0, rm:form.rm||0, rr:form.rr||0, fr:form.fr||0 } })
     await refresh()
     showToast(selectedEntry.value ? 'Dia atualizado!' : 'Dia salvo!')
   } finally { saving.value = false }
@@ -281,7 +282,7 @@ function dayTag(e: DiaryEntry) {
 <style scoped>
 .md-today-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap }
 .md-date { width:auto;flex-shrink:0 }
-.md-steppers { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px }
+.md-steppers { display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:14px }
 @media (max-width:640px){ .md-steppers{ grid-template-columns:repeat(2,1fr) } }
 .md-stepper { background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;gap:8px }
 .md-stepper-label { font-size:11px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }

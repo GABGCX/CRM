@@ -4,11 +4,11 @@
 
 import type { DiaryEntry } from '~/types'
 
-type DiaryField = 'ce' | 'rm' | 'rr' | 'fr'
+type DiaryField = 'ld' | 'ce' | 'rm' | 'rr' | 'fr'
 
 export const useDiaryToday = () => {
   const todayStr = new Date().toISOString().slice(0, 10)
-  const day      = reactive<Record<DiaryField, number>>({ ce: 0, rm: 0, rr: 0, fr: 0 })
+  const day      = reactive<Record<DiaryField, number>>({ ld: 0, ce: 0, rm: 0, rr: 0, fr: 0 })
   const loaded   = ref(false)
   const saving   = ref(false)
   let saveTimer: ReturnType<typeof setTimeout> | null = null
@@ -20,7 +20,7 @@ export const useDiaryToday = () => {
         query: { month: String(now.getMonth() + 1), year: String(now.getFullYear()) },
       })
       const entry = (rows || []).find(e => e.date === todayStr)
-      if (entry) { day.ce = entry.ce; day.rm = entry.rm; day.rr = entry.rr; day.fr = entry.fr }
+      if (entry) { day.ld = entry.ld ?? 0; day.ce = entry.ce; day.rm = entry.rm; day.rr = entry.rr; day.fr = entry.fr }
     } catch { /* silencioso */ }
     finally { loaded.value = true }
   }
