@@ -575,7 +575,15 @@ function passesExtra(l: LeadWithFU): boolean {
 const { tags, fetchTags, resolve: resolveTags } = useTags()
 const { prefs: cardPrefs, init: initCardPrefs } = useCardPrefs()
 const { defs: customDefs, load: loadCustomFields } = useCustomFields()
-onMounted(() => { fetchTags(); initCardPrefs(); loadCustomFields() })
+const route = useRoute()
+onMounted(() => {
+  fetchTags(); initCardPrefs(); loadCustomFields()
+  // Drill-down vindo dos Relatorios (?status=...&view=list)
+  if (typeof route.query.status === 'string') {
+    filterStatus.value = route.query.status
+    if (route.query.view === 'list') viewMode.value = 'list'
+  }
+})
 const leadTags = (l: LeadWithFU) => resolveTags(l.tag_ids)
 const selectedId         = ref<string | null>(null)
 const showModal          = ref(false)

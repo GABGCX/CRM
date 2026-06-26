@@ -24,6 +24,9 @@
         <option v-for="m in membersList" :key="m.id" :value="m.id">{{ m.name || m.email }}</option>
       </select>
       <span v-if="loading" style="font-size:12px;color:var(--text-3)">atualizando...</span>
+      <button class="btn" style="margin-left:auto" :disabled="!activityData.length" @click="exportCSV">
+        <i class="ti ti-download" aria-hidden="true"></i> Exportar CSV
+      </button>
     </div>
 
     <!-- KPIs com delta vs periodo anterior -->
@@ -231,12 +234,13 @@
               :stroke-dasharray="`${seg.dash} ${239 - seg.dash}`" :stroke-dashoffset="seg.offset"
               transform="rotate(-90 50 50)" />
           </svg>
-          <div style="flex:1;display:flex;flex-direction:column;gap:5px;overflow:hidden">
-            <div v-for="s in statusData.slice(0,7)" :key="s.status" style="display:flex;align-items:center;gap:6px;font-size:12px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px;overflow:hidden">
+            <button v-for="s in statusData.slice(0,7)" :key="s.status" class="legend-row"
+              :title="`Ver leads em ${s.status}`" @click="goToStatus(s.status)">
               <div :style="{ width:'8px', height:'8px', borderRadius:'50%', background: statusColor(s.status), flexShrink:0 }"/>
               <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2)">{{ s.status }}</span>
               <span style="margin-left:auto;font-weight:600;color:var(--text-1)">{{ s.count }}</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -271,6 +275,97 @@
           <div class="vol-label">{{ a.label }}</div>
           <div class="vol-value" :style="{ color: a.label.startsWith('31') && a.count > 0 ? 'var(--bad)' : 'var(--text-1)' }">{{ a.count }}</div>
           <div class="vol-hint">{{ agingTotal > 0 ? (a.count / agingTotal * 100).toFixed(0) : 0 }}% dos ativos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ Analise estrutural ════ -->
+    <div style="margin:20px 0 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)">
+      Analise estrutural
+    </div>
+
+    <!-- Waterfall + Velocidade -->
+    <div class="r-grid-2">
+      <div class="card">
+        <div class="card-label">Movimentacao do pipeline no periodo</div>
+        <div class="r-sublabel">A partir do historico de transicoes (lead_events).</div>
+        <div v-if="!waterfall.created && !waterfall.advanced && !waterfall.won && !waterfall.lost" class="r-empty">
+          Sem movimentacoes registradas no periodo.
+        </div>
+        <div v-else style="display:flex;flex-direction:column;gap:9px">
+          <div v-for="b in waterfallBars" :key="b.label">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+              <span style="color:var(--text-1);font-weight:500">{{ b.label }}</span>
+              <span style="color:var(--text-2);font-variant-numeric:tabular-nums">{{ b.value }}</span>
+            </div>
+            <div class="funbar-track"><div class="funbar-fill" :style="{ width: b.pct + '%', background: b.color }" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Velocidade do funil</div>
+        <div class="r-sublabel">Tempo medio em cada etapa e ciclo ate o fechamento.</div>
+        <div class="rev-row" style="margin-bottom:10px">
+          <span class="rev-k">Ciclo medio (criacao &rarr; fechamento)</span>
+          <span class="rev-v">{{ velocity.cycleDays }}d</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">{{ velocity.cycleCount }} fechamentos no periodo</div>
+        <div v-if="!velocity.stages.length" style="font-size:12px;color:var(--text-3)">
+          Sem transicoes suficientes no periodo para medir tempo por etapa.
+        </div>
+        <div v-else style="display:flex;flex-direction:column;gap:7px">
+          <div v-for="st in velocity.stages.slice(0,6)" :key="st.stage" style="display:flex;align-items:center;gap:8px">
+            <span style="width:120px;font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ st.stage }}</span>
+            <div class="funbar-track"><div class="funbar-fill" :style="{ width: velStagePct(st.avgDays) + '%', background: C.rr }" /></div>
+            <span style="width:42px;text-align:right;font-size:12px;font-weight:600;color:var(--text-1)">{{ st.avgDays }}d</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px">baseado em {{ velocity.transitions }} transicoes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coorte -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">Coorte por mes de criacao (posicao atual no funil)</div>
+      <div class="r-sublabel">Dos leads criados em cada mes, quantos % chegaram a cada etapa.</div>
+      <div v-if="!cohortRows.length" class="r-empty">Sem leads criados no periodo.</div>
+      <div v-else style="overflow-x:auto">
+        <table class="cohort-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Coorte</th>
+              <th>Leads</th>
+              <th>Reuniao+</th>
+              <th>Proposta+</th>
+              <th>Fechou</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in cohortRows" :key="c.month">
+              <td style="text-align:left;font-weight:500;color:var(--text-1)">{{ c.label }}</td>
+              <td>{{ c.total }}</td>
+              <td><span class="coh-cell" :style="{ background: cohBg(c.reuniaoPct) }">{{ c.reuniaoPct }}%</span></td>
+              <td><span class="coh-cell" :style="{ background: cohBg(c.propostaPct) }">{{ c.propostaPct }}%</span></td>
+              <td><span class="coh-cell" :style="{ background: cohBg(c.wonPct) }">{{ c.wonPct }}%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pipeline ao longo do tempo -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-label">Pipeline ao longo do tempo (valor ativo)</div>
+      <div v-if="!pipeHistory.length" class="r-empty">
+        Sem historico ainda. Aplique a migracao de snapshots; o grafico passa a acumular a partir dai.
+      </div>
+      <div v-else style="overflow-x:auto">
+        <svg :width="pipeW" height="100" style="display:block">
+          <polyline :points="pipePoints" fill="none" :stroke="C.ce" stroke-width="2" stroke-linejoin="round" />
+        </svg>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">
+          {{ pipeHistory.length }} dias · pico R$ {{ fmtMoney(Math.round(pipeMax)) }}
         </div>
       </div>
     </div>
@@ -367,6 +462,10 @@ const bdrData = ref<{ user_id: string; ld: number; ce: number; rm: number; rr: n
 const revenue = ref({ closedValue: 0, closedCount: 0, pipelineValue: 0, weightedForecast: 0, activeWithValue: 0 })
 const fuDrop = ref<{ totalLeads: number; completedByAttempt: number[] }>({ totalLeads: 0, completedByAttempt: [] })
 const agingData = ref<{ label: string; count: number }[]>([])
+const velocity = ref<{ cycleDays: number; cycleCount: number; transitions: number; stages: { stage: string; avgDays: number; count: number }[] }>({ cycleDays: 0, cycleCount: 0, transitions: 0, stages: [] })
+const cohortData = ref<{ month: string; total: number; reuniao: number; proposta: number; won: number }[]>([])
+const waterfall = ref({ created: 0, advanced: 0, won: 0, lost: 0 })
+const pipeHistory = ref<{ date: string; count: number; value: number }[]>([])
 const loading = ref(false)
 
 const membersList = ref<(Profile & { email: string })[]>([])
@@ -384,6 +483,10 @@ async function loadAll() {
       $fetch<any[]>(`/api/reports/loss-reasons?${p}`).then(d => lossData.value = d),
       $fetch<any[]>(`/api/reports/by-source?${p}`).then(d => sourceData.value = d),
       $fetch<any>(`/api/reports/revenue?${p}`).then(d => revenue.value = d),
+      $fetch<any>(`/api/reports/velocity?${p}`).then(d => velocity.value = d),
+      $fetch<any[]>(`/api/reports/cohort?${p}`).then(d => cohortData.value = d),
+      $fetch<any>(`/api/reports/waterfall?${p}`).then(d => waterfall.value = d),
+      $fetch<any[]>(`/api/reports/pipeline-history?${p}`).then(d => pipeHistory.value = d),
     ]
     if (profile.value?.role !== 'bdr' && !selectedUser.value) {
       tasks.push($fetch<any[]>(`/api/reports/by-bdr?${p}`).then(d => bdrData.value = d))
@@ -561,6 +664,65 @@ const donutSegments = computed(() => {
   })
 })
 const lossTotal = computed(() => lossData.value.reduce((s, r) => s + r.count, 0))
+
+// ── Coorte ──────────────────────────────────────────────────────────────
+function cohortLabel(m: string) {
+  return new Date(m + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
+}
+const cohortRows = computed(() => cohortData.value.map(c => ({
+  ...c,
+  label: cohortLabel(c.month),
+  reuniaoPct: c.total ? Math.round(c.reuniao / c.total * 100) : 0,
+  propostaPct: c.total ? Math.round(c.proposta / c.total * 100) : 0,
+  wonPct: c.total ? Math.round(c.won / c.total * 100) : 0,
+})))
+
+// ── Waterfall ───────────────────────────────────────────────────────────
+const waterfallBars = computed(() => {
+  const w = waterfall.value
+  const max = Math.max(1, w.created, w.advanced, w.won, w.lost)
+  return [
+    { label: 'Entraram', value: w.created, color: C.ce, pct: w.created / max * 100 },
+    { label: 'Avancaram', value: w.advanced, color: C.rm, pct: w.advanced / max * 100 },
+    { label: 'Ganharam', value: w.won, color: C.fr, pct: w.won / max * 100 },
+    { label: 'Perderam', value: w.lost, color: C.bad, pct: w.lost / max * 100 },
+  ]
+})
+
+// ── Pipeline historico ──────────────────────────────────────────────────
+const pipeW = computed(() => Math.max(360, pipeHistory.value.length * 22))
+const pipeMax = computed(() => Math.max(1, ...pipeHistory.value.map(p => p.value)))
+const pipePoints = computed(() => {
+  const arr = pipeHistory.value
+  if (!arr.length) return ''
+  const step = arr.length > 1 ? (pipeW.value - 20) / (arr.length - 1) : 0
+  return arr.map((p, i) => `${10 + step * i},${88 - (p.value / pipeMax.value) * 74}`).join(' ')
+})
+
+// ── Velocidade / coorte helpers ─────────────────────────────────────────
+const velMax = computed(() => Math.max(1, ...velocity.value.stages.map(s => s.avgDays)))
+function velStagePct(d: number) { return Math.max(3, d / velMax.value * 100) }
+function cohBg(pct: number) {
+  if (pct <= 0) return 'var(--bg-subtle)'
+  return `rgba(22,163,74,${(0.1 + pct / 100 * 0.55).toFixed(2)})`
+}
+
+// ── Export CSV ──────────────────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['data', 'LD', 'CE', 'RM', 'RR', 'FR'],
+    ...activityData.value.map(d => [d.date, d.ld, d.ce, d.rm, d.rr, d.fr])]
+  const csv = rows.map(r => r.join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const href = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = href; a.download = `relatorio-atividade-${todayStr}.csv`; a.click()
+  URL.revokeObjectURL(href)
+}
+
+// ── Drill-down ──────────────────────────────────────────────────────────
+function goToStatus(status: string) {
+  navigateTo({ path: '/dashboard/pipeline', query: { status, view: 'list' } })
+}
 </script>
 
 <style scoped>
@@ -607,4 +769,12 @@ const lossTotal = computed(() => lossData.value.reduce((s, r) => s + r.count, 0)
 .bar-x { font-size:9px; color:var(--text-3); margin-top:4px; white-space:nowrap; }
 
 .heat-cell { height:46px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-1); border:1px solid var(--border-soft); }
+
+.legend-row { display:flex; align-items:center; gap:6px; font-size:12px; background:none; border:none; padding:3px 4px; border-radius:6px; cursor:pointer; font-family:inherit; text-align:left; width:100%; transition:background .1s; }
+.legend-row:hover { background:var(--bg-subtle); }
+
+.cohort-table { width:100%; border-collapse:collapse; font-size:12px; min-width:380px; }
+.cohort-table th { font-size:10px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; text-align:center; padding:0 8px 8px; }
+.cohort-table td { text-align:center; padding:6px 8px; border-top:1px solid var(--border-soft); color:var(--text-2); font-variant-numeric:tabular-nums; }
+.coh-cell { display:inline-block; min-width:42px; padding:2px 6px; border-radius:5px; font-weight:600; color:var(--text-1); }
 </style>
