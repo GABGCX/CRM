@@ -28,9 +28,9 @@
       </div>
 
       <div v-if="mode === 'custom'" style="display:flex;align-items:center;gap:6px">
-        <input type="month" v-model="customFrom" :max="customTo || todayMonth" style="width:auto" />
+        <input type="date" v-model="customFrom" :max="customTo || todayStr" style="width:auto" />
         <span style="font-size:12px;color:var(--text-3)">ate</span>
-        <input type="month" v-model="customTo" :min="customFrom" :max="todayMonth" style="width:auto" />
+        <input type="date" v-model="customTo" :min="customFrom" :max="todayStr" style="width:auto" />
       </div>
 
       <select v-if="profile?.role !== 'bdr'" v-model="selectedUser" style="width:auto">
@@ -243,17 +243,21 @@ const ldPerRM = Math.round(1 / OUTBOUND_BENCHMARKS.TX_CE_RM / OUTBOUND_BENCHMARK
 const months      = ref(6)
 const mode         = ref<'preset' | 'custom'>('preset')
 const _now         = new Date()
-const todayMonth   = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}`
-const customFrom   = ref('')
-const customTo     = ref(todayMonth)
+const todayStr     = _now.toISOString().slice(0, 10)
+const monthStartStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-01`
+const customFrom   = ref(monthStartStr)
+const customTo     = ref(todayStr)
 const selectedUser = ref('')
 
 function setPreset(v: number) { months.value = v; mode.value = 'preset' }
 
 // Rotulo do periodo (usado nos KPIs) conforme preset ou range personalizado.
+const fmtDay = (s: string) => s
+  ? new Date(s + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })
+  : ''
 const periodLabel = computed(() =>
   mode.value === 'custom' && customFrom.value && customTo.value
-    ? `${customFrom.value} a ${customTo.value}`
+    ? `${fmtDay(customFrom.value)} a ${fmtDay(customTo.value)}`
     : months.value === 12 ? '1 ano' : `${months.value} meses`
 )
 
