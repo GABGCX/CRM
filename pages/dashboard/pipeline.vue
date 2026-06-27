@@ -25,7 +25,7 @@
       <div class="pipe-summary-divider"></div>
       <div class="pipe-summary-item">
         <span class="pipe-summary-label">Previsao ponderada</span>
-        <span class="pipe-summary-value" style="color:#16a34a">R$ {{ fmtMoney(Math.round(weightedForecast)) }}</span>
+        <span class="pipe-summary-value" style="color:var(--ok)">R$ {{ fmtMoney(Math.round(weightedForecast)) }}</span>
         <span class="pipe-summary-hint">por probabilidade de estagio</span>
       </div>
       <div class="pipe-summary-divider"></div>
@@ -981,39 +981,41 @@ async function handleCreateLead() {
   gap: 0;
   background: var(--bg-card, #fff);
   border: 1px solid var(--border, var(--border-soft));
-  border-radius: 10px;
-  padding: 12px 4px;
-  margin-bottom: 12px;
+  border-radius: var(--radius);
+  padding: 16px 6px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
 }
 .pipe-summary-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 18px;
+  gap: 6px;
+  padding: 0 22px;
   flex: 1;
-  min-width: 140px;
+  min-width: 150px;
 }
 .pipe-summary-label {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: .08em;
   color: var(--text-3, var(--text-3));
 }
 .pipe-summary-value {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text-1, var(--text-1));
-  letter-spacing: -.02em;
-  line-height: 1.1;
+  letter-spacing: -.01em;
+  line-height: 1.05;
+  font-family: var(--font-mono);
 }
 .pipe-summary-hint { font-size: 11px; color: var(--text-3, var(--text-3)); }
 .pipe-summary-divider { width: 1px; background: var(--border-soft, var(--border-soft)); align-self: stretch; }
 
 .lead-value {
   font-weight: 600;
-  color: #16a34a;
+  color: var(--ok);
   background: var(--ok-bg);
   border: 1px solid var(--ok-bd);
   border-radius: 4px;
@@ -1055,8 +1057,8 @@ async function handleCreateLead() {
 .pipe-view:hover { color: var(--text-1); }
 .pipe-view.active {
   background: var(--bg-card, #fff);
-  color: var(--accent);
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
 }
 .pipe-filters {
   display: flex;

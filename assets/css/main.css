@@ -3,11 +3,15 @@
 @import '@fontsource/geist/500.css';
 @import '@fontsource/geist/600.css';
 @import '@fontsource/geist/700.css';
+@import '@fontsource/geist-mono/400.css';
+@import '@fontsource/geist-mono/500.css';
+@import '@fontsource/geist-mono/600.css';
 @import '@tabler/icons-webfont/dist/tabler-icons.min.css';
 
 /* ── Design tokens ──────────────────────────────────────── */
 :root {
   color-scheme: light;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   /* Raio refinado (Vercel/Linear) */
   --radius:    8px;
   --radius-sm: 6px;
@@ -203,7 +207,7 @@
   /* ── Metric cards ────────────────────────────────────── */
   .metric-card  { background:var(--bg-card); border-radius:var(--radius); padding:18px; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
   .metric-label { font-size:12px; color:var(--text-2); margin-bottom:8px; }
-  .metric-value { font-size:27px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1.1; letter-spacing:-0.03em; font-family:'Geist', sans-serif; }
+  .metric-value { font-size:27px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1.1; letter-spacing:-0.02em; font-family:var(--font-mono); }
   .metric-sub   { font-size:11px; margin-top:6px; color:var(--text-3); }
   .metric-ok    { color:var(--ok) !important; }
   .metric-warn  { color:var(--warn) !important; }
@@ -265,7 +269,7 @@
 }
 
 @layer utilities {
-  .tabular { font-variant-numeric: tabular-nums; }
+  .tabular { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
   .hover-actions { opacity: 0; transition: opacity .1s; }
   *:hover > .hover-actions { opacity: 1; }
 }
