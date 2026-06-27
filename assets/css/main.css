@@ -8,30 +8,39 @@
 /* ── Design tokens ──────────────────────────────────────── */
 :root {
   color-scheme: light;
-  /* Raio: cantos quase retos (sistema unico) */
-  --radius:    4px;   /* cards, inputs, botoes */
-  --radius-sm: 3px;   /* tags, chips, dots */
-  --bg:          #f9f6ef;
+  /* Raio refinado (Vercel/Linear) */
+  --radius:    8px;
+  --radius-sm: 6px;
+  /* Sombra sutil (profundidade Apple/Linear, quase imperceptivel) */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.06);
+  /* Neutros puros, alto contraste na tipografia (Vercel) */
+  --bg:          #ffffff;
   --bg-card:     #ffffff;
   --bg-input:    #ffffff;
-  --bg-subtle:   #f0ebe0;
+  --bg-subtle:   #fafafa;
   --bg-elevated: #ffffff;
-  --text-1:      #282828;
-  --text-2:      #7a7068;
-  --text-3:      #b0a898;
-  --border:      #e9e4db;
-  --border-soft: #f1ede5;
+  --text-1:      #111111;
+  --text-2:      #666666;
+  --text-3:      #999999;
+  --border:      #eaeaea;
+  --border-soft: #f2f2f2;
   --accent:      #193497;
   --accent-dark: #0f2480;
   --accent-text: #193497;
-  --accent-soft: rgba(25,52,151,.07);
+  --accent-soft: rgba(25,52,151,.06);
   --accent-bd:   #c5d1f1;
 
-  /* Semanticos dessaturados (mono cobalt): a cor sinaliza sem competir */
-  --ok:   #4e8c6a; --ok-bg:   #eef3ef; --ok-bd:   #d6e1da;
-  --warn: #a87b35; --warn-bg: #f6f1e7; --warn-bd: #e6dac3;
-  --bad:  #b14a44; --bad-bg:  #f6ece9; --bad-bd:  #e8d1cc;
-  --info: #46599a; --info-bg: #eef0f6; --info-bd: #d6dceb;
+  /* Acao primaria estilo Vercel: preto no claro (invertido no escuro) */
+  --btn-pri:    #111111;
+  --btn-pri-h:  #000000;
+  --btn-pri-fg: #ffffff;
+
+  /* Semanticos limpos (crisp, nao lavado nem neon) */
+  --ok:   #30a46c; --ok-bg:   #ecfdf3; --ok-bd:   #c4e8d1;
+  --warn: #d97706; --warn-bg: #fff7ed; --warn-bd: #fce0c2;
+  --bad:  #e5484d; --bad-bg:  #fff0f0; --bad-bd:  #f6c9c9;
+  --info: #0070f3; --info-bg: #eff6ff; --info-bd: #c2dbff;
 
   /* Dashboard cockpit: dark premium estilo CentralFlow (fixo, independe do tema) */
   --dash-bg:       #0b0b0f;
@@ -67,6 +76,11 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.5);
+  --btn-pri:    #fafafa;
+  --btn-pri-h:  #ffffff;
+  --btn-pri-fg: #111111;
   /* cinza neutro (nao preto); cards levantados = elevacao visivel */
   --bg:          #1a1a1d;
   --bg-card:     #222226;
@@ -179,15 +193,15 @@
   .page-container { padding:30px 36px; }
 
   /* ── Typography ──────────────────────────────────────── */
-  .page-title { font-size:20px; font-weight:600; color:var(--text-1); letter-spacing:-0.02em; font-family:'Geist', sans-serif; }
-  .page-sub   { font-size:13px; color:var(--text-2); margin-top:3px; }
+  .page-title { font-size:22px; font-weight:600; color:var(--text-1); letter-spacing:-0.025em; font-family:'Geist', sans-serif; }
+  .page-sub   { font-size:13px; color:var(--text-2); margin-top:4px; }
 
-  /* ── Cards (hairline, mais respiro) ──────────────────── */
-  .card       { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:var(--radius); padding:20px; }
+  /* ── Cards (hairline crisp + sombra sutil) ───────────── */
+  .card       { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-sm); }
   .card-label { font-size:11px; font-weight:500; color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:16px; }
 
   /* ── Metric cards ────────────────────────────────────── */
-  .metric-card  { background:var(--bg-card); border-radius:var(--radius); padding:18px; border:1px solid var(--border-soft); }
+  .metric-card  { background:var(--bg-card); border-radius:var(--radius); padding:18px; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
   .metric-label { font-size:12px; color:var(--text-2); margin-bottom:8px; }
   .metric-value { font-size:27px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1.1; letter-spacing:-0.03em; font-family:'Geist', sans-serif; }
   .metric-sub   { font-size:11px; margin-top:6px; color:var(--text-3); }
@@ -199,9 +213,9 @@
   .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 15px; border-radius:var(--radius); font-size:13px; font-weight:500; font-family:inherit; cursor:pointer; border:1px solid var(--border); background:var(--bg-card); color:var(--text-1); transition:all .12s; white-space:nowrap; }
   .btn:hover { background:var(--bg-subtle); border-color:var(--border); }
   .btn:disabled { opacity:.5; cursor:not-allowed; }
-  .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
-  .btn-primary:hover { background:var(--accent-dark); border-color:var(--accent-dark); }
-  .btn-primary:disabled { background:var(--accent); border-color:var(--accent); }
+  .btn-primary { background:var(--btn-pri); border-color:var(--btn-pri); color:var(--btn-pri-fg); }
+  .btn-primary:hover { background:var(--btn-pri-h); border-color:var(--btn-pri-h); }
+  .btn-primary:disabled { background:var(--btn-pri); border-color:var(--btn-pri); }
   .btn-danger  { background:var(--bad-bg); border-color:var(--bad-bd); color:var(--bad); }
   .btn-danger:hover { background:var(--bad-bg); border-color:var(--bad); }
   [data-theme="dark"] .btn-danger  { background:rgba(224,149,149,.10); border-color:rgba(224,149,149,.25); color:#e09595; }
