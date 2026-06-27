@@ -98,20 +98,21 @@ onMounted(() => fetchTags())
 const leadTags = (lead: LeadWithFU) => resolve(lead.tag_ids)
 
 // Ordem das colunas = fluxo do funil
+// Paleta dessaturada (mono cobalt): tons harmonicos que distinguem sem competir.
 const COLUMN_DEFS: { status: LeadStatus; label: string; color: string }[] = [
-  { status: 'Novo',               label: 'Novo',             color: '#64748b' },
-  { status: 'Prospecção',         label: 'Prospecção',       color: '#6366f1' },
-  { status: 'Qualificação',       label: 'Qualificação',     color: '#0ea5e9' },
-  { status: 'Aguardando retorno', label: 'Aguardando',      color: '#d97706' },
-  { status: 'Follow-up',          label: 'Follow-up',        color: '#2563eb' },
-  { status: 'De molho',           label: 'De molho',         color: '#7c3aed' },
-  { status: 'Reunião agendada',   label: 'Reunião agendada', color: '#0d9488' },
-  { status: 'Enviar proposta',    label: 'Enviar proposta',  color: '#ea580c' },
-  { status: 'Proposta enviada',   label: 'Proposta enviada', color: '#0891b2' },
-  { status: 'Fechado',            label: 'Fechado',          color: '#16a34a' },
-  { status: 'Recusado',           label: 'Recusado',         color: '#dc2626' },
-  { status: 'Sem interesse',      label: 'Sem interesse',    color: '#64748b' },
-  { status: 'Não atende',         label: 'Não atende',       color: '#94a3b8' },
+  { status: 'Novo',               label: 'Novo',             color: '#8a857d' },
+  { status: 'Prospecção',         label: 'Prospecção',       color: '#5b6bb0' },
+  { status: 'Qualificação',       label: 'Qualificação',     color: '#4f7fa8' },
+  { status: 'Aguardando retorno', label: 'Aguardando',      color: '#a87b35' },
+  { status: 'Follow-up',          label: 'Follow-up',        color: '#46599a' },
+  { status: 'De molho',           label: 'De molho',         color: '#7a6f9c' },
+  { status: 'Reunião agendada',   label: 'Reunião agendada', color: '#3f7a74' },
+  { status: 'Enviar proposta',    label: 'Enviar proposta',  color: '#a8693f' },
+  { status: 'Proposta enviada',   label: 'Proposta enviada', color: '#4f7d8a' },
+  { status: 'Fechado',            label: 'Fechado',          color: '#4e8c6a' },
+  { status: 'Recusado',           label: 'Recusado',         color: '#b14a44' },
+  { status: 'Sem interesse',      label: 'Sem interesse',    color: '#8a857d' },
+  { status: 'Não atende',         label: 'Não atende',       color: '#a8a39b' },
 ]
 
 const draggingId       = ref<string | null>(null)

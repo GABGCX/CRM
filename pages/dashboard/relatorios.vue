@@ -383,8 +383,8 @@ const { profile, org } = useProfile()
 
 // Cores de serie/grafico (consts, nao literais em style="" para a trava de cores)
 const C = {
-  ld: '#64748b', ce: '#193497', rm: '#7c3aed', rr: '#d97706', fr: '#16a34a',
-  bad: '#dc2626', axis: '#94a3b8', donutBg: '#f1f5f9',
+  ld: '#8a857d', ce: '#193497', rm: '#5b6bb0', rr: '#a87b35', fr: '#4e8c6a',
+  bad: '#b14a44', axis: '#b0a898', donutBg: '#ece7dd',
 }
 const TREND_SERIES = [
   { key: 'ce' as const, label: 'CE', color: C.ce },
@@ -646,10 +646,10 @@ const agingTotal = computed(() => agingData.value.reduce((s, a) => s + a.count, 
 
 // ── Donut status ────────────────────────────────────────────────────────
 const STATUS_COLORS: Record<string, string> = {
-  'Novo': '#64748b', 'Prospecção': '#6366f1', 'Qualificação': '#0ea5e9',
-  'Aguardando retorno': '#f59e0b', 'Follow-up': '#3b82f6', 'De molho': '#8b5cf6',
-  'Reunião agendada': '#14b8a6', 'Enviar proposta': '#f97316', 'Proposta enviada': '#6366f1',
-  'Fechado': '#22c55e', 'Recusado': '#ef4444', 'Sem interesse': '#94a3b8', 'Não atende': '#cbd5e1',
+  'Novo': '#8a857d', 'Prospecção': '#5b6bb0', 'Qualificação': '#4f7fa8',
+  'Aguardando retorno': '#a87b35', 'Follow-up': '#46599a', 'De molho': '#7a6f9c',
+  'Reunião agendada': '#3f7a74', 'Enviar proposta': '#a8693f', 'Proposta enviada': '#4f7d8a',
+  'Fechado': '#4e8c6a', 'Recusado': '#b14a44', 'Sem interesse': '#8a857d', 'Não atende': '#a8a39b',
 }
 function statusColor(s: string) { return STATUS_COLORS[s] || '#e2e8f0' }
 const CIRCUM = 2 * Math.PI * 38
