@@ -383,7 +383,7 @@ const { profile, org } = useProfile()
 
 // Cores de serie/grafico (consts, nao literais em style="" para a trava de cores)
 const C = {
-  ld: '#8a857d', ce: '#193497', rm: '#5b6bb0', rr: '#a87b35', fr: '#4e8c6a',
+  ld: '#8a857d', ce: '#0f62fe', rm: '#5b6bb0', rr: '#a87b35', fr: '#4e8c6a',
   bad: '#b14a44', axis: '#b0a898', donutBg: '#ece7dd',
 }
 const TREND_SERIES = [
@@ -638,7 +638,7 @@ const dowMax = computed(() => Math.max(1, ...dowData.value.map(d => d.ce)))
 function heatColor(ce: number) {
   if (ce <= 0) return 'var(--bg-subtle)'
   const a = 0.12 + (ce / dowMax.value) * 0.5
-  return `rgba(25,52,151,${a.toFixed(2)})`
+  return `rgba(15,98,254,${a.toFixed(2)})`
 }
 
 // ── Aging ───────────────────────────────────────────────────────────────

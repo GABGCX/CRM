@@ -242,7 +242,7 @@ async function runImport() {
 
 .drop-zone:hover,
 .drop-zone--over {
-  border-color: #193497;
+  border-color: #0f62fe;
   background: var(--accent-soft);
 }
 </style>

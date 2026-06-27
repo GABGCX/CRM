@@ -119,14 +119,14 @@
         <svg v-else viewBox="0 0 240 80" preserveAspectRatio="none" style="width:100%;height:96px;overflow:visible">
           <defs>
             <linearGradient id="ceArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#193497" stop-opacity="0.10"/>
-              <stop offset="100%" stop-color="#193497" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#0f62fe" stop-opacity="0.10"/>
+              <stop offset="100%" stop-color="#0f62fe" stop-opacity="0"/>
             </linearGradient>
           </defs>
           <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#eaeaea" stroke-width="1" stroke-dasharray="4 4" />
           <path :d="sparkAreaPath" fill="url(#ceArea)" />
-          <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#193497" />
+          <path :d="sparkLinePath" fill="none" stroke="#0f62fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#0f62fe" />
         </svg>
         <div class="spark-foot">
           <span>{{ monthTotals.ce }} CE acumulados</span>

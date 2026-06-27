@@ -187,7 +187,7 @@
             style="text-align:center;padding:10px 4px;border-radius:8px;border:1px solid"
             :style="d.isToday ? 'background:var(--accent-soft);border-color:var(--accent-bd)' : 'background:var(--bg-subtle);border-color:var(--border-soft)'"
             :title="d.count > 0 ? d.names : undefined">
-            <div style="font-size:10px;margin-bottom:4px;font-weight:500" :style="{ color: d.isToday ? '#193497' : 'var(--text-3)' }">
+            <div style="font-size:10px;margin-bottom:4px;font-weight:500" :style="{ color: d.isToday ? '#0f62fe' : 'var(--text-3)' }">
               {{ d.isToday ? 'Hoje' : d.label }}
             </div>
             <div style="font-size:20px;font-weight:600;color:var(--text-1)" class="tabular">{{ d.count }}</div>

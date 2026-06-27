@@ -20,7 +20,7 @@
         </button>
         <button v-if="currentMonth !== now.getMonth() + 1 || currentYear !== now.getFullYear()"
           class="btn" @click="goToCurrentMonth"
-          style="font-size:11px;padding:4px 10px;color:#193497;border-color:var(--accent-bd);background:var(--accent-soft)">
+          style="font-size:11px;padding:4px 10px;color:#0f62fe;border-color:var(--accent-bd);background:var(--accent-soft)">
           Mês atual
         </button>
       </div>
@@ -108,9 +108,9 @@
               onmouseenter="this.style.background='var(--bg-subtle)'"
               onmouseleave="this.style.background=''">
               <td style="padding:8px 8px 8px 0;color:var(--text-1);font-weight:500;white-space:nowrap"
-                :style="{ borderLeft: form.date === e.date ? '2px solid #193497' : '2px solid transparent', paddingLeft: '6px' }">
+                :style="{ borderLeft: form.date === e.date ? '2px solid #0f62fe' : '2px solid transparent', paddingLeft: '6px' }">
                 {{ fmtDateBr(e.date) }}
-                <span v-if="e.date === todayStr" style="font-size:10px;color:#193497;margin-left:4px">hoje</span>
+                <span v-if="e.date === todayStr" style="font-size:10px;color:#0f62fe;margin-left:4px">hoje</span>
               </td>
               <td v-for="f in FIELDS" :key="f.key"
                 style="text-align:right;padding:8px;font-variant-numeric:tabular-nums;font-weight:500"
@@ -194,7 +194,7 @@ const rmPerDay = computed(() => Math.max(1, Math.ceil(cePerDay.value * 0.027)))
 
 const FIELDS = computed(() => [
   { key:'ld', label:'Ligações',          color:'#0ea5e9', meta: 'N/A' },
-  { key:'ce', label:'Contatos efetivos', color:'#193497', meta: String(cePerDay.value) },
+  { key:'ce', label:'Contatos efetivos', color:'#0f62fe', meta: String(cePerDay.value) },
   { key:'rm', label:'Reuniões marcadas', color:'#7c3aed', meta: String(rmPerDay.value) },
   { key:'rr', label:'Reuniões realizadas',color:'#0d9488', meta: 'N/A' },
   { key:'fr', label:'Fechamentos',        color:'#d97706', meta: 'N/A' },

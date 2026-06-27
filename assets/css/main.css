@@ -1,50 +1,49 @@
-@import '@fontsource/geist/300.css';
-@import '@fontsource/geist/400.css';
-@import '@fontsource/geist/500.css';
-@import '@fontsource/geist/600.css';
-@import '@fontsource/geist/700.css';
-@import '@fontsource/geist-mono/400.css';
-@import '@fontsource/geist-mono/500.css';
-@import '@fontsource/geist-mono/600.css';
+@import '@fontsource/ibm-plex-sans/300.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
 @import '@tabler/icons-webfont/dist/tabler-icons.min.css';
 
 /* ── Design tokens ──────────────────────────────────────── */
 :root {
   color-scheme: light;
-  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  /* Raio refinado (Vercel/Linear) */
-  --radius:    8px;
-  --radius-sm: 6px;
-  /* Sombra sutil (profundidade Apple/Linear, quase imperceptivel) */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.06);
-  /* Neutros puros, alto contraste na tipografia (Vercel) */
-  --bg:          #ffffff;
+  --font-sans: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* IBM Carbon: cantos retos */
+  --radius:    2px;
+  --radius-sm: 2px;
+  /* Carbon usa CAMADAS (nao sombra) pra profundidade; sombra so em overlays */
+  --shadow-sm: none;
+  --shadow-md: 0 2px 6px rgba(0,0,0,.16);
+  /* Carbon Gray-10: pagina cinza, paineis brancos, campos cinza = camadas */
+  --bg:          #f4f4f4;
   --bg-card:     #ffffff;
-  --bg-input:    #ffffff;
-  --bg-subtle:   #fafafa;
+  --bg-input:    #f4f4f4;
+  --bg-subtle:   #f4f4f4;
   --bg-elevated: #ffffff;
-  --text-1:      #111111;
-  --text-2:      #666666;
-  --text-3:      #999999;
-  --border:      #eaeaea;
-  --border-soft: #f2f2f2;
-  --accent:      #193497;
-  --accent-dark: #0f2480;
-  --accent-text: #193497;
-  --accent-soft: rgba(25,52,151,.06);
-  --accent-bd:   #c5d1f1;
+  --text-1:      #161616;
+  --text-2:      #525252;
+  --text-3:      #8d8d8d;
+  --border:      #e0e0e0;
+  --border-soft: #e8e8e8;
+  --accent:      #0f62fe;
+  --accent-dark: #0353e9;
+  --accent-text: #0f62fe;
+  --accent-soft: rgba(15,98,254,.08);
+  --accent-bd:   #a6c8ff;
 
-  /* Acao primaria estilo Vercel: preto no claro (invertido no escuro) */
-  --btn-pri:    #111111;
-  --btn-pri-h:  #000000;
+  /* Acao primaria Carbon: azul (Blue 60) */
+  --btn-pri:    #0f62fe;
+  --btn-pri-h:  #0353e9;
   --btn-pri-fg: #ffffff;
 
-  /* Semanticos limpos (crisp, nao lavado nem neon) */
-  --ok:   #30a46c; --ok-bg:   #ecfdf3; --ok-bd:   #c4e8d1;
-  --warn: #d97706; --warn-bg: #fff7ed; --warn-bd: #fce0c2;
-  --bad:  #e5484d; --bad-bg:  #fff0f0; --bad-bd:  #f6c9c9;
-  --info: #0070f3; --info-bg: #eff6ff; --info-bd: #c2dbff;
+  /* Semanticos Carbon */
+  --ok:   #24a148; --ok-bg:   #defbe6; --ok-bd:   #a7f0ba;
+  --warn: #b28600; --warn-bg: #fcf4d6; --warn-bd: #f1c21b;
+  --bad:  #da1e28; --bad-bg:  #fff1f1; --bad-bd:  #ffb3b8;
+  --info: #0f62fe; --info-bg: #edf5ff; --info-bd: #a6c8ff;
 
   /* Dashboard cockpit: dark premium estilo CentralFlow (fixo, independe do tema) */
   --dash-bg:       #0b0b0f;
@@ -80,33 +79,32 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
-  --shadow-md: 0 6px 24px rgba(0,0,0,.5);
-  --btn-pri:    #fafafa;
-  --btn-pri-h:  #ffffff;
-  --btn-pri-fg: #111111;
-  /* cinza neutro (nao preto); cards levantados = elevacao visivel */
-  --bg:          #1a1a1d;
-  --bg-card:     #222226;
-  --bg-input:    #1e1e22;
-  --bg-subtle:   #27272c;
-  --bg-elevated: #2d2d33;
-  /* texto cinza-claro (nao branco) pra tirar o brilho agressivo */
-  --text-1:      #d4d3da;
-  --text-2:      #93939c;
-  --text-3:      #65656d;
-  /* bordas sutis, neutras */
-  --border:      #323239;
-  --border-soft: #27272c;
-  --accent-text: #8aa2f0;
-  --accent-soft: rgba(138,162,240,.10);
-  --accent-bd:   rgba(138,162,240,.24);
+  --shadow-sm: none;
+  --shadow-md: 0 4px 16px rgba(0,0,0,.6);
+  --btn-pri:    #0f62fe;
+  --btn-pri-h:  #0353e9;
+  --btn-pri-fg: #ffffff;
+  /* Carbon Gray-100: fundo #161616, camadas em cinza */
+  --bg:          #161616;
+  --bg-card:     #262626;
+  --bg-input:    #393939;
+  --bg-subtle:   #393939;
+  --bg-elevated: #262626;
+  --text-1:      #f4f4f4;
+  --text-2:      #c6c6c6;
+  --text-3:      #8d8d8d;
+  --border:      #393939;
+  --border-soft: #303030;
+  --accent:      #4589ff;
+  --accent-text: #78a9ff;
+  --accent-soft: rgba(15,98,254,.18);
+  --accent-bd:   #4589ff;
 
-  /* semanticos dessaturados (nao neon) + fundos translucidos discretos */
-  --ok:   #74c69a; --ok-bg:   rgba(116,198,154,.12); --ok-bd:   rgba(116,198,154,.22);
-  --warn: #d9b87a; --warn-bg: rgba(217,184,122,.12); --warn-bd: rgba(217,184,122,.22);
-  --bad:  #e09595; --bad-bg:  rgba(224,149,149,.12); --bad-bd:  rgba(224,149,149,.22);
-  --info: #8fb0e8; --info-bg: rgba(143,176,232,.12); --info-bd: rgba(143,176,232,.22);
+  /* Semanticos Carbon (dark) */
+  --ok:   #42be65; --ok-bg:   rgba(36,161,72,.16);  --ok-bd:   rgba(66,190,101,.30);
+  --warn: #f1c21b; --warn-bg: rgba(241,194,27,.14); --warn-bd: rgba(241,194,27,.30);
+  --bad:  #fa4d56; --bad-bg:  rgba(218,30,40,.16);  --bad-bd:  rgba(250,77,86,.30);
+  --info: #78a9ff; --info-bg: rgba(15,98,254,.16);  --info-bd: rgba(69,137,255,.30);
 
   --sb-bg:          #161619;
   --sb-border:      #26262b;
@@ -130,7 +128,7 @@
 @layer base {
   * { box-sizing: border-box; }
   html {
-    font-family: 'Geist', -apple-system, sans-serif;
+    font-family: var(--font-sans);
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
     background: var(--bg);
@@ -197,7 +195,7 @@
   .page-container { padding:30px 36px; }
 
   /* ── Typography ──────────────────────────────────────── */
-  .page-title { font-size:22px; font-weight:600; color:var(--text-1); letter-spacing:-0.025em; font-family:'Geist', sans-serif; }
+  .page-title { font-size:22px; font-weight:600; color:var(--text-1); letter-spacing:-0.02em; font-family:var(--font-sans); }
   .page-sub   { font-size:13px; color:var(--text-2); margin-top:4px; }
 
   /* ── Cards (hairline crisp + sombra sutil) ───────────── */

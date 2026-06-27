@@ -200,7 +200,7 @@
               </div>
               <div v-if="i < FUNNEL_STAGES.length - 1"
                 style="width:16px;height:2px;flex-shrink:0"
-                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#193497' : 'var(--border)' }" />
+                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#0f62fe' : 'var(--border)' }" />
             </template>
           </div>
 
@@ -426,7 +426,7 @@
                 <label class="input-label">
                   Data de retorno
                   <button type="button" @click="suggestRetorno"
-                    style="border:none;background:none;color:#193497;font-size:11px;cursor:pointer;padding:0 0 0 4px;font-family:inherit">
+                    style="border:none;background:none;color:#0f62fe;font-size:11px;cursor:pointer;padding:0 0 0 4px;font-family:inherit">
                     +2d
                   </button>
                 </label>
@@ -448,7 +448,7 @@
 
               <div style="grid-column:span 2">
                 <button type="button" @click="showExtra = !showExtra"
-                  style="background:none;border:none;color:#193497;font-size:12px;cursor:pointer;padding:0;font-family:inherit;font-weight:500">
+                  style="background:none;border:none;color:#0f62fe;font-size:12px;cursor:pointer;padding:0;font-family:inherit;font-weight:500">
                   {{ showExtra ? '▲ Ocultar dados adicionais' : '▼ Dados adicionais (ICP)' }}
                 </button>
               </div>
@@ -1171,7 +1171,7 @@ async function handleCreateLead() {
   transition: all .12s;
 }
 .lead-row:hover       { border-color: var(--border); }
-.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(25,52,151,.12); }
+.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.12); }
 .lead-row-qa          { opacity: 0; transition: opacity .12s; }
 .lead-row:hover .lead-row-qa,
 .lead-row:focus-within .lead-row-qa { opacity: 1; }

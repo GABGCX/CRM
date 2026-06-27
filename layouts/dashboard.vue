@@ -243,7 +243,7 @@ function openGlobalSearch() {
   font-size: 14px;
   font-weight: 700;
   color: #fff;
-  font-family: 'Geist', sans-serif;
+  font-family: var(--font-sans);
   letter-spacing: -.01em;
   white-space: nowrap;
 }

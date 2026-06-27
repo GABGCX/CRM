@@ -4,7 +4,7 @@
 
       <!-- Brand -->
       <div style="text-align:center;margin-bottom:28px">
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#193497;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 14px rgba(25,52,151,.18)">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#0f62fe;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 14px rgba(15,98,254,.18)">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
             <circle cx="12" cy="12" r="4" fill="white"/>
@@ -64,7 +64,7 @@
               .{{ appDomain }}
             </span>
           </div>
-          <p v-if="form.slug" style="font-size:12px;color:#193497;margin:4px 0 0;font-weight:500">
+          <p v-if="form.slug" style="font-size:12px;color:#0f62fe;margin:4px 0 0;font-weight:500">
             Acesso em: <strong>{{ form.slug }}.{{ appDomain }}</strong>
           </p>
         </div>
@@ -81,7 +81,7 @@
 
       <p style="text-align:center;font-size:13px;color:var(--text-2);margin-top:20px">
         Já tem conta?
-        <NuxtLink to="/login" style="color:#193497;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
+        <NuxtLink to="/login" style="color:#0f62fe;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
       </p>
     </div>
   </div>
