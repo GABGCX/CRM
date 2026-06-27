@@ -14,6 +14,10 @@
   /* IBM Carbon: cantos retos */
   --radius:    2px;
   --radius-sm: 2px;
+  /* Escala de numeros de dados (refinada, consistente em todas as telas) */
+  --num-hero: 22px;  /* destaque principal do painel */
+  --num-lg:   20px;  /* valores de metrica / KPI / stat */
+  --num-md:   18px;  /* numeros densos / inputs de stepper */
   /* Carbon usa CAMADAS (nao sombra) pra profundidade; sombra so em overlays */
   --shadow-sm: none;
   --shadow-md: 0 2px 6px rgba(0,0,0,.16);
@@ -140,6 +144,7 @@
   input[type="password"], input[type="date"], input[type="url"],
   input[type="search"], input[type="tel"], input[type="time"],
   input[type="datetime-local"], input[type="month"],
+  input:not([type]),
   textarea, select {
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -209,7 +214,7 @@
   /* ── Metric cards ────────────────────────────────────── */
   .metric-card  { background:var(--bg-card); border-radius:var(--radius); padding:18px; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
   .metric-label { font-size:12px; color:var(--text-2); margin-bottom:8px; }
-  .metric-value { font-size:27px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1.1; letter-spacing:-0.02em; font-family:var(--font-mono); }
+  .metric-value { font-size:var(--num-hero); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1.1; letter-spacing:-0.02em; font-family:var(--font-mono); }
   .metric-sub   { font-size:11px; margin-top:6px; color:var(--text-3); }
   .metric-ok    { color:var(--ok) !important; }
   .metric-warn  { color:var(--warn) !important; }
@@ -221,7 +226,7 @@
   .btn:disabled { opacity:.5; cursor:not-allowed; }
   .btn-primary { background:var(--btn-pri); border-color:var(--btn-pri); color:var(--btn-pri-fg); }
   .btn-primary:hover { background:var(--btn-pri-h); border-color:var(--btn-pri-h); }
-  .btn-primary:disabled { background:var(--btn-pri); border-color:var(--btn-pri); }
+  .btn-primary:disabled { background:var(--bg-subtle); border-color:var(--border); color:var(--text-3); opacity:1; }
   .btn-danger  { background:var(--bad-bg); border-color:var(--bad-bd); color:var(--bad); }
   .btn-danger:hover { background:var(--bad-bg); border-color:var(--bad); }
   [data-theme="dark"] .btn-danger  { background:rgba(224,149,149,.10); border-color:rgba(224,149,149,.25); color:#e09595; }
@@ -238,10 +243,10 @@
   .tag-green  { background:var(--ok-bg);   color:var(--ok); }
   .tag-blue   { background:var(--info-bg); color:var(--info); }
   .tag-gray   { background:var(--bg-subtle); color:var(--text-2); }
-  .tag-purple { background:#f1eef4; color:#6b5f8f; }
-  .tag-teal   { background:#eaf1f0; color:#3f7a74; }
+  .tag-purple { background:rgba(138,63,252,.10);  color:#8a3ffc; }
+  .tag-teal   { background:rgba(0,157,154,.10);   color:#009d9a; }
   .tag-indigo { background:var(--accent-soft); color:var(--accent-text); }
-  .tag-pink   { background:#f4ece9; color:#9a605b; }
+  .tag-pink   { background:rgba(238,83,150,.10);  color:#ee5396; }
 
   [data-theme="dark"] .tag-red    { background:rgba(224,149,149,.12); color:#e09595; }
   [data-theme="dark"] .tag-amber  { background:rgba(217,184,122,.12); color:#d9b87a; }
@@ -256,7 +261,7 @@
   .nav-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius); cursor:pointer; border:none; border-left:2px solid transparent; width:100%; text-align:left; background:transparent; color:var(--sb-text); font-size:13px; font-family:inherit; transition:all .12s; }
   .nav-item:hover { background:var(--sb-hover); color:var(--sb-text-hover); }
   .nav-item.active { background:var(--sb-active); color:var(--sb-text-active); border-left-color:var(--accent); font-weight:500; }
-  .nav-badge { margin-left:auto; background:#b6534b; color:#fff; font-size:10px; font-weight:600; padding:1px 6px; border-radius:var(--radius-sm); }
+  .nav-badge { margin-left:auto; background:var(--bad); color:#fff; font-size:10px; font-weight:600; padding:1px 6px; border-radius:var(--radius-sm); }
 
   /* ── Misc components ─────────────────────────────────── */
   .divider        { height:1px; background:var(--border-soft); margin:16px 0; }

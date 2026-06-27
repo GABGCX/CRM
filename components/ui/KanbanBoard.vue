@@ -150,9 +150,9 @@ function fmtDate(iso: string) {
 }
 function retColor(iso: string) {
   const diff = Math.floor((new Date(iso).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86_400_000)
-  if (diff < 0)  return '#dc2626'
-  if (diff === 0) return '#ea580c'
-  if (diff <= 3) return '#d97706'
+  if (diff < 0)  return 'var(--bad)'
+  if (diff === 0) return 'var(--warn)'
+  if (diff <= 3) return 'var(--warn)'
   return 'var(--text-3)'
 }
 </script>

@@ -294,7 +294,7 @@ function dayTag(e: DiaryEntry) {
 .md-step-btn:disabled{ opacity:.35;cursor:not-allowed }
 .md-step-plus{ background:var(--accent);border-color:var(--accent);color:#fff }
 .md-step-plus:hover:not(:disabled){ background:var(--accent-dark);border-color:var(--accent-dark);color:#fff }
-.md-step-input { width:100%;text-align:center;font-size:21px;font-weight:600;padding:5px 2px;color:var(--text-1);font-family:var(--font-mono);font-variant-numeric:tabular-nums }
+.md-step-input { width:100%;text-align:center;font-size:var(--num-md);font-weight:600;padding:5px 2px;color:var(--text-1);font-family:var(--font-mono);font-variant-numeric:tabular-nums }
 .md-stepper-goal { font-size:10px;color:var(--text-3);text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center }
 .md-progress { width:100%;height:4px;background:var(--border-soft);border-radius:2px;overflow:hidden }
 .md-progress-fill { height:100%;border-radius:2px;transition:width .3s }

@@ -404,12 +404,12 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .dash { max-width: 1200px; }
 
 .dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:20px; }
-.dash-greet { font-size:24px; font-weight:600; letter-spacing:-.02em; color:var(--text-1); line-height:1.1; }
+.dash-greet { font-size:22px; font-weight:600; letter-spacing:-.02em; color:var(--text-1); line-height:1.1; }
 .dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
 .dash-select { font-size:13px; padding:7px 11px; max-width:170px; width:auto; }
 .dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.1; }
-.dash-days-n { font-size:20px; font-weight:600; color:var(--text-2); }
+.dash-days-n { font-size:var(--num-md); font-weight:600; color:var(--text-2); }
 .dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
 /* ── Grid 12 col ─────────────────────────────────────────── */
@@ -435,7 +435,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .pill.is-hot { color:var(--accent); background:var(--accent-soft); }
 
 /* ── Foco ────────────────────────────────────────────────── */
-.focus-title { font-size:20px; font-weight:600; letter-spacing:-.01em; line-height:1.3; color:var(--text-1); max-width:580px; }
+.focus-title { font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:1.3; color:var(--text-1); max-width:580px; }
 .focus-desc { font-size:13px; color:var(--text-2); margin-top:10px; line-height:1.6; max-width:540px; }
 .focus-cta { align-self:flex-start; margin-top:20px; }
 
@@ -443,7 +443,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-gauge { align-items:center; }
 .gauge-wrap { display:flex; justify-content:center; padding:4px 0; }
 .gauge-svg { width:120px; height:120px; }
-.gauge-pct { font-family:var(--font-mono); font-size:24px; font-weight:600; fill:var(--text-1); }
+.gauge-pct { font-family:var(--font-mono); font-size:var(--num-hero); font-weight:600; fill:var(--text-1); }
 .gauge-cap { font-size:9px; fill:var(--text-3); text-transform:uppercase; letter-spacing:.08em; }
 .gauge-foot { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center; }
 
@@ -465,7 +465,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .hot-name { font-size:15px; font-weight:600; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hot-company { font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hot-spacer { flex:1; min-height:14px; }
-.hot-value { font-size:21px; font-weight:600; color:var(--accent); letter-spacing:-.01em; }
+.hot-value { font-size:var(--num-lg); font-weight:600; color:var(--accent); letter-spacing:-.01em; }
 .hot-status { font-size:11px; color:var(--text-3); margin-top:5px; display:flex; align-items:center; gap:6px; }
 .hot-status .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
 
@@ -476,7 +476,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .kpi-top { display:flex; align-items:center; gap:6px; color:var(--text-2); }
 .kpi-ic { width:14px; height:14px; fill:none; stroke:var(--text-3); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .kpi-name { font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--text-2); }
-.kpi-num { font-size:28px; font-weight:600; color:var(--text-1); letter-spacing:-.02em; line-height:1; margin-top:10px; }
+.kpi-num { font-size:var(--num-hero); font-weight:600; color:var(--text-1); letter-spacing:-.02em; line-height:1; margin-top:10px; }
 .kpi-num.is-ok { color:var(--ok); } .kpi-num.is-warn { color:var(--warn); } .kpi-num.is-bad { color:var(--bad); }
 .kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.7; }
 .kpi-spark-empty { height:20px; margin-top:8px; }
@@ -488,7 +488,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .reg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
 .reg-cell { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .reg-cell-label { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-3); }
-input.reg-input { text-align:center; font-size:22px; font-weight:600; padding:9px 4px; }
+input.reg-input { text-align:center; font-size:var(--num-md); font-weight:600; padding:9px 4px; }
 .reg-cell-meta { font-size:10px; color:var(--text-3); }
 .reg-foot { font-size:12px; color:var(--text-2); margin-top:14px; }
 .reg-foot strong { color:var(--text-1); font-weight:600; }

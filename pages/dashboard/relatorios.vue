@@ -738,7 +738,7 @@ function goToStatus(status: string) {
 .kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:14px; }
 .kpi-label { font-size:12px; color:var(--text-2); margin-bottom:6px; }
 .kpi-value-row { display:flex; align-items:baseline; gap:8px; }
-.kpi-value { font-size:27px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-.01em; font-family:var(--font-mono); }
+.kpi-value { font-size:var(--num-hero); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-.01em; font-family:var(--font-mono); }
 .kpi-delta { font-size:12px; font-weight:600; }
 .kpi-sub { font-size:11px; color:var(--text-3); margin-top:6px; }
 
@@ -761,7 +761,7 @@ function goToStatus(status: string) {
 
 .vol-item  { background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px; }
 .vol-label { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; font-weight:600; margin-bottom:6px; }
-.vol-value { font-size:25px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; font-family:var(--font-mono); letter-spacing:-.01em; }
+.vol-value { font-size:var(--num-lg); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; font-family:var(--font-mono); letter-spacing:-.01em; }
 .vol-hint  { font-size:11px; color:var(--text-3); margin-top:5px; }
 
 .bars-row { display:flex; align-items:flex-end; gap:3px; height:90px; }

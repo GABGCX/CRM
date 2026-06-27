@@ -190,7 +190,7 @@
             <div style="font-size:10px;margin-bottom:4px;font-weight:500" :style="{ color: d.isToday ? '#0f62fe' : 'var(--text-3)' }">
               {{ d.isToday ? 'Hoje' : d.label }}
             </div>
-            <div style="font-size:20px;font-weight:600;color:var(--text-1)" class="tabular">{{ d.count }}</div>
+            <div style="font-size:var(--num-md);font-weight:600;color:var(--text-1)" class="tabular">{{ d.count }}</div>
             <div style="height:3px;border-radius:2px;margin-top:6px" :style="{ background: d.color }"></div>
           </div>
         </div>
@@ -205,11 +205,11 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div style="background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:10px;padding:14px">
-            <div style="font-size:26px;font-weight:600;color:var(--warn)" class="tabular">44%</div>
+            <div style="font-size:var(--num-hero);font-weight:600;color:var(--warn)" class="tabular">44%</div>
             <div style="font-size:13px;color:var(--warn);margin-top:4px">dos vendedores desistem na <strong>1ª tentativa</strong></div>
           </div>
           <div style="background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:14px">
-            <div style="font-size:26px;font-weight:600;color:var(--ok)" class="tabular">80%</div>
+            <div style="font-size:var(--num-hero);font-weight:600;color:var(--ok)" class="tabular">80%</div>
             <div style="font-size:13px;color:var(--ok);margin-top:4px">das vendas fecham com <strong>8+ contatos</strong></div>
           </div>
         </div>

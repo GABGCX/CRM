@@ -217,7 +217,7 @@ const bottleneck = computed(() => {
 @media(max-width:640px){ .gd-stats{ grid-template-columns:repeat(2,1fr) } }
 .gd-stat { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm) }
 .gd-stat-label { font-size:11px;color:var(--text-2);margin-bottom:8px }
-.gd-stat-value { font-size:25px;font-weight:600;color:var(--text-1);letter-spacing:-.01em;font-variant-numeric:tabular-nums;font-family:var(--font-mono) }
+.gd-stat-value { font-size:var(--num-lg);font-weight:600;color:var(--text-1);letter-spacing:-.01em;font-variant-numeric:tabular-nums;font-family:var(--font-mono) }
 .gd-stat-sub { font-size:11px;margin-top:4px;font-weight:500 }
 
 .gd-bottleneck { border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:14px }
