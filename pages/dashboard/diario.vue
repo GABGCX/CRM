@@ -192,12 +192,14 @@ const cePerDay = computed(() => {
 })
 const rmPerDay = computed(() => Math.max(1, Math.ceil(cePerDay.value * 0.027)))
 
+// Paleta categorica Carbon, alinhada com Relatorios (LD cinza = volume bruto,
+// CE/RM/RR/FR = conversoes). Hex literal: vao em :style de cor/barra.
 const FIELDS = computed(() => [
-  { key:'ld', label:'Ligações',          color:'#0ea5e9', meta: 'N/A' },
+  { key:'ld', label:'Ligações',          color:'#8d8d8d', meta: 'N/A' },
   { key:'ce', label:'Contatos efetivos', color:'#0f62fe', meta: String(cePerDay.value) },
-  { key:'rm', label:'Reuniões marcadas', color:'#7c3aed', meta: String(rmPerDay.value) },
-  { key:'rr', label:'Reuniões realizadas',color:'#0d9488', meta: 'N/A' },
-  { key:'fr', label:'Fechamentos',        color:'#d97706', meta: 'N/A' },
+  { key:'rm', label:'Reuniões marcadas', color:'#8a3ffc', meta: String(rmPerDay.value) },
+  { key:'rr', label:'Reuniões realizadas',color:'#009d9a', meta: 'N/A' },
+  { key:'fr', label:'Fechamentos',        color:'#24a148', meta: 'N/A' },
 ] as const)
 
 // Fetch

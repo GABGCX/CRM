@@ -65,15 +65,15 @@ export function leadUrgency(l: Pick<Lead, 'data_retorno' | 'resultado'>): Urgenc
 
 export const isOverdue = (l: Pick<Lead, 'data_retorno' | 'resultado'>) => leadUrgency(l) === 'overdue'
 
-// Cores por urgencia (barra/avatar)
+// Cores por urgencia (barra/avatar) — tokens Carbon, adaptam ao dark mode
 export const URGENCY_COLOR: Record<Urgency, string> = {
-  overdue: '#dc2626', today: '#d97706', soon: '#193497', none: '#cbd5e1',
+  overdue: 'var(--bad)', today: 'var(--warn)', soon: 'var(--accent)', none: 'var(--border)',
 }
 export const URGENCY_AVATAR: Record<Urgency, { bg: string; fg: string }> = {
-  overdue: { bg: '#fef2f2', fg: '#dc2626' },
-  today:   { bg: '#fffbeb', fg: '#d97706' },
-  soon:    { bg: '#eef2ff', fg: '#193497' },
-  none:    { bg: '#f1f5f9', fg: '#475569' },
+  overdue: { bg: 'var(--bad-bg)',     fg: 'var(--bad)' },
+  today:   { bg: 'var(--warn-bg)',    fg: 'var(--warn)' },
+  soon:    { bg: 'var(--accent-soft)', fg: 'var(--accent)' },
+  none:    { bg: 'var(--bg-subtle)',  fg: 'var(--text-2)' },
 }
 
 // ── Estagio do funil ────────────────────────────────────────────────────
@@ -98,10 +98,10 @@ const LOST_FOR_FUNNEL = ['Recusado', 'Sem interesse', 'Não atende']
 export function funnelStageColor(resultado: string, idx: number): string {
   const cur  = funnelStageOf(resultado)
   const lost = LOST_FOR_FUNNEL.includes(resultado)
-  if (lost && idx === cur) return '#dc2626'
-  if (idx < cur)  return '#193497'
-  if (idx === cur) return '#282828'
-  return '#cbd5e1'
+  if (lost && idx === cur) return 'var(--bad)'
+  if (idx < cur)  return 'var(--accent)'
+  if (idx === cur) return 'var(--text-1)'
+  return 'var(--border)'
 }
 export const funnelStagePassed = (resultado: string, idx: number) => idx < funnelStageOf(resultado)
 

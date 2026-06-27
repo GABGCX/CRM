@@ -381,10 +381,12 @@ definePageMeta({ layout: 'dashboard' })
 
 const { profile, org } = useProfile()
 
-// Cores de serie/grafico (consts, nao literais em style="" para a trava de cores)
+// Cores de serie/grafico — paleta categorica Carbon (hex literal: vao em
+// atributos SVG fill/stroke, onde var(--...) nao resolve). Consts, nao
+// literais em style="" para a trava de cores.
 const C = {
-  ld: '#8a857d', ce: '#0f62fe', rm: '#5b6bb0', rr: '#a87b35', fr: '#4e8c6a',
-  bad: '#b14a44', axis: '#b0a898', donutBg: '#ece7dd',
+  ld: '#8d8d8d', ce: '#0f62fe', rm: '#8a3ffc', rr: '#009d9a', fr: '#24a148',
+  bad: '#da1e28', axis: '#a8a8a8', donutBg: '#e0e0e0',
 }
 const TREND_SERIES = [
   { key: 'ce' as const, label: 'CE', color: C.ce },
