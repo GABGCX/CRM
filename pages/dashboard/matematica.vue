@@ -269,7 +269,7 @@ async function debounceSave() {
 .mr-chain { display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0 }
 .mr-chain-step { flex:1;min-width:110px;text-align:center;padding:10px 8px;border:1px solid var(--border-soft);border-radius:10px;background:var(--bg-subtle);display:flex;flex-direction:column;gap:3px;justify-content:center }
 .mr-chain-label { font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap }
-.mr-chain-value { font-size:26px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;line-height:1.1 }
+.mr-chain-value { font-size:27px;font-weight:600;color:var(--text-1);letter-spacing:-.01em;line-height:1.1;font-family:var(--font-mono);font-variant-numeric:tabular-nums }
 .mr-chain-perday { font-size:11px;color:var(--accent);font-weight:600 }
 .mr-chain-note { font-size:10px;color:var(--text-3) }
 .mr-chain-arrow { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-3);flex-shrink:0;padding:0 4px }

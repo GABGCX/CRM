@@ -4,20 +4,20 @@
 
       <!-- Brand -->
       <div style="text-align:center;margin-bottom:28px">
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:#193497;border-radius:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(25,52,151,.3)">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#193497;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 14px rgba(25,52,151,.18)">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
             <circle cx="12" cy="12" r="4" fill="white"/>
             <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 style="font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin:0 0 6px">Entrar no Prospecta</h1>
+        <h1 style="font-size:23px;font-weight:600;color:var(--text-1);letter-spacing:-.03em;margin:0 0 7px">Entrar no Prospecta</h1>
         <p style="font-size:14px;color:var(--text-2);margin:0">Bem-vindo de volta. Acesse sua conta.</p>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="handleLogin"
-        style="background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:16px">
+        style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:16px">
 
         <div v-if="error"
           style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
