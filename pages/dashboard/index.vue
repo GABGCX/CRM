@@ -1,197 +1,140 @@
-﻿<template>
-  <div>
-    <!-- Page header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+<template>
+  <div class="dash">
+    <!-- Cabecalho editorial -->
+    <header class="dash-head">
       <div>
-        <div class="page-title">Bom {{ greeting }}, {{ firstName }}</div>
-        <div class="page-sub">{{ todayLabel }} · semana {{ currentWeek }} de 4</div>
+        <h1 class="dash-greet">Bom {{ greeting }}, {{ firstName }}</h1>
+        <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <select
-          v-if="canFilterUsers && orgMembers?.length"
-          v-model="selectedUserId"
-          style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-2);cursor:pointer;max-width:160px">
+      <div class="dash-head-right">
+        <select v-if="canFilterUsers && orgMembers?.length" v-model="selectedUserId" class="dash-select">
           <option :value="null">Toda equipe</option>
           <option v-for="m in orgMembers" :key="m.id" :value="m.id">{{ m.name || m.id.slice(0,8) }}</option>
         </select>
-        <div style="font-size:12px;color:var(--text-3);text-align:right;line-height:1.5">
-          <div>{{ workdaysLeft }} dias úteis restantes</div>
-          <div>{{ totalWorkdays }} dias úteis no mês</div>
+        <div class="dash-days">
+          <span class="dash-days-n tabular">{{ workdaysLeft }}</span>
+          <span class="dash-days-l">dias uteis restantes · {{ totalWorkdays }} no mes</span>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Foco agora: proxima acao concreta -->
-    <div class="focus-hero" :class="`focus-hero--${focusAction.tone}`">
-      <div class="focus-main">
-        <div class="focus-eyebrow">
-          <span class="focus-dot"></span>
-          Foco agora
+    <!-- Foco agora -->
+    <section class="dash-section" :class="`focus--${focusAction.tone}`">
+      <div class="eyebrow"><span class="eyebrow-dot" /> Foco agora</div>
+      <div class="focus-grid" :class="{ 'has-hot': hottestLead }">
+        <div>
+          <h2 class="focus-headline">{{ focusAction.title }}</h2>
+          <p class="focus-desc">{{ focusAction.sub }}</p>
+          <NuxtLink :to="focusAction.to" class="focus-link">
+            {{ focusAction.cta }}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </NuxtLink>
         </div>
-        <div class="focus-title">{{ focusAction.title }}</div>
-        <div class="focus-sub">{{ focusAction.sub }}</div>
-        <NuxtLink :to="focusAction.to" class="focus-cta">
-          {{ focusAction.cta }}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-          </svg>
+        <NuxtLink v-if="hottestLead" :to="`/dashboard/pipeline?highlight=${hottestLead.id}`" class="hot-aside">
+          <div class="hot-eyebrow">Lead mais quente</div>
+          <div class="hot-name">{{ hottestLead.decisor }}</div>
+          <div class="hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
+          <div class="hot-foot">
+            <span class="hot-value">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</span>
+            <span class="hot-status">{{ hottestLead.resultado }}</span>
+          </div>
         </NuxtLink>
       </div>
-      <NuxtLink v-if="hottestLead" :to="`/dashboard/pipeline?highlight=${hottestLead.id}`" class="focus-hot">
-        <div class="focus-hot-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="margin-right:3px">
-            <path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2.5-1-4 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-10z"/>
-          </svg>
-          Lead mais quente
-        </div>
-        <div class="focus-hot-name">{{ hottestLead.decisor }}</div>
-        <div class="focus-hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
-        <div class="focus-hot-footer">
-          <span class="focus-hot-value">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</span>
-          <span class="focus-hot-status">{{ hottestLead.resultado }}</span>
-        </div>
-      </NuxtLink>
-    </div>
+    </section>
 
-    <!-- ── HOJE ─────────────────────────────────────────── -->
-    <div class="ck-label">Hoje · {{ todayFormatted }}</div>
-    <div class="cockpit-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
-      <!-- Registrar hoje (acao diaria, prioritaria) -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="card-label" style="margin-bottom:0">Registrar dia</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:11px;color:var(--text-3);background:var(--bg-subtle);padding:2px 7px;border-radius:4px">Ctrl+S</span>
-            <span v-if="alreadySaved" style="font-size:12px;color:#16a34a;font-weight:500">Salvo</span>
-          </div>
-        </div>
-        <div class="cockpit-quick-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
-          <div v-for="f in quickFields" :key="f.key" style="text-align:center">
-            <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center">
-              <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
-              <span v-else>{{ f.label }}</span>
-            </div>
-            <input type="number" v-model.number="quickForm[f.key]" min="0"
-              style="text-align:center;font-size:20px;font-weight:600;padding:8px 4px;color:var(--text-1)" />
-            <div style="font-size:11px;color:var(--text-3);margin-top:2px">meta: {{ f.meta }}</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px;color:var(--text-2)">
-            CE→RM hoje: <strong>{{ todayCERMRate }}%</strong> &nbsp;·&nbsp; mês: <strong>{{ monthCERMRate }}%</strong>
-          </div>
-          <button class="btn btn-primary" :disabled="saving" @click="saveQuick">
-            {{ saving ? 'Salvando...' : 'Salvar dia' }}
-          </button>
+    <!-- Hoje -->
+    <section class="dash-section">
+      <div class="section-bar">
+        <div class="eyebrow" style="margin-bottom:0">Hoje · {{ todayFormatted }}</div>
+        <div class="bar-actions">
+          <span v-if="alreadySaved && !saving" class="saved-flag">salvo</span>
+          <span class="hint">Ctrl+S</span>
+          <button class="btn btn-primary" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
         </div>
       </div>
 
-      <!-- Follow-ups hoje -->
-      <div class="card">
-        <div class="card-label">Follow-ups hoje</div>
-        <div v-if="!todayTasks.length" style="text-align:center;padding:28px 0;color:var(--text-3);font-size:13px">
-          Nenhum retorno urgente.
-        </div>
-        <div v-for="t in todayTasks" :key="t.id"
-          style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-soft)">
-          <div>
-            <div style="font-size:13px;font-weight:500;color:var(--text-1)">{{ t.decisor }}</div>
-            <div style="font-size:12px;color:var(--text-2)">{{ t.sub }}</div>
+      <div class="stat-strip">
+        <div v-for="f in quickFields" :key="f.key" class="stat">
+          <input type="number" min="0" v-model.number="quickForm[f.key]" class="stat-input tabular" />
+          <div class="stat-label">
+            <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
+            <span v-else>{{ f.label }}</span>
           </div>
-          <span class="tag" :class="t.tagClass">{{ t.tagLabel }}</span>
+          <div class="stat-meta">meta {{ f.meta }}</div>
         </div>
-        <NuxtLink to="/dashboard/followup" style="display:block;margin-top:12px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:500">
-          Ver todos →
-        </NuxtLink>
       </div>
-    </div>
 
-    <!-- ── ESTE MÊS ─────────────────────────────────────── -->
-    <div class="ck-head">
-      <div class="ck-label" style="margin:0">Este mês · {{ MONTH_NAMES[currentMonth-1] }}</div>
-      <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
-    </div>
-
-    <!-- Pace banner -->
-    <div class="pace-banner" :class="paceBanner.bannerClass"
-      style="border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;border:1px solid">
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:500">{{ paceBanner.title }}</div>
-        <div style="font-size:12px;margin-top:3px;opacity:.8">{{ paceBanner.sub }}</div>
+      <div class="today-line">
+        <span class="today-line-label">Follow-ups</span>
+        <template v-if="todayTasks.length">
+          <span v-for="t in todayTasks" :key="t.id" class="task-chip">
+            <span class="tag" :class="t.tagClass">{{ t.tagLabel }}</span>{{ t.decisor }}
+          </span>
+        </template>
+        <span v-else class="today-empty">nenhum retorno urgente</span>
+        <NuxtLink to="/dashboard/followup" class="today-all">Ver fila completa &rarr;</NuxtLink>
       </div>
-    </div>
+    </section>
 
-    <!-- Metric cards -->
-    <div class="cockpit-kpi-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
-      <div v-if="diaryPending" v-for="i in 4" :key="i"
-        class="metric-card" style="animation:pulse 1.5s infinite;min-height:88px">
-        <div style="height:10px;background:var(--bg-subtle);border-radius:3px;margin-bottom:10px;width:55%" />
-        <div style="height:30px;background:var(--bg-subtle);border-radius:3px;width:40%" />
+    <!-- Este mes -->
+    <section class="dash-section">
+      <div class="section-bar">
+        <div class="eyebrow" style="margin-bottom:0">Este mes · {{ MONTH_NAMES[currentMonth-1] }}</div>
+        <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
       </div>
-      <UiMetricCard v-else v-for="m in metricCards" :key="m.label" :value="m.value" :sub="m.sub" :sub-class="m.subClass">
-        <template #label>
-          <span style="display:flex;align-items:center;gap:4px">
+
+      <div v-if="diaryPending" class="stat-strip">
+        <div v-for="i in 4" :key="i" class="stat">
+          <div class="skel" style="height:30px;width:50%" />
+          <div class="skel" style="height:10px;width:70%;margin-top:10px" />
+        </div>
+      </div>
+      <div v-else class="stat-strip">
+        <div v-for="m in metricCards" :key="m.label" class="stat">
+          <div class="stat-num tabular" :class="m.subClass">{{ m.value }}</div>
+          <div class="stat-label">
             <UiMetricTooltip v-if="['CE no mês','RM no mês','RR no mês','FR no mês'].includes(m.label)"
               :metric="(m.label.split(' ')[0] as MetricKey)" />
             <span v-else>{{ m.label }}</span>
-            <span v-if="['CE no mês','RM no mês','RR no mês','FR no mês'].includes(m.label)"
-              style="font-size:11px;color:var(--text-3);font-weight:400"> no mês</span>
-          </span>
-        </template>
-      </UiMetricCard>
-    </div>
-
-    <!-- Charts row -->
-    <div class="cockpit-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <!-- Pace bars -->
-      <div class="card">
-        <div class="card-label">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
-        <div v-for="r in paceRows" :key="r.label" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-            <span style="font-size:13px;color:var(--text-2)">{{ r.label }}</span>
-            <span style="font-size:13px;font-weight:500;color:var(--text-1)" class="tabular">{{ r.current }} / {{ r.target }}</span>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }"></div>
-          </div>
-          <div style="font-size:11px;margin-top:3px" :style="{ color: r.color }">{{ r.note }}</div>
+          <div class="stat-meta">{{ m.sub }}</div>
         </div>
       </div>
 
-      <!-- Sparkline CE -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="card-label" style="margin-bottom:0">Evolução CE no mês</div>
-          <span style="font-size:12px;color:var(--text-3)">acumulado vs meta</span>
+      <p class="pace-line"><strong>{{ paceBanner.title }}.</strong> {{ paceBanner.sub }}</p>
+
+      <div class="dash-two">
+        <div>
+          <div class="mini-label">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
+          <div v-for="r in paceRows" :key="r.label" class="pace-row">
+            <div class="pace-row-head">
+              <span>{{ r.label }}</span>
+              <span class="tabular">{{ r.current }} / {{ r.target }}</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
+            <div class="pace-row-note" :style="{ color: r.color }">{{ r.note }}</div>
+          </div>
         </div>
-        <div v-if="diaryPending"
-          style="height:80px;background:var(--bg-subtle);border-radius:8px;animation:pulse 1.5s infinite" />
-        <svg v-else viewBox="0 0 240 80" style="width:100%;height:80px;overflow:visible">
-          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY"
-            stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 2" />
-          <text x="2" :y="ceGoalY - 3" fill="#94a3b8" font-size="8">meta</text>
-          <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.08" />
-          <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round" />
-          <circle v-if="sparkPoints.length"
-            :cx="sparkPoints[sparkPoints.length-1].x"
-            :cy="sparkPoints[sparkPoints.length-1].y"
-            r="3" fill="#193497" />
-          <text v-if="sparkPoints.length > 0"
-            :x="sparkPoints[0].x" y="78" fill="#94a3b8" font-size="7" text-anchor="middle">1</text>
-          <text v-if="sparkPoints.length > 1"
-            :x="sparkPoints[Math.floor(sparkPoints.length/2)].x" y="78"
-            fill="#94a3b8" font-size="7" text-anchor="middle">{{ Math.floor(sparkPoints.length/2) + 1 }}</text>
-          <text v-if="sparkPoints.length > 2"
-            :x="sparkPoints[sparkPoints.length-1].x" y="78"
-            fill="#94a3b8" font-size="7" text-anchor="middle">{{ sparkPoints.length }}</text>
-        </svg>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px">
-          <span style="color:#193497;font-weight:500">{{ monthTotals.ce }} CE acumulados</span>
-          <span style="color:var(--text-3)">meta: {{ ceNec }}</span>
+
+        <div>
+          <div class="mini-label">Evolucao CE no mes · acumulado vs meta</div>
+          <div v-if="diaryPending" class="skel" style="height:88px;margin-top:6px" />
+          <svg v-else viewBox="0 0 240 80" style="width:100%;height:88px;overflow:visible">
+            <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#ece7dd" stroke-width="1" stroke-dasharray="4 3" />
+            <text x="2" :y="ceGoalY - 3" fill="#b0a898" font-size="8">meta</text>
+            <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.06" />
+            <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#193497" />
+          </svg>
+          <div class="spark-foot">
+            <span>{{ monthTotals.ce }} CE acumulados</span>
+            <span style="color:var(--text-3)">meta {{ ceNec }}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <Transition name="toast">
       <div v-if="toast" class="toast">{{ toast }}</div>
@@ -445,7 +388,7 @@ const metricCards = computed(() => {
 
 const paceRows = computed(() => {
   const t     = monthTotals.value
-  const color = (v: number, n: number) => v>=n ? '#16a34a' : v>=n*.8 ? '#d97706' : '#dc2626'
+  const color = (v: number, n: number) => v>=n ? 'var(--ok)' : v>=n*.8 ? 'var(--warn)' : 'var(--bad)'
   const pct   = (v: number, n: number) => Math.min(100, n>0 ? Math.round((v/n)*100) : 0)
   const ceN   = Math.floor(ceNec.value  * daysGone / totalWorkdays)
   const rmN   = Math.floor(rmNec.value  * daysGone / totalWorkdays)
@@ -455,7 +398,7 @@ const paceRows = computed(() => {
     { label:'Reuniões marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),
       color:color(t.rm,rmN),  note:`meta: ${rmPerDay.value}/dia` },
     { label:'Fechamentos',       current:t.fr, target:fechNec.value, pct:pct(t.fr,fechNec.value),
-      color:t.fr>=fechNec.value?'#16a34a':'#dc2626', note:`meta: ${fechNec.value} no mês` },
+      color:t.fr>=fechNec.value?'var(--ok)':'var(--bad)', note:`meta: ${fechNec.value} no mês` },
   ]
 })
 
@@ -482,111 +425,89 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 }))
 </script>
 
-<style>
+<style scoped>
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+.skel { background:var(--bg-subtle); border-radius:var(--radius-sm); animation:pulse 1.5s infinite; }
 
-.pace-ok   { background:var(--ok-bg); border-color:var(--ok-bd) !important; color:var(--ok); }
-.pace-warn { background:var(--warn-bg); border-color:var(--warn-bd) !important; color:var(--warn); }
-.pace-bad  { background:var(--bad-bg); border-color:var(--bad-bd) !important; color:var(--bad); }
+.dash { max-width: 1080px; }
 
-.ck-label { font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px; }
-.ck-head  { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px; }
+/* ── Cabecalho ───────────────────────────────────────────── */
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+.dash-greet { font-size:30px; font-weight:600; letter-spacing:-.03em; color:var(--text-1); line-height:1.1; }
+.dash-date { font-size:13px; color:var(--text-3); margin-top:7px; text-transform:capitalize; }
+.dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
+.dash-select { font-size:13px; padding:7px 11px; max-width:160px; width:auto; }
+.dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.15; }
+.dash-days-n { font-size:22px; font-weight:600; color:var(--text-2); }
+.dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
-/* ── Foco agora (hero acionavel) ─────────────────────────── */
-.focus-hero {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-}
-.focus-hero:has(.focus-hot) { grid-template-columns: 1fr 220px; }
-.focus-main { display: flex; flex-direction: column; min-width: 0; }
-.focus-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text-3);
-  margin-bottom: 8px;
-}
-.focus-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-.focus-title { font-size: 18px; font-weight: 600; color: var(--text-1); letter-spacing: -.02em; line-height: 1.25; }
-.focus-sub { font-size: 13px; color: var(--text-2); margin-top: 5px; line-height: 1.5; }
-.focus-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  align-self: flex-start;
-  margin-top: 14px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background .12s;
-}
-.focus-cta:hover { background: var(--accent-dark); }
+/* ── Secao (separada por hairline + muito respiro) ───────── */
+.dash-section { margin-top:40px; padding-top:40px; border-top:1px solid var(--border-soft); }
 
-/* Tom por urgencia: borda esquerda + cor do dot/cta */
-.focus-hero--urgent { border-left: 3px solid #dc2626; }
-.focus-hero--urgent .focus-dot, .focus-hero--urgent .focus-cta { background: #dc2626; }
-.focus-hero--urgent .focus-cta:hover { background: var(--bad); }
-.focus-hero--today  { border-left: 3px solid #d97706; }
-.focus-hero--today .focus-dot, .focus-hero--today .focus-cta { background: #d97706; }
-.focus-hero--today .focus-cta:hover { background: var(--warn); }
-.focus-hero--pace   { border-left: 3px solid #d97706; }
-.focus-hero--pace .focus-dot, .focus-hero--pace .focus-cta { background: #d97706; }
-.focus-hero--pace .focus-cta:hover { background: var(--warn); }
-.focus-hero--hot    { border-left: 3px solid var(--accent); }
-.focus-hero--clear  { border-left: 3px solid #16a34a; }
-.focus-hero--clear .focus-dot, .focus-hero--clear .focus-cta { background: #16a34a; }
-.focus-hero--clear .focus-cta:hover { background: var(--ok); }
+.eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--text-3); margin-bottom:18px; }
+.eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.focus--urgent .eyebrow-dot { background:var(--bad); }
+.focus--today .eyebrow-dot, .focus--pace .eyebrow-dot { background:var(--warn); }
+.focus--clear .eyebrow-dot { background:var(--ok); }
 
-/* Card do lead mais quente */
-.focus-hot {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-soft);
-  text-decoration: none;
-  transition: border-color .12s;
-}
-.focus-hot:hover { border-color: var(--accent); }
-.focus-hot-label {
-  display: inline-flex;
-  align-items: center;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: #d97706;
-  margin-bottom: 4px;
-}
-.focus-hot-name { font-size: 14px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.focus-hot-company { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.focus-hot-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; }
-.focus-hot-value { font-size: 15px; font-weight: 700; color: #16a34a; letter-spacing: -.01em; }
-.focus-hot-status { font-size: 10px; font-weight: 500; color: var(--text-2); background: var(--bg-card); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.section-bar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:22px; }
+.bar-actions { display:flex; align-items:center; gap:12px; }
+.saved-flag { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ok); }
+.hint { font-size:11px; color:var(--text-3); background:var(--bg-subtle); padding:2px 7px; border-radius:var(--radius-sm); }
 
-@media (max-width: 640px) {
-  .focus-hero, .focus-hero:has(.focus-hot) { grid-template-columns: 1fr !important; }
-}
+/* ── Foco agora ──────────────────────────────────────────── */
+.focus-grid { display:grid; grid-template-columns:1fr; gap:28px; }
+.focus-grid.has-hot { grid-template-columns:minmax(0,1fr) 260px; align-items:start; }
+.focus-headline { font-size:25px; font-weight:600; letter-spacing:-.025em; line-height:1.2; color:var(--text-1); max-width:680px; }
+.focus-desc { font-size:14px; color:var(--text-2); margin-top:12px; line-height:1.6; max-width:580px; }
+.focus-link { display:inline-flex; align-items:center; gap:7px; margin-top:20px; font-size:13px; font-weight:600; color:var(--accent); text-decoration:none; transition:gap .12s; }
+.focus-link:hover { gap:11px; }
 
-@media (max-width: 640px) {
-  .cockpit-kpi-grid   { grid-template-columns: repeat(2, 1fr) !important; }
-  .cockpit-quick-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .cockpit-charts     { grid-template-columns: 1fr !important; }
+.hot-aside { display:block; padding:18px; border:1px solid var(--border-soft); border-radius:var(--radius); background:var(--bg-card); text-decoration:none; transition:border-color .12s; }
+.hot-aside:hover { border-color:var(--accent-bd); }
+.hot-eyebrow { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); }
+.hot-name { font-size:15px; font-weight:600; color:var(--text-1); margin-top:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-company { font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-foot { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-top:14px; }
+.hot-value { font-size:16px; font-weight:600; color:var(--text-1); letter-spacing:-.01em; }
+.hot-status { font-size:10px; color:var(--text-3); white-space:nowrap; }
+
+/* ── Faixa panoramica de numeros (sem caixa) ─────────────── */
+.stat-strip { display:flex; flex-wrap:wrap; gap:24px 0; }
+.stat { flex:1 1 0; min-width:110px; padding:0 26px; border-left:1px solid var(--border-soft); }
+.stat:first-child { padding-left:0; border-left:none; }
+.stat-num { font-size:30px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; }
+.stat-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); margin-top:10px; display:flex; align-items:center; gap:4px; }
+.stat-meta { font-size:11px; color:var(--text-3); margin-top:5px; }
+
+input.stat-input { font-size:30px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; width:100%; border:none; background:transparent; padding:0 0 4px; border-bottom:1px solid var(--border-soft); border-radius:0; transition:border-color .12s; }
+input.stat-input:focus { box-shadow:none; border-bottom:1px solid var(--accent); }
+input.stat-input::-webkit-outer-spin-button, input.stat-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+
+/* ── Linha de follow-ups ─────────────────────────────────── */
+.today-line { margin-top:26px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; font-size:13px; color:var(--text-1); }
+.today-line-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); }
+.task-chip { display:inline-flex; align-items:center; gap:8px; }
+.today-empty { color:var(--text-3); }
+.today-all { margin-left:auto; font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; }
+
+/* ── Pace como frase + colunas fluidas ───────────────────── */
+.pace-line { font-size:14px; color:var(--text-2); line-height:1.6; margin:24px 0 0; max-width:700px; }
+.pace-line strong { color:var(--text-1); font-weight:600; }
+
+.dash-two { display:grid; grid-template-columns:1.15fr 1fr; gap:48px; margin-top:32px; }
+.mini-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); margin-bottom:16px; }
+.pace-row { margin-bottom:18px; }
+.pace-row:last-child { margin-bottom:0; }
+.pace-row-head { display:flex; justify-content:space-between; font-size:13px; color:var(--text-2); margin-bottom:6px; }
+.pace-row-head span:last-child { color:var(--text-1); font-weight:500; }
+.pace-row-note { font-size:11px; margin-top:4px; }
+.spark-foot { display:flex; justify-content:space-between; font-size:12px; margin-top:8px; color:var(--accent); font-weight:500; }
+
+@media (max-width: 720px) {
+  .stat { min-width:80px; padding:0 14px; }
+  .stat-num, input.stat-input { font-size:24px; }
+  .dash-two { grid-template-columns:1fr; gap:32px; }
+  .focus-grid.has-hot { grid-template-columns:1fr; }
 }
 </style>
