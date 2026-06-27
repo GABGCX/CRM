@@ -194,6 +194,10 @@
   .main-content { flex:1; overflow:auto; background:var(--bg); }
   .page-container { padding:30px 36px; }
 
+  /* Mobile drawer chrome (escondido no desktop, ligado no @media) */
+  .mobile-topbar   { display:none; }
+  .sidebar-backdrop { display:none; }
+
   /* ── Typography ──────────────────────────────────────── */
   .page-title { font-size:22px; font-weight:600; color:var(--text-1); letter-spacing:-0.02em; font-family:var(--font-sans); }
   .page-sub   { font-size:13px; color:var(--text-2); margin-top:4px; }
@@ -287,23 +291,28 @@
 /* ── Pulse skeleton animation ────────────────────────── */
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-/* ── Mobile responsive ───────────────────────────────── */
+/* ── Mobile: sidebar vira drawer off-canvas ──────────── */
 @media (max-width: 768px) {
-  .app-shell { flex-direction: column; height: auto; min-height: 100vh; }
-  .sidebar {
-    width: 100% !important;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 8px;
-    gap: 4px;
-    transition: none;
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 10px;
+    position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 60;
+    padding: 0 12px; background: var(--bg-card); border-bottom: 1px solid var(--border);
   }
-  .sidebar > div:first-child { width: 100%; }
-  .sidebar nav { flex: 1; overflow-x: auto; display: flex; flex-direction: row; flex-wrap: wrap; padding: 0; }
-  .sidebar nav .nav-item { width: auto; border-left: none; border-bottom: 2px solid transparent; border-radius: 6px; }
-  .sidebar nav .nav-item.active { border-bottom-color: var(--accent); }
-  .sidebar > div:last-child { display: none; }
-  .main-content { overflow: auto; flex: 1; }
+  .main-content { padding-top: 52px; }
   .page-container { padding: 16px; }
+
+  /* Sai do fluxo e desliza a partir da esquerda */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 252px !important; height: 100%; z-index: 80;
+    transform: translateX(-100%);
+    transition: transform .24s cubic-bezier(.16,1,.3,1);
+    box-shadow: 4px 0 28px rgba(0,0,0,.22);
+  }
+  .sidebar--mobile-open { transform: translateX(0); }
+
+  .sidebar-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 70;
+    background: rgba(15,15,15,.48); backdrop-filter: blur(1.5px);
+  }
 }

@@ -184,25 +184,25 @@ const bottleneck = computed(() => {
     eyebrow: 'Sem atividade', title: 'Nenhum contato registrado este mes',
     body: 'Este BDR ainda nao registrou contatos efetivos no diario.',
     action: 'Verifique se o diario esta sendo preenchido.',
-    style: 'background:#f1f5f9;border-color:#e2e8f0;color:#475569',
+    style: 'background:var(--bg-subtle);border-color:var(--border);color:var(--text-2)',
   }
   if (rrFr.value < 20 && t.value.rr > 0) return {
     eyebrow: 'Gargalo identificado', title: 'Conversao reuniao → fechamento (RR→FR)',
     body: `Taxa atual ${rrFr.value.toFixed(0)}% contra benchmark de 40%.`,
     action: 'Foco em tecnica de negociacao e fechamento, nao em prospeccao.',
-    style: 'background:#fef2f2;border-color:#fecaca;color:#7f1d1d',
+    style: 'background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad)',
   }
   if (ceRm.value < 1.5 && t.value.ce > 20) return {
     eyebrow: 'Gargalo identificado', title: 'Conversao contato → reuniao (CE→RM)',
     body: `Taxa CE→RM ${ceRm.value.toFixed(1)}% contra benchmark de 2.7%.`,
     action: 'Foco em script de abertura e geracao de interesse.',
-    style: 'background:#fffbeb;border-color:#fde68a;color:#78350f',
+    style: 'background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn)',
   }
   return {
     eyebrow: 'No ritmo', title: 'Taxas dentro do benchmark',
     body: `CE→RM ${ceRm.value.toFixed(1)}% · RM→RR ${rmRr.value.toFixed(0)}%.`,
     action: 'Manter o volume diario de contatos.',
-    style: 'background:#f0fdf4;border-color:#bbf7d0;color:#14532d',
+    style: 'background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)',
   }
 })
 </script>

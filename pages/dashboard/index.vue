@@ -56,14 +56,21 @@
       <section class="tile t-funnel">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.funnel" /><span>Funil do mes</span><span class="tile-cap">{{ MONTH_NAMES[currentMonth-1] }}</span></div>
         <div v-if="!monthTotals.ld && !monthTotals.ce" class="empty-mini">Sem atividade registrada no mes.</div>
-        <svg v-else viewBox="0 0 340 196" class="funnel-svg">
-          <g v-for="(b, i) in funnelBands" :key="b.key">
-            <polygon :points="b.pts" :fill="FUNNEL_BLUE[i]" />
-            <text x="8" :y="b.midY + 4" class="fn-label">{{ b.label }}</text>
-            <text x="332" :y="b.midY + 4" text-anchor="end" class="fn-value">{{ b.v.toLocaleString('pt-BR') }}</text>
-            <text v-if="b.rate !== null" x="170" :y="b.y - 1" text-anchor="middle" class="fn-rate">{{ b.rate.toFixed(b.rate < 10 ? 1 : 0) }}%</text>
-          </g>
-        </svg>
+        <div v-else class="fn-bars">
+          <template v-for="(row, i) in funnelRows" :key="row.key">
+            <div v-if="i > 0" class="fn-gap">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="fn-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+              <span v-if="row.rate !== null" class="fn-rate tabular">{{ row.rate.toFixed(row.rate < 10 ? 1 : 0) }}%</span>
+            </div>
+            <div class="fn-row">
+              <span class="fn-lbl">{{ row.label }}</span>
+              <div class="fn-track">
+                <div class="fn-fill" :style="{ width: row.pct + '%' }" />
+              </div>
+              <span class="fn-val tabular">{{ row.v.toLocaleString('pt-BR') }}</span>
+            </div>
+          </template>
+        </div>
       </section>
 
       <!-- Lead quente -->
@@ -321,30 +328,22 @@ const gaugePct = computed(() => Math.min(100, Math.round(monthTotals.value.ce / 
 const gaugeOffset = computed(() => GAUGE_C * (1 - gaugePct.value / 100))
 const paceColor = computed(() => ceDelta.value >= 5 ? 'var(--ok)' : ceDelta.value >= 0 ? 'var(--warn)' : 'var(--bad)')
 
-// ── Funil SVG ───────────────────────────────────────────────────────────
-const FUNNEL_BLUE = ['#d0e2ff', '#a6c8ff', '#78a9ff', '#4589ff', '#0f62fe']
-const funnelBands = computed(() => {
+// ── Funil ────────────────────────────────────────────────────────────────
+const funnelRows = computed(() => {
   const t = monthTotals.value
-  const rows = [
-    { key:'LD', label:'Ligacoes',        v:t.ld },
-    { key:'CE', label:'Contato efetivo', v:t.ce },
-    { key:'RM', label:'Reuniao marcada', v:t.rm },
-    { key:'RR', label:'Reuniao realiz.', v:t.rr },
-    { key:'FR', label:'Fechamento',      v:t.fr },
+  const stages = [
+    { key:'LD', label:'Ligacoes',        v: t.ld },
+    { key:'CE', label:'Contato efetivo', v: t.ce },
+    { key:'RM', label:'Reuniao marcada', v: t.rm },
+    { key:'RR', label:'Reuniao realiz.', v: t.rr },
+    { key:'FR', label:'Fechamento',      v: t.fr },
   ]
-  const maxV = Math.max(rows[0].v, 1), cx = 170, innerW = 180, bandH = 30, gap = 9, y0 = 10
-  return rows.map((s, i) => {
-    const y = y0 + i * (bandH + gap)
-    const topW = Math.max(10, (s.v / maxV) * innerW)
-    const next = rows[i+1]
-    const botW = next ? Math.max(8, (next.v / maxV) * innerW) : topW
-    const prev = rows[i-1]
-    return {
-      ...s, y, midY: y + bandH/2,
-      pts: `${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+bandH} ${cx-botW/2},${y+bandH}`,
-      rate: prev && prev.v > 0 ? (s.v / prev.v * 100) : null,
-    }
-  })
+  const maxV = Math.max(...stages.map(s => s.v), 1)
+  return stages.map((s, i) => ({
+    ...s,
+    pct: s.v > 0 ? Math.max(3, Math.round((s.v / maxV) * 100)) : 0,
+    rate: i > 0 && stages[i-1].v > 0 ? (s.v / stages[i-1].v * 100) : null,
+  }))
 })
 
 // ── Foco agora ──────────────────────────────────────────────────────────
@@ -449,10 +448,15 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .gauge-foot { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center; }
 
 /* ── Funil ───────────────────────────────────────────────── */
-.funnel-svg { width:100%; height:auto; }
-.fn-label { font-size:9px; fill:var(--text-2); }
-.fn-value { font-family:var(--font-mono); font-size:11px; font-weight:600; fill:var(--text-1); }
-.fn-rate { font-size:8px; fill:var(--text-3); }
+.fn-bars { display:flex; flex-direction:column; flex:1; justify-content:center; padding:4px 0; }
+.fn-row { display:flex; align-items:center; gap:10px; }
+.fn-lbl { font-size:11px; color:var(--text-2); width:114px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:1px; overflow:hidden; }
+.fn-fill { height:100%; background:var(--accent); border-radius:1px; opacity:.88; transition:width .5s ease; }
+.fn-val { font-size:12px; font-weight:600; color:var(--text-1); width:42px; text-align:right; flex-shrink:0; }
+.fn-gap { display:flex; align-items:center; gap:5px; padding:3px 0 3px 124px; }
+.fn-chevron { color:var(--text-3); flex-shrink:0; }
+.fn-rate { font-size:10px; font-weight:500; color:var(--text-3); }
 .empty-mini { font-size:12px; color:var(--text-3); padding:24px 0; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; }
 
 /* ── Lead quente ─────────────────────────────────────────── */

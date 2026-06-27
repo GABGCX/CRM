@@ -1,6 +1,27 @@
 <template>
   <div class="app-shell">
-    <aside class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
+    <!-- Topbar mobile (so <=768px) -->
+    <header class="mobile-topbar">
+      <button class="mobile-burger" @click="mobileOpen = true" aria-label="Abrir menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="mobile-brand">
+        <div class="mobile-brand-icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="white"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <span>Prospecta</span>
+      </div>
+      <button class="mobile-theme" @click="toggleTheme" :aria-label="isDark ? 'Tema claro' : 'Tema escuro'">
+        <svg v-if="isDark" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </header>
+
+    <Transition name="mb-fade">
+      <div v-if="mobileOpen" class="sidebar-backdrop" @click="mobileOpen = false" />
+    </Transition>
+
+    <aside class="sidebar" :class="{ 'sidebar--collapsed': collapsed, 'sidebar--mobile-open': mobileOpen }">
 
       <!-- Header: logo + toggle -->
       <div class="sb-header">
@@ -17,7 +38,7 @@
             <div class="sb-brand-sub">{{ profile?.name || 'BDR' }}</div>
           </div>
         </div>
-        <button class="sb-toggle" @click="collapsed = !collapsed" :title="collapsed ? 'Expandir menu' : 'Recolher menu'">
+        <button class="sb-toggle" @click="onToggleCollapse" :title="collapsed ? 'Expandir menu' : 'Recolher menu'">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
             :style="{ transform: collapsed ? 'rotate(180deg)' : '', transition: 'transform .18s' }">
             <path d="M15 18l-6-6 6-6"/>
@@ -168,16 +189,38 @@ useHead(computed(() => ({
   title: overdueCount.value > 0 ? `(${overdueCount.value}) Prospecta` : 'Prospecta',
 })))
 
-const collapsed = ref(false)
+const collapsed       = ref(false)  // estado visual (icon-only) — sempre falso no mobile
+const desktopCollapsed = ref(false) // preferencia persistida do desktop
+const isMobile        = ref(false)
+const mobileOpen      = ref(false)
+
+// Fecha o drawer ao navegar
+const route = useRoute()
+watch(() => route.fullPath, () => { mobileOpen.value = false })
+
+function onToggleCollapse() {
+  if (isMobile.value) { mobileOpen.value = false; return }  // no mobile, age como "fechar"
+  desktopCollapsed.value = !desktopCollapsed.value
+  collapsed.value = desktopCollapsed.value
+  localStorage.setItem('sidebar-collapsed', desktopCollapsed.value ? '1' : '0')
+}
+
+let mq: MediaQueryList | null = null
+function onMqChange(e: MediaQueryListEvent | MediaQueryList) {
+  isMobile.value = e.matches
+  collapsed.value = e.matches ? false : desktopCollapsed.value
+  if (!e.matches) mobileOpen.value = false
+}
 
 onMounted(() => {
-  collapsed.value = localStorage.getItem('sidebar-collapsed') === '1'
+  desktopCollapsed.value = localStorage.getItem('sidebar-collapsed') === '1'
+  mq = window.matchMedia('(max-width: 768px)')
+  onMqChange(mq)
+  mq.addEventListener('change', onMqChange)
   initDark()
   fetchProfile()
   window.addEventListener('crm:toast-error', onCrmToastError)
 })
-
-watch(collapsed, v => localStorage.setItem('sidebar-collapsed', v ? '1' : '0'))
 
 const errorToast = ref<string | null>(null)
 let errorToastTimer: ReturnType<typeof setTimeout> | null = null
@@ -192,7 +235,10 @@ function onCrmToastError(e: Event) {
   showErrorToast((e as CustomEvent).detail?.message || 'Ocorreu um erro.')
 }
 
-onUnmounted(() => window.removeEventListener('crm:toast-error', onCrmToastError))
+onUnmounted(() => {
+  window.removeEventListener('crm:toast-error', onCrmToastError)
+  mq?.removeEventListener('change', onMqChange)
+})
 
 async function logout() {
   await supabase.auth.signOut()
@@ -425,6 +471,22 @@ function openGlobalSearch() {
 .sb-logout:hover { background: rgba(220,38,38,.15); color: #ef4444; }
 
 .sb-theme-toggle { margin-top: 4px; }
+
+/* ── Mobile topbar + drawer ─────────────────────────── */
+.mobile-topbar { justify-content: space-between; }
+.mobile-burger, .mobile-theme {
+  width: 36px; height: 36px; border: none; background: transparent;
+  color: var(--text-2); cursor: pointer; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.mobile-burger:hover, .mobile-theme:hover { background: var(--bg-subtle); color: var(--text-1); }
+.mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--text-1); letter-spacing: -.01em; }
+.mobile-brand-icon {
+  width: 24px; height: 24px; border-radius: 6px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.mb-fade-enter-active, .mb-fade-leave-active { transition: opacity .2s ease; }
+.mb-fade-enter-from, .mb-fade-leave-to { opacity: 0; }
 
 /* ── Layout toast ───────────────────────────────────── */
 .layout-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:500; padding:9px 16px; border-radius:8px; display:flex; align-items:center; gap:7px; box-shadow:0 2px 8px rgba(0,0,0,.14); z-index:9999; white-space:nowrap; pointer-events:none; letter-spacing:-.01em; }

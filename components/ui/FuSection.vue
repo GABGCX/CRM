@@ -162,28 +162,28 @@ function daysUntil(d: string) {
 }
 
 function urgencyColor(lead: LeadWithFU): string {
-  if (!lead.data_retorno) return '#e2e8f0'
+  if (!lead.data_retorno) return 'var(--border)'
   const diff = daysUntil(lead.data_retorno)
-  if (diff < 0) return '#ef4444'
-  if (diff === 0) return '#f59e0b'
-  if (diff <= 3) return '#0f62fe'
-  return '#e2e8f0'
+  if (diff < 0) return 'var(--bad)'
+  if (diff === 0) return 'var(--warn)'
+  if (diff <= 3) return 'var(--accent)'
+  return 'var(--border)'
 }
 
 function initialStyle(lead: LeadWithFU): Record<string, string> {
-  if (!lead.data_retorno) return { background: '#f1f5f9', color: '#475569' }
+  if (!lead.data_retorno) return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
   const diff = daysUntil(lead.data_retorno)
-  if (diff < 0)  return { background: '#fef2f2', color: '#dc2626' }
-  if (diff === 0) return { background: '#fffbeb', color: '#d97706' }
-  if (diff <= 3) return { background: '#eaefff', color: '#0f62fe' }
-  return { background: '#f1f5f9', color: '#475569' }
+  if (diff < 0)  return { background: 'var(--bad-bg)', color: 'var(--bad)' }
+  if (diff === 0) return { background: 'var(--warn-bg)', color: 'var(--warn)' }
+  if (diff <= 3) return { background: 'var(--accent-soft)', color: 'var(--accent)' }
+  return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
 }
 
 function retStyle(d: string): Record<string, string> {
   const diff = daysUntil(d)
-  if (diff < 0)  return { background: '#fef2f2', color: '#dc2626' }
-  if (diff === 0) return { background: '#fffbeb', color: '#d97706' }
-  return { background: '#f1f5f9', color: '#475569' }
+  if (diff < 0)  return { background: 'var(--bad-bg)', color: 'var(--bad)' }
+  if (diff === 0) return { background: 'var(--warn-bg)', color: 'var(--warn)' }
+  return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
 }
 
 function retLabel(d: string): string {
