@@ -42,10 +42,24 @@ export const sortedFU = (fus?: Followup[]) => [...(fus || [])].sort((a, b) => a.
 // ── Tempo / urgencia ────────────────────────────────────────────────────
 export type Urgency = 'overdue' | 'today' | 'soon' | 'none'
 
+// Data local em ISO (YYYY-MM-DD). Use SEMPRE isto no client em vez de
+// toISOString().slice(0,10): toISOString e UTC e vira o dia seguinte a noite
+// em fusos negativos (BRT = UTC-3), corrompendo o "hoje" de diario/follow-up.
+export function localDateISO(d: Date = new Date()): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export function daysUntil(date: string | null): number | null {
   if (!date) return null
   const t = new Date(); t.setHours(0, 0, 0, 0)
-  return Math.floor((new Date(date).getTime() - t.getTime()) / 86_400_000)
+  // "YYYY-MM-DD" (date-only) e parseado como UTC pelo JS; forcamos parse LOCAL
+  // pra evitar off-by-one em fusos negativos (BRT). Datas com hora passam direto.
+  const target = new Date(date.length === 10 ? `${date}T00:00:00` : date)
+  target.setHours(0, 0, 0, 0)
+  return Math.round((target.getTime() - t.getTime()) / 86_400_000)
 }
 
 export function daysIn(createdAt: string): number {

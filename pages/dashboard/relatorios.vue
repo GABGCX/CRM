@@ -376,7 +376,7 @@
 <script setup lang="ts">
 import type { Profile } from '~/types'
 import { OUTBOUND_BENCHMARKS, useOutboundMath } from '~/composables/useOutboundMath'
-import { fmtMoney } from '~/utils/leadDomain'
+import { fmtMoney, localDateISO } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const { profile, org } = useProfile()
@@ -413,7 +413,7 @@ const { ldPerDay, cePerDay } = useOutboundMath(
 const months       = ref(6)
 const mode         = ref<'preset' | 'custom'>('preset')
 const _now         = new Date()
-const todayStr     = _now.toISOString().slice(0, 10)
+const todayStr     = localDateISO(_now)
 const monthStartStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-01`
 const customFrom   = ref(monthStartStr)
 const customTo     = ref(todayStr)
@@ -436,14 +436,14 @@ function resolveRange(): { from: string; to: string } {
     return { from: customFrom.value, to: customTo.value }
   }
   const c = new Date(); c.setMonth(c.getMonth() - months.value + 1); c.setDate(1)
-  return { from: c.toISOString().slice(0, 10), to: todayStr }
+  return { from: localDateISO(c), to: todayStr }
 }
 function prevRange(r: { from: string; to: string }) {
   const fromD = new Date(r.from + 'T00:00:00'); const toD = new Date(r.to + 'T00:00:00')
   const lenDays = Math.round((toD.getTime() - fromD.getTime()) / 86_400_000) + 1
   const prevTo = new Date(fromD); prevTo.setDate(prevTo.getDate() - 1)
   const prevFrom = new Date(prevTo); prevFrom.setDate(prevFrom.getDate() - (lenDays - 1))
-  return { from: prevFrom.toISOString().slice(0, 10), to: prevTo.toISOString().slice(0, 10) }
+  return { from: localDateISO(prevFrom), to: localDateISO(prevTo) }
 }
 function paramsFor(r: { from: string; to: string }) {
   const p = new URLSearchParams({ from: r.from, to: r.to })
@@ -580,7 +580,7 @@ const granLabel = computed(() => ({ day: 'diario', week: 'semanal', month: 'mens
 
 function mondayOf(ds: string) {
   const d = new Date(ds + 'T00:00:00'); const off = (d.getDay() + 6) % 7
-  d.setDate(d.getDate() - off); return d.toISOString().slice(0, 10)
+  d.setDate(d.getDate() - off); return localDateISO(d)
 }
 const trendBuckets = computed(() => {
   const map = new Map<string, DayRow>()

@@ -174,7 +174,7 @@
 
 <script setup lang="ts">
 import type { DiaryEntry, Profile, MetricKey } from '~/types'
-import { isHot } from '~/utils/leadDomain'
+import { isHot, localDateISO, daysUntil } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const supabase = useSupabaseClient()
@@ -197,7 +197,7 @@ const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
 const now          = new Date()
 const currentMonth = now.getMonth() + 1
 const currentYear  = now.getFullYear()
-const todayStr     = now.toISOString().slice(0, 10)
+const todayStr     = localDateISO(now)
 const toast        = ref<string|null>(null)
 const saving       = ref(false)
 const alreadySaved = ref(false)
@@ -388,12 +388,12 @@ const { data: urgentLeadsData } = await useAsyncData('urgent-leads', async () =>
   const { data } = await supabase.from('leads').select('id,decisor,data_retorno,resultado')
     .not('resultado', 'in', '("Fechado","Recusado","Sem interesse")')
     .not('data_retorno', 'is', null)
-    .lte('data_retorno', new Date(Date.now() + 2*86400000).toISOString().slice(0,10))
+    .lte('data_retorno', localDateISO(new Date(Date.now() + 2*86400000)))
     .order('data_retorno').limit(5)
   return data || []
 })
 const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
-  const diff = Math.floor((new Date(l.data_retorno!).setHours(0,0,0,0) - new Date(todayStr).setHours(0,0,0,0)) / 86400000)
+  const diff = daysUntil(l.data_retorno) ?? 0
   return { ...l, sub: diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'hoje' : 'amanhã', cls: diff < 0 ? 'is-bad' : diff === 0 ? 'is-warn' : 'is-info' }
 }))
 </script>

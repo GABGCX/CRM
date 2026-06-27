@@ -82,7 +82,7 @@ import type { Lead, Followup, LeadStatus } from '~/types'
 import type { CardPrefs } from '~/composables/useCardPrefs'
 import {
   calcLeadScore, leadScoreColor, leadScoreBg,
-  sortedFU, daysIn, isOverdue, fmtK,
+  sortedFU, daysIn, isOverdue, fmtK, daysUntil,
 } from '~/utils/leadDomain'
 
 type LeadWithFU = Lead & { followups: Followup[] }
@@ -142,14 +142,14 @@ const columns = computed(() =>
 )
 
 function fmtDate(iso: string) {
-  const diff = Math.floor((new Date(iso).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86_400_000)
+  const diff = daysUntil(iso) ?? 0
   if (diff < 0)  return `${Math.abs(diff)}d atraso`
   if (diff === 0) return 'hoje'
   if (diff === 1) return 'amanhã'
   return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
 }
 function retColor(iso: string) {
-  const diff = Math.floor((new Date(iso).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86_400_000)
+  const diff = daysUntil(iso) ?? 0
   if (diff < 0)  return 'var(--bad)'
   if (diff === 0) return 'var(--warn)'
   if (diff <= 3) return 'var(--warn)'

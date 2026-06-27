@@ -526,7 +526,7 @@ import {
   STATUSES, FU_DAYS, LOSS_STATUSES, STAGE_PROBABILITY, FUNNEL_STAGES,
   funnelStageColor, funnelStagePassed, FONTE_LABEL,
   fuDone, sortedFU, daysIn, isActive, calcLeadScore,
-  fmtMoney,
+  fmtMoney, daysUntil, localDateISO,
 } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
@@ -553,8 +553,8 @@ const filterOverdue      = ref(false)
 const searchQ            = ref('')
 const sortBy             = ref<'created_at'|'data_retorno'|'fu_done'|'score'>('created_at')
 
-const todayISO = new Date().toISOString().slice(0, 10)
-const monthStartISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)
+const todayISO = localDateISO()
+const monthStartISO = localDateISO(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
 
 function matchesCreated(l: LeadWithFU): boolean {
   if (!filterCreated.value) return true
@@ -562,7 +562,7 @@ function matchesCreated(l: LeadWithFU): boolean {
   if (!created) return false
   if (filterCreated.value === 'month') return created >= monthStartISO
   const d = new Date(); d.setDate(d.getDate() - Number(filterCreated.value))
-  return created >= d.toISOString().slice(0, 10)
+  return created >= localDateISO(d)
 }
 
 // Filtros que valem tanto na lista quanto no kanban: etiqueta, atrasados, data de criacao.
@@ -608,8 +608,10 @@ const templates       = ref<MessageTemplate[]>([])
 const templatePreview = ref<MessageTemplate | null>(null)
 
 const showToast = (m: string) => { toastMsg.value = m; setTimeout(() => toastMsg.value = null, 2500) }
-const isVencido = (l: LeadWithFU) =>
-  !!l.data_retorno && new Date(l.data_retorno) <= new Date() && isActive(l)
+const isVencido = (l: LeadWithFU) => {
+  const d = daysUntil(l.data_retorno)
+  return d !== null && d < 0 && isActive(l)
+}
 
 const totalLeads    = computed(() => leadsTotal.value || (leads.value||[]).length)
 const countByStatus = computed(() =>
@@ -827,7 +829,7 @@ function onStatusChange() {
   hasUnsavedChanges.value = true
   if (editForm.resultado === 'Follow-up' && !editForm.data_retorno) {
     const d = new Date(); d.setDate(d.getDate() + 2)
-    editForm.data_retorno = d.toISOString().slice(0, 10)
+    editForm.data_retorno = localDateISO(d)
   }
   if (LOSS_STATUSES.includes(editForm.resultado)) {
     lossModalStatus.value = editForm.resultado
@@ -920,7 +922,7 @@ onMounted(async () => {
 
 function suggestRetorno() {
   const d = new Date(); d.setDate(d.getDate() + 2)
-  newForm.data_retorno = d.toISOString().slice(0, 10)
+  newForm.data_retorno = localDateISO(d)
 }
 
 function goToDuplicate() {

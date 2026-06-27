@@ -152,6 +152,7 @@
 
 <script setup lang="ts">
 import type { DiaryEntry, MetricKey } from '~/types'
+import { localDateISO } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const supabase = useSupabaseClient()
@@ -159,7 +160,7 @@ const { org } = useProfile()
 
 const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 const now = new Date()
-const todayStr = now.toISOString().slice(0,10)
+const todayStr = localDateISO(now)
 
 const currentMonth = ref(now.getMonth() + 1)
 const currentYear  = ref(now.getFullYear())

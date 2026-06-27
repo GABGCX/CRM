@@ -226,14 +226,14 @@
 import type { Lead, Followup, LeadStatus, Cadence, CadenceStep, LeadNote } from '~/types'
 import {
   FU_DAYS, STATUSES, leadUrgency, URGENCY_COLOR, URGENCY_AVATAR,
-  fuDone, sortedFU, daysIn, telHref, waHref,
+  fuDone, sortedFU, daysIn, telHref, waHref, daysUntil, localDateISO,
 } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 type LeadWithFU = Lead & { followups: Followup[] }
 type ViewId = 'fila' | 'todos' | 'previsao'
 
-const todayStr  = new Date().toISOString().slice(0, 10)
+const todayStr  = localDateISO()
 const view      = ref<ViewId>('fila')
 const toastMsg  = ref<string | null>(null)
 const showToast = (m: string) => { toastMsg.value = m; setTimeout(() => toastMsg.value = null, 2500) }
@@ -331,7 +331,7 @@ async function onStatus(lead: LeadWithFU, resultado: LeadStatus) {
 async function setRetorno(days: number) {
   if (!selectedLead.value) return
   const d = new Date(); d.setDate(d.getDate() + days)
-  const iso = d.toISOString().slice(0, 10)
+  const iso = localDateISO(d)
   try { await patchLead(selectedLead.value.id, { data_retorno: iso }); showToast(`Retorno em +${days}d`) }
   catch { showToast('Erro ao reagendar.') }
 }
@@ -359,8 +359,8 @@ const avatarBg = (l: LeadWithFU) => URGENCY_AVATAR[leadUrgency(l)].bg
 const avatarFg = (l: LeadWithFU) => URGENCY_AVATAR[leadUrgency(l)].fg
 
 function retLabel(date: string | null): string {
-  if (!date) return ''
-  const diff = Math.floor((new Date(date).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86_400_000)
+  const diff = daysUntil(date)
+  if (diff === null) return ''
   if (diff < 0)  return `${Math.abs(diff)}d atraso`
   if (diff === 0) return 'hoje'
   if (diff === 1) return 'amanha'
@@ -374,7 +374,7 @@ function fmtDate(iso: string) {
 const weekForecast = computed(() =>
   Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() + i)
-    const date = d.toISOString().slice(0, 10)
+    const date = localDateISO(d)
     const label = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' })
     const dayLeads = activeLeads.value.filter(l => l.data_retorno === date)
     const count = dayLeads.length

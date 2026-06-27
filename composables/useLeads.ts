@@ -3,6 +3,7 @@
 // Gerencia paginação cursor-based e operações otimistas (patch, toggleFU, etc.).
 
 import type { Lead, Followup, LeadStatus } from '~/types'
+import { localDateISO, daysUntil } from '~/utils/leadDomain'
 
 export type LeadWithFU = Lead & { followups: Followup[] }
 
@@ -144,7 +145,7 @@ export const useLeads = () => {
     const url    = URL.createObjectURL(blob)
     Object.assign(document.createElement('a'), {
       href: url,
-      download: `leads_${new Date().toISOString().slice(0, 10)}.csv`,
+      download: `leads_${localDateISO()}.csv`,
     }).click()
     URL.revokeObjectURL(url)
   }
@@ -156,14 +157,12 @@ export const useLeads = () => {
     )
   )
 
-  const overdueLeads = computed(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return activeLeads.value.filter(l => {
-      if (!l.data_retorno) return false
-      return new Date(l.data_retorno).getTime() < today.getTime()
+  const overdueLeads = computed(() =>
+    activeLeads.value.filter(l => {
+      const d = daysUntil(l.data_retorno)
+      return d !== null && d < 0
     })
-  })
+  )
 
   const overdueCount = computed(() => overdueLeads.value.length)
 

@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { isHot, isActive } from '~/utils/leadDomain'
+import { isHot, isActive, localDateISO } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const supabase = useSupabaseClient()
@@ -151,7 +151,7 @@ const { data: diaryRows, pending: diaryPending } = await useAsyncData(
   'math-diary',
   async () => {
     const ms = `${currentYear}-${String(currentMonth).padStart(2,'0')}-01`
-    const me = new Date(currentYear, currentMonth, 0).toISOString().slice(0,10)
+    const me = localDateISO(new Date(currentYear, currentMonth, 0))
     const { data } = await supabase.from('daily_diary').select('ce,rm,rr,fr')
       .gte('date', ms).lte('date', me)
     return data || []
