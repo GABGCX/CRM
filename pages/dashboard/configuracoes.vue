@@ -80,22 +80,6 @@
           </div>
 
           <div class="field">
-            <label class="label">Cor primária</label>
-            <div class="color-row">
-              <div class="color-swatch-wrap">
-                <input type="color" v-model="tf.primary_color" class="color-native" />
-              </div>
-              <input type="text" v-model="tf.primary_color" class="input mono"
-                style="width:96px;flex-shrink:0" maxlength="7" />
-              <div class="presets">
-                <button v-for="c in PRESETS" :key="c" type="button"
-                  class="preset" :class="{ 'preset-active': tf.primary_color === c }"
-                  :style="{ background: c }" @click="tf.primary_color = c" :title="c" />
-              </div>
-            </div>
-          </div>
-
-          <div class="field">
             <label class="label">URL do logo</label>
             <input v-model="tf.logo_url" type="url" placeholder="https://..." class="input" />
           </div>
@@ -107,16 +91,16 @@
           <div class="preview-block">
             <div class="preview-title">Preview</div>
             <div class="preview-card">
-              <div class="preview-logo" :style="{ background: tf.primary_color }">
+              <div class="preview-logo" style="background:var(--accent)">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
               <div class="preview-info">
                 <div class="preview-name">{{ tf.product_name }}</div>
-                <div class="preview-url" :style="{ color: tf.primary_color }">{{ org?.slug }}.{{ appDomain }}</div>
+                <div class="preview-url" style="color:var(--accent)">{{ org?.slug }}.{{ appDomain }}</div>
               </div>
-              <button type="button" class="preview-cta" :style="{ background: tf.primary_color }">
+              <button type="button" class="preview-cta" style="background:var(--accent)">
                 Entrar
               </button>
             </div>
@@ -503,17 +487,15 @@ const showToast = (msg: string) => {
 
 // ── Constantes ────────────────────────────────────────────────────────
 const ROLE_LABELS: Record<string, string> = { owner:'Proprietário', admin:'Admin', bdr:'BDR' }
-const PRESETS = [
-  '#0f62fe','#0353e9','#0a0a0a','#7c3aed',
-  '#db2777','#dc2626','#ea580c','#d97706','#16a34a','#0891b2',
-]
+// Marca travada em Carbon: a cor primaria nao e mais editavel; persiste o azul Carbon.
+const BRAND_COLOR = '#0f62fe'
 
 // ── Estado local ──────────────────────────────────────────────────────
 const localOrg = ref<typeof org.value>(null)
 
 // ── Forms ─────────────────────────────────────────────────────────────
 const sf = reactive({ name:'', meta_mensal:10000, ticket_medio:2000 })
-const tf = reactive({ product_name:'Outbound', primary_color:'#0a0a0a', logo_url:'', favicon_url:'' })
+const tf = reactive({ product_name:'Outbound', primary_color:BRAND_COLOR, logo_url:'', favicon_url:'' })
 const domainVal   = ref('')
 const inviteEmail = ref('')
 const inviteRole  = ref('bdr')
@@ -683,7 +665,7 @@ function syncFromOrg(o: NonNullable<typeof org.value>) {
   sf.meta_mensal   = o.settings?.meta_mensal  ?? 10000
   sf.ticket_medio  = o.settings?.ticket_medio ?? 2000
   tf.product_name  = o.theme?.product_name  || 'Outbound'
-  tf.primary_color = o.theme?.primary_color || '#0a0a0a'
+  tf.primary_color = BRAND_COLOR  // marca travada em Carbon; normaliza valor legado no proximo save
   tf.logo_url      = o.theme?.logo_url      || ''
   tf.favicon_url   = o.theme?.favicon_url   || ''
   domainVal.value  = o.custom_domain || ''
