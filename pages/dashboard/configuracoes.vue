@@ -835,7 +835,7 @@ async function sendInvite() {
   --danger-bg:rgba(224,149,149,.12); --danger-bdr:rgba(224,149,149,.25);
 }
 .page-header   { margin-bottom:16px }
-.page-title    { font-size:18px;font-weight:600;color:var(--text-1);letter-spacing:-.02em }
+.page-title    { font-size:22px;font-weight:600;color:var(--text-1);letter-spacing:-.025em }
 .page-sub      { font-size:13px;color:var(--text-3);margin-top:2px }
 .loading-state { padding:56px 0 }
 
@@ -867,7 +867,7 @@ async function sendInvite() {
 .projection-row { display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft) }
 .projection-row:last-child { border-bottom:none }
 .projection-label { font-size:12px;color:var(--text-2) }
-.projection-value { font-size:14px;font-weight:500;color:var(--text-1);font-variant-numeric:tabular-nums;letter-spacing:-.02em }
+.projection-value { font-size:14px;font-weight:600;color:var(--text-1);font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-family:var(--font-mono) }
 
 .color-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap }
 .color-swatch-wrap { width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden;flex-shrink:0;cursor:pointer }

@@ -215,9 +215,9 @@ const bottleneck = computed(() => {
 
 .gd-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px }
 @media(max-width:640px){ .gd-stats{ grid-template-columns:repeat(2,1fr) } }
-.gd-stat { background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px }
-.gd-stat-label { font-size:11px;color:var(--text-2);margin-bottom:6px }
-.gd-stat-value { font-size:24px;font-weight:600;color:var(--text-1);letter-spacing:-.02em;font-variant-numeric:tabular-nums }
+.gd-stat { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm) }
+.gd-stat-label { font-size:11px;color:var(--text-2);margin-bottom:8px }
+.gd-stat-value { font-size:25px;font-weight:600;color:var(--text-1);letter-spacing:-.01em;font-variant-numeric:tabular-nums;font-family:var(--font-mono) }
 .gd-stat-sub { font-size:11px;margin-top:4px;font-weight:500 }
 
 .gd-bottleneck { border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:14px }
@@ -238,7 +238,7 @@ const bottleneck = computed(() => {
 .gd-lead-link { flex:1;min-width:0;text-decoration:none }
 .gd-lead-name { font-size:13px;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .gd-lead-company { font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-.gd-lead-value { font-size:11px;font-weight:600;color:#16a34a;background:rgba(22,163,74,.10);border-radius:4px;padding:1px 6px;flex-shrink:0 }
+.gd-lead-value { font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:var(--radius-sm);padding:1px 6px;flex-shrink:0 }
 .gd-reassign { width:auto;flex-shrink:0;font-size:11px;padding:4px 6px }
 
 .gd-notes { display:flex;flex-direction:column;gap:7px;margin-top:14px }

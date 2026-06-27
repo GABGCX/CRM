@@ -205,11 +205,11 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div style="background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:10px;padding:14px">
-            <div style="font-size:26px;font-weight:600;color:#d97706" class="tabular">44%</div>
+            <div style="font-size:26px;font-weight:600;color:var(--warn)" class="tabular">44%</div>
             <div style="font-size:13px;color:var(--warn);margin-top:4px">dos vendedores desistem na <strong>1ª tentativa</strong></div>
           </div>
           <div style="background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:14px">
-            <div style="font-size:26px;font-weight:600;color:#16a34a" class="tabular">80%</div>
+            <div style="font-size:26px;font-weight:600;color:var(--ok)" class="tabular">80%</div>
             <div style="font-size:13px;color:var(--ok);margin-top:4px">das vendas fecham com <strong>8+ contatos</strong></div>
           </div>
         </div>
@@ -407,7 +407,7 @@ const weekForecast = computed(() =>
 .ql-plus { background:var(--accent);border-color:var(--accent);color:#fff }
 .ql-plus:hover:not(:disabled) { background:var(--accent-dark);border-color:var(--accent-dark);color:#fff }
 .ql-count { display:flex;flex-direction:column;align-items:center;min-width:30px }
-.ql-num { font-size:17px;font-weight:600;color:var(--text-1);line-height:1.1 }
+.ql-num { font-size:18px;font-weight:600;color:var(--text-1);line-height:1.1;font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em }
 .ql-label { font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em }
 .ql-state { font-size:11px;font-weight:500;color:#16a34a;flex-shrink:0;display:flex;align-items:center;gap:5px }
 .ql-state::before { content:'';width:6px;height:6px;border-radius:50%;background:#16a34a }
