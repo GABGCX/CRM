@@ -1,6 +1,6 @@
 <template>
   <div class="dash">
-    <!-- Cabecalho editorial -->
+    <!-- Cabecalho -->
     <header class="dash-head">
       <div>
         <h1 class="dash-greet">Bom {{ greeting }}, {{ firstName }}</h1>
@@ -18,123 +18,118 @@
       </div>
     </header>
 
-    <!-- Foco agora -->
-    <section class="dash-section" :class="`focus--${focusAction.tone}`">
-      <div class="eyebrow"><span class="eyebrow-dot" /> Foco agora</div>
-      <div class="focus-grid" :class="{ 'has-hot': hottestLead }">
-        <div>
-          <h2 class="focus-headline">{{ focusAction.title }}</h2>
-          <p class="focus-desc">{{ focusAction.sub }}</p>
-          <NuxtLink :to="focusAction.to" class="focus-link">
-            {{ focusAction.cta }}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </NuxtLink>
-        </div>
-        <NuxtLink v-if="hottestLead" :to="`/dashboard/pipeline?highlight=${hottestLead.id}`" class="hot-aside">
-          <div class="hot-eyebrow">Lead mais quente</div>
+    <!-- Bento -->
+    <div class="bento">
+      <!-- Foco agora -->
+      <section class="panel b-focus" :class="`focus--${focusAction.tone}`">
+        <div class="panel-eyebrow"><span class="tone-dot" /> Foco agora</div>
+        <h2 class="focus-title">{{ focusAction.title }}</h2>
+        <p class="focus-desc">{{ focusAction.sub }}</p>
+        <NuxtLink :to="focusAction.to" class="focus-cta">
+          {{ focusAction.cta }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </NuxtLink>
+      </section>
+
+      <!-- Lead quente -->
+      <component :is="hottestLead ? 'NuxtLink' : 'section'"
+        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined"
+        class="panel b-hot">
+        <div class="panel-eyebrow">Lead mais quente</div>
+        <template v-if="hottestLead">
           <div class="hot-name">{{ hottestLead.decisor }}</div>
           <div class="hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
-          <div class="hot-foot">
-            <span class="hot-value">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</span>
-            <span class="hot-status">{{ hottestLead.resultado }}</span>
-          </div>
-        </NuxtLink>
-      </div>
-    </section>
-
-    <!-- Hoje -->
-    <section class="dash-section">
-      <div class="section-bar">
-        <div class="eyebrow" style="margin-bottom:0">Hoje · {{ todayFormatted }}</div>
-        <div class="bar-actions">
-          <span v-if="alreadySaved && !saving" class="saved-flag">salvo</span>
-          <span class="hint">Ctrl+S</span>
-          <button class="btn btn-primary" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
-        </div>
-      </div>
-
-      <div class="stat-strip">
-        <div v-for="f in quickFields" :key="f.key" class="stat">
-          <input type="number" min="0" v-model.number="quickForm[f.key]" class="stat-input tabular" />
-          <div class="stat-label">
-            <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
-            <span v-else>{{ f.label }}</span>
-          </div>
-          <div class="stat-meta">meta {{ f.meta }}</div>
-        </div>
-      </div>
-
-      <div class="today-line">
-        <span class="today-line-label">Follow-ups</span>
-        <template v-if="todayTasks.length">
-          <span v-for="t in todayTasks" :key="t.id" class="task-chip">
-            <span class="tag" :class="t.tagClass">{{ t.tagLabel }}</span>{{ t.decisor }}
-          </span>
+          <div class="hot-spacer" />
+          <div class="hot-value">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</div>
+          <div class="hot-status">{{ hottestLead.resultado }}</div>
         </template>
-        <span v-else class="today-empty">nenhum retorno urgente</span>
-        <NuxtLink to="/dashboard/followup" class="today-all">Ver fila completa &rarr;</NuxtLink>
-      </div>
-    </section>
+        <div v-else class="hot-empty">Nenhuma oportunidade aberta com valor.</div>
+      </component>
 
-    <!-- Este mes -->
-    <section class="dash-section">
-      <div class="section-bar">
-        <div class="eyebrow" style="margin-bottom:0">Este mes · {{ MONTH_NAMES[currentMonth-1] }}</div>
-        <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
-      </div>
-
-      <div v-if="diaryPending" class="stat-strip">
-        <div v-for="i in 4" :key="i" class="stat">
-          <div class="skel" style="height:30px;width:50%" />
-          <div class="skel" style="height:10px;width:70%;margin-top:10px" />
+      <!-- KPIs do mes -->
+      <section v-for="m in kpiPanels" :key="m.label" class="panel b-kpi">
+        <div class="kpi-label">
+          <UiMetricTooltip v-if="m.metric" :metric="m.metric" />
+          <span v-else>{{ m.label }}</span>
         </div>
-      </div>
-      <div v-else class="stat-strip">
-        <div v-for="m in metricCards" :key="m.label" class="stat">
-          <div class="stat-num tabular" :class="m.subClass">{{ m.value }}</div>
-          <div class="stat-label">
-            <UiMetricTooltip v-if="['CE no mês','RM no mês','RR no mês','FR no mês'].includes(m.label)"
-              :metric="(m.label.split(' ')[0] as MetricKey)" />
-            <span v-else>{{ m.label }}</span>
+        <div v-if="diaryPending" class="skel" style="height:26px;width:55%;margin-top:8px" />
+        <div v-else class="kpi-num tabular" :class="m.subClass">{{ m.value }}</div>
+        <div class="kpi-sub">{{ m.sub }}</div>
+      </section>
+
+      <!-- Registrar hoje -->
+      <section class="panel b-reg">
+        <div class="panel-head">
+          <div class="panel-eyebrow" style="margin-bottom:0">Registrar hoje · {{ todayFormatted }}</div>
+          <div class="panel-actions">
+            <span v-if="alreadySaved && !saving" class="saved-flag">salvo</span>
+            <span class="hint">Ctrl+S</span>
+            <button class="btn btn-primary" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
           </div>
-          <div class="stat-meta">{{ m.sub }}</div>
         </div>
-      </div>
-
-      <p class="pace-line"><strong>{{ paceBanner.title }}.</strong> {{ paceBanner.sub }}</p>
-
-      <div class="dash-two">
-        <div>
-          <div class="mini-label">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
-          <div v-for="r in paceRows" :key="r.label" class="pace-row">
-            <div class="pace-row-head">
-              <span>{{ r.label }}</span>
-              <span class="tabular">{{ r.current }} / {{ r.target }}</span>
+        <div class="reg-grid">
+          <div v-for="f in quickFields" :key="f.key" class="reg-cell">
+            <div class="reg-cell-label">
+              <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
+              <span v-else>{{ f.label }}</span>
             </div>
-            <div class="progress-track"><div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
-            <div class="pace-row-note" :style="{ color: r.color }">{{ r.note }}</div>
+            <input type="number" min="0" v-model.number="quickForm[f.key]" class="reg-input tabular" />
+            <div class="reg-cell-meta">meta {{ f.meta }}</div>
           </div>
         </div>
+        <div class="reg-foot">CE&rarr;RM hoje <strong>{{ todayCERMRate }}%</strong> · mes <strong>{{ monthCERMRate }}%</strong></div>
+      </section>
 
-        <div>
-          <div class="mini-label">Evolucao CE no mes · acumulado vs meta</div>
-          <div v-if="diaryPending" class="skel" style="height:88px;margin-top:6px" />
-          <svg v-else viewBox="0 0 240 80" style="width:100%;height:88px;overflow:visible">
-            <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#ece7dd" stroke-width="1" stroke-dasharray="4 3" />
-            <text x="2" :y="ceGoalY - 3" fill="#b0a898" font-size="8">meta</text>
-            <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.06" />
-            <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#193497" />
-          </svg>
-          <div class="spark-foot">
-            <span>{{ monthTotals.ce }} CE acumulados</span>
-            <span style="color:var(--text-3)">meta {{ ceNec }}</span>
-          </div>
+      <!-- Ritmo -->
+      <section class="panel b-ritmo">
+        <div class="panel-head">
+          <div class="panel-eyebrow" style="margin-bottom:0">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
+          <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
         </div>
-      </div>
-    </section>
+        <div v-for="r in paceRows" :key="r.label" class="pace-row">
+          <div class="pace-row-head">
+            <span>{{ r.label }}</span>
+            <span class="tabular">{{ r.current }} / {{ r.target }}</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
+          <div class="pace-row-note" :style="{ color: r.color }">{{ r.note }}</div>
+        </div>
+      </section>
+
+      <!-- Follow-ups hoje -->
+      <section class="panel b-follow">
+        <div class="panel-eyebrow">Follow-ups hoje</div>
+        <div v-if="!todayTasks.length" class="follow-empty">Nenhum retorno urgente.</div>
+        <NuxtLink v-for="t in todayTasks" :key="t.id" to="/dashboard/followup" class="follow-row">
+          <span class="follow-dot" :class="t.tagClass" />
+          <span class="follow-name">{{ t.decisor }}</span>
+          <span class="follow-sub">{{ t.sub }}</span>
+        </NuxtLink>
+        <NuxtLink to="/dashboard/followup" class="follow-all">Ver fila completa &rarr;</NuxtLink>
+      </section>
+
+      <!-- Evolucao CE -->
+      <section class="panel b-spark">
+        <div class="panel-head">
+          <div class="panel-eyebrow" style="margin-bottom:0">Evolucao CE no mes</div>
+          <span style="font-size:12px;color:var(--text-3)">acumulado vs meta</span>
+        </div>
+        <div v-if="diaryPending" class="skel" style="height:88px" />
+        <svg v-else viewBox="0 0 240 80" preserveAspectRatio="none" style="width:100%;height:88px;overflow:visible">
+          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#ece7dd" stroke-width="1" stroke-dasharray="4 3" />
+          <text x="2" :y="ceGoalY - 3" fill="#b0a898" font-size="8">meta</text>
+          <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.06" />
+          <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#193497" />
+        </svg>
+        <div class="spark-foot">
+          <span>{{ monthTotals.ce }} CE acumulados</span>
+          <span style="color:var(--text-3)">meta {{ ceNec }}</span>
+        </div>
+      </section>
+    </div>
 
     <Transition name="toast">
       <div v-if="toast" class="toast">{{ toast }}</div>
@@ -367,21 +362,21 @@ const focusAction = computed(() => {
   }
 })
 
-// ── Metric cards ────────────────────────────────────────────────────────
-const metricCards = computed(() => {
+// ── KPIs do mes ─────────────────────────────────────────────────────────
+const kpiPanels = computed(() => {
   const t = monthTotals.value
   const needed   = Math.floor(ceNec.value  * daysGone / totalWorkdays)
   const rmNeeded = Math.floor(rmNec.value  * daysGone / totalWorkdays)
   return [
-    { label:'CE no mês',  value:t.ce,
-      sub:`meta: ${ceNec.value}`, subClass: t.ce >= needed ? 'metric-ok' : 'metric-bad' },
-    { label:'RM no mês',  value:t.rm,
-      sub:`tx: ${monthCERMRate.value}% · meta: ${rmNec.value}`,
+    { label:'CE no mês', metric:'CE' as MetricKey, value:t.ce,
+      sub:`meta ${ceNec.value}`, subClass: t.ce >= needed ? 'metric-ok' : 'metric-bad' },
+    { label:'RM no mês', metric:'RM' as MetricKey, value:t.rm,
+      sub:`tx ${monthCERMRate.value}% · meta ${rmNec.value}`,
       subClass: t.rm >= rmNeeded ? 'metric-ok' : 'metric-warn' },
-    { label:'RR no mês',  value:t.rr,
-      sub:`tx RM→RR: ${t.rm>0?((t.rr/t.rm)*100).toFixed(0):0}%`, subClass:'' },
-    { label:'FR no mês',  value:t.fr,
-      sub:`meta: ${fechNec.value}`,
+    { label:'RR no mês', metric:'RR' as MetricKey, value:t.rr,
+      sub:`RM→RR ${t.rm>0?((t.rr/t.rm)*100).toFixed(0):0}%`, subClass:'' },
+    { label:'FR no mês', metric:'FR' as MetricKey, value:t.fr,
+      sub:`meta ${fechNec.value}`,
       subClass: t.fr>=fechNec.value?'metric-ok':t.fr>0?'metric-warn':'metric-bad' },
   ]
 })
@@ -408,7 +403,7 @@ const { data: urgentLeadsData } = await useAsyncData('urgent-leads', async () =>
     .not('resultado', 'in', '("Fechado","Recusado","Sem interesse")')
     .not('data_retorno', 'is', null)
     .lte('data_retorno', new Date(Date.now() + 2*86400000).toISOString().slice(0,10))
-    .order('data_retorno').limit(4)
+    .order('data_retorno').limit(5)
   return data || []
 })
 
@@ -418,8 +413,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
   )
   return {
     ...l,
-    sub:      diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'retorno hoje' : 'retorno amanhã',
-    tagLabel: diff < 0 ? 'vencido' : diff === 0 ? 'hoje' : 'amanhã',
+    sub:      diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'hoje' : 'amanhã',
     tagClass: diff < 0 ? 'tag-red' : diff === 0 ? 'tag-amber' : 'tag-blue',
   }
 }))
@@ -429,85 +423,103 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 .skel { background:var(--bg-subtle); border-radius:var(--radius-sm); animation:pulse 1.5s infinite; }
 
-.dash { max-width: 1080px; }
+.dash { max-width: 1180px; }
 
 /* ── Cabecalho ───────────────────────────────────────────── */
-.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
-.dash-greet { font-size:30px; font-weight:600; letter-spacing:-.03em; color:var(--text-1); line-height:1.1; }
-.dash-date { font-size:13px; color:var(--text-3); margin-top:7px; text-transform:capitalize; }
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:22px; }
+.dash-greet { font-size:26px; font-weight:600; letter-spacing:-.025em; color:var(--text-1); line-height:1.1; }
+.dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
 .dash-select { font-size:13px; padding:7px 11px; max-width:160px; width:auto; }
 .dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.15; }
-.dash-days-n { font-size:22px; font-weight:600; color:var(--text-2); }
+.dash-days-n { font-size:20px; font-weight:600; color:var(--text-2); }
 .dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
-/* ── Secao (separada por hairline + muito respiro) ───────── */
-.dash-section { margin-top:40px; padding-top:40px; border-top:1px solid var(--border-soft); }
+/* ── Bento grid ──────────────────────────────────────────── */
+.bento { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.b-focus  { grid-column:span 3; }
+.b-hot    { grid-column:span 1; }
+.b-kpi    { grid-column:span 1; }
+.b-reg    { grid-column:span 4; }
+.b-ritmo  { grid-column:span 2; }
+.b-follow { grid-column:span 2; }
+.b-spark  { grid-column:span 4; }
 
-.eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--text-3); margin-bottom:18px; }
-.eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
-.focus--urgent .eyebrow-dot { background:var(--bad); }
-.focus--today .eyebrow-dot, .focus--pace .eyebrow-dot { background:var(--warn); }
-.focus--clear .eyebrow-dot { background:var(--ok); }
-
-.section-bar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:22px; }
-.bar-actions { display:flex; align-items:center; gap:12px; }
+.panel { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:var(--radius); padding:18px 20px; display:flex; flex-direction:column; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.panel-actions { display:flex; align-items:center; gap:11px; }
+.panel-eyebrow { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--text-3); margin-bottom:14px; }
 .saved-flag { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ok); }
 .hint { font-size:11px; color:var(--text-3); background:var(--bg-subtle); padding:2px 7px; border-radius:var(--radius-sm); }
 
 /* ── Foco agora ──────────────────────────────────────────── */
-.focus-grid { display:grid; grid-template-columns:1fr; gap:28px; }
-.focus-grid.has-hot { grid-template-columns:minmax(0,1fr) 260px; align-items:start; }
-.focus-headline { font-size:25px; font-weight:600; letter-spacing:-.025em; line-height:1.2; color:var(--text-1); max-width:680px; }
-.focus-desc { font-size:14px; color:var(--text-2); margin-top:12px; line-height:1.6; max-width:580px; }
-.focus-link { display:inline-flex; align-items:center; gap:7px; margin-top:20px; font-size:13px; font-weight:600; color:var(--accent); text-decoration:none; transition:gap .12s; }
-.focus-link:hover { gap:11px; }
+.b-focus { border-left:2px solid var(--accent); }
+.focus--urgent { border-left-color:var(--bad); }
+.focus--today, .focus--pace { border-left-color:var(--warn); }
+.focus--clear { border-left-color:var(--ok); }
+.b-focus .tone-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:7px; vertical-align:middle; }
+.focus--urgent .tone-dot { background:var(--bad); }
+.focus--today .tone-dot, .focus--pace .tone-dot { background:var(--warn); }
+.focus--clear .tone-dot { background:var(--ok); }
+.focus-title { font-size:20px; font-weight:600; letter-spacing:-.02em; line-height:1.25; color:var(--text-1); max-width:560px; }
+.focus-desc { font-size:13px; color:var(--text-2); margin-top:9px; line-height:1.55; max-width:520px; }
+.focus-cta { display:inline-flex; align-items:center; gap:7px; align-self:flex-start; margin-top:auto; padding-top:16px; font-size:13px; font-weight:600; color:var(--accent); text-decoration:none; transition:gap .12s; }
+.focus-cta:hover { gap:11px; }
 
-.hot-aside { display:block; padding:18px; border:1px solid var(--border-soft); border-radius:var(--radius); background:var(--bg-card); text-decoration:none; transition:border-color .12s; }
-.hot-aside:hover { border-color:var(--accent-bd); }
-.hot-eyebrow { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); }
-.hot-name { font-size:15px; font-weight:600; color:var(--text-1); margin-top:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* ── Lead quente ─────────────────────────────────────────── */
+.b-hot { text-decoration:none; transition:border-color .12s; }
+.b-hot:hover { border-color:var(--accent-bd); }
+.hot-name { font-size:15px; font-weight:600; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hot-company { font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.hot-foot { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-top:14px; }
-.hot-value { font-size:16px; font-weight:600; color:var(--text-1); letter-spacing:-.01em; }
-.hot-status { font-size:10px; color:var(--text-3); white-space:nowrap; }
+.hot-spacer { flex:1; min-height:14px; }
+.hot-value { font-size:19px; font-weight:600; color:var(--text-1); letter-spacing:-.02em; }
+.hot-status { font-size:11px; color:var(--text-3); margin-top:3px; }
+.hot-empty { font-size:12px; color:var(--text-3); line-height:1.5; margin-top:4px; }
 
-/* ── Faixa panoramica de numeros (sem caixa) ─────────────── */
-.stat-strip { display:flex; flex-wrap:wrap; gap:24px 0; }
-.stat { flex:1 1 0; min-width:110px; padding:0 26px; border-left:1px solid var(--border-soft); }
-.stat:first-child { padding-left:0; border-left:none; }
-.stat-num { font-size:30px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; }
-.stat-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); margin-top:10px; display:flex; align-items:center; gap:4px; }
-.stat-meta { font-size:11px; color:var(--text-3); margin-top:5px; }
+/* ── KPIs ────────────────────────────────────────────────── */
+.kpi-label { font-size:12px; color:var(--text-2); display:flex; align-items:center; gap:4px; }
+.kpi-num { font-size:28px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; margin-top:10px; }
+.kpi-sub { font-size:11px; color:var(--text-3); margin-top:8px; }
 
-input.stat-input { font-size:30px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; width:100%; border:none; background:transparent; padding:0 0 4px; border-bottom:1px solid var(--border-soft); border-radius:0; transition:border-color .12s; }
-input.stat-input:focus { box-shadow:none; border-bottom:1px solid var(--accent); }
-input.stat-input::-webkit-outer-spin-button, input.stat-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+/* ── Registrar ───────────────────────────────────────────── */
+.reg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.reg-cell { text-align:center; }
+.reg-cell-label { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-3); margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:3px; }
+input.reg-input { text-align:center; font-size:22px; font-weight:600; padding:8px 4px; }
+.reg-cell-meta { font-size:10px; color:var(--text-3); margin-top:6px; }
+.reg-foot { font-size:12px; color:var(--text-2); margin-top:14px; }
+.reg-foot strong { color:var(--text-1); font-weight:600; }
 
-/* ── Linha de follow-ups ─────────────────────────────────── */
-.today-line { margin-top:26px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; font-size:13px; color:var(--text-1); }
-.today-line-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); }
-.task-chip { display:inline-flex; align-items:center; gap:8px; }
-.today-empty { color:var(--text-3); }
-.today-all { margin-left:auto; font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; }
-
-/* ── Pace como frase + colunas fluidas ───────────────────── */
-.pace-line { font-size:14px; color:var(--text-2); line-height:1.6; margin:24px 0 0; max-width:700px; }
-.pace-line strong { color:var(--text-1); font-weight:600; }
-
-.dash-two { display:grid; grid-template-columns:1.15fr 1fr; gap:48px; margin-top:32px; }
-.mini-label { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--text-3); margin-bottom:16px; }
-.pace-row { margin-bottom:18px; }
+/* ── Ritmo ───────────────────────────────────────────────── */
+.pace-row { margin-bottom:16px; }
 .pace-row:last-child { margin-bottom:0; }
 .pace-row-head { display:flex; justify-content:space-between; font-size:13px; color:var(--text-2); margin-bottom:6px; }
 .pace-row-head span:last-child { color:var(--text-1); font-weight:500; }
 .pace-row-note { font-size:11px; margin-top:4px; }
+
+/* ── Follow-ups ──────────────────────────────────────────── */
+.follow-row { display:flex; align-items:center; gap:9px; padding:9px 0; border-bottom:1px solid var(--border-soft); text-decoration:none; }
+.follow-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.follow-dot.tag-red { background:var(--bad); }
+.follow-dot.tag-amber { background:var(--warn); }
+.follow-dot.tag-blue { background:var(--info); }
+.follow-name { font-size:13px; font-weight:500; color:var(--text-1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.follow-sub { font-size:12px; color:var(--text-3); flex-shrink:0; }
+.follow-empty { font-size:13px; color:var(--text-3); padding:14px 0; }
+.follow-all { font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; margin-top:14px; }
+
+/* ── Spark ───────────────────────────────────────────────── */
 .spark-foot { display:flex; justify-content:space-between; font-size:12px; margin-top:8px; color:var(--accent); font-weight:500; }
 
-@media (max-width: 720px) {
-  .stat { min-width:80px; padding:0 14px; }
-  .stat-num, input.stat-input { font-size:24px; }
-  .dash-two { grid-template-columns:1fr; gap:32px; }
-  .focus-grid.has-hot { grid-template-columns:1fr; }
+@media (max-width: 920px) {
+  .bento { grid-template-columns:repeat(2,1fr); }
+  .b-focus, .b-reg, .b-ritmo, .b-follow, .b-spark { grid-column:span 2; }
+  .b-hot, .b-kpi { grid-column:span 1; }
+}
+@media (max-width: 540px) {
+  .bento { grid-template-columns:1fr; }
+  .b-focus, .b-hot, .b-kpi, .b-reg, .b-ritmo, .b-follow, .b-spark { grid-column:span 1; }
+  .reg-grid { grid-template-columns:repeat(5,1fr); gap:6px; }
+  input.reg-input { font-size:18px; }
 }
 </style>
