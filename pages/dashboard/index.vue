@@ -18,19 +18,21 @@
       </div>
     </header>
 
-    <!-- Bento -->
     <div class="bento">
-      <!-- Foco agora -->
-      <section class="panel b-focus" :class="`focus--${focusAction.tone}`">
-        <div class="panel-eyebrow"><span class="tone-dot" /> Foco agora</div>
-        <h2 class="focus-title">{{ focusAction.title }}</h2>
-        <p class="focus-desc">{{ focusAction.sub }}</p>
-        <NuxtLink :to="focusAction.to" class="focus-cta">
-          {{ focusAction.cta }}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </NuxtLink>
+      <!-- Foco agora (herói com gradiente) -->
+      <section class="panel b-focus">
+        <div class="focus-glow" />
+        <div class="focus-content">
+          <div class="focus-eyebrow">Foco agora</div>
+          <h2 class="focus-title">{{ focusAction.title }}</h2>
+          <p class="focus-desc">{{ focusAction.sub }}</p>
+          <NuxtLink :to="focusAction.to" class="focus-cta">
+            {{ focusAction.cta }}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </NuxtLink>
+        </div>
       </section>
 
       <!-- Lead quente -->
@@ -54,8 +56,8 @@
           <UiMetricTooltip v-if="m.metric" :metric="m.metric" />
           <span v-else>{{ m.label }}</span>
         </div>
-        <div v-if="diaryPending" class="skel" style="height:26px;width:55%;margin-top:8px" />
-        <div v-else class="kpi-num tabular" :class="m.subClass">{{ m.value }}</div>
+        <div v-if="diaryPending" class="skel" style="height:30px;width:55%;margin-top:10px" />
+        <div v-else class="kpi-num tabular" :class="m.cls">{{ m.value }}</div>
         <div class="kpi-sub">{{ m.sub }}</div>
       </section>
 
@@ -66,7 +68,7 @@
           <div class="panel-actions">
             <span v-if="alreadySaved && !saving" class="saved-flag">salvo</span>
             <span class="hint">Ctrl+S</span>
-            <button class="btn btn-primary" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
+            <button class="cta-solid" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
           </div>
         </div>
         <div class="reg-grid">
@@ -86,14 +88,14 @@
       <section class="panel b-ritmo">
         <div class="panel-head">
           <div class="panel-eyebrow" style="margin-bottom:0">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
-          <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
+          <span class="pill" :class="paceBanner.toneClass">{{ paceBanner.tagLabel }}</span>
         </div>
         <div v-for="r in paceRows" :key="r.label" class="pace-row">
           <div class="pace-row-head">
             <span>{{ r.label }}</span>
             <span class="tabular">{{ r.current }} / {{ r.target }}</span>
           </div>
-          <div class="progress-track"><div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
+          <div class="track"><div class="track-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
           <div class="pace-row-note" :style="{ color: r.color }">{{ r.note }}</div>
         </div>
       </section>
@@ -103,7 +105,7 @@
         <div class="panel-eyebrow">Follow-ups hoje</div>
         <div v-if="!todayTasks.length" class="follow-empty">Nenhum retorno urgente.</div>
         <NuxtLink v-for="t in todayTasks" :key="t.id" to="/dashboard/followup" class="follow-row">
-          <span class="follow-dot" :class="t.tagClass" />
+          <span class="follow-dot" :class="t.cls" />
           <span class="follow-name">{{ t.decisor }}</span>
           <span class="follow-sub">{{ t.sub }}</span>
         </NuxtLink>
@@ -114,19 +116,28 @@
       <section class="panel b-spark">
         <div class="panel-head">
           <div class="panel-eyebrow" style="margin-bottom:0">Evolucao CE no mes</div>
-          <span style="font-size:12px;color:var(--text-3)">acumulado vs meta</span>
+          <span class="spark-cap">acumulado vs meta {{ ceNec }}</span>
         </div>
-        <div v-if="diaryPending" class="skel" style="height:88px" />
-        <svg v-else viewBox="0 0 240 80" preserveAspectRatio="none" style="width:100%;height:88px;overflow:visible">
-          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#ece7dd" stroke-width="1" stroke-dasharray="4 3" />
-          <text x="2" :y="ceGoalY - 3" fill="#b0a898" font-size="8">meta</text>
-          <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.06" />
-          <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#193497" />
+        <div v-if="diaryPending" class="skel" style="height:96px" />
+        <svg v-else viewBox="0 0 240 80" preserveAspectRatio="none" style="width:100%;height:96px;overflow:visible">
+          <defs>
+            <linearGradient id="ceLine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ff7a45"/>
+              <stop offset="100%" stop-color="#7c5cff"/>
+            </linearGradient>
+            <linearGradient id="ceArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7c5cff" stop-opacity="0.28"/>
+              <stop offset="100%" stop-color="#7c5cff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#2c2c38" stroke-width="1" stroke-dasharray="4 4" />
+          <path :d="sparkAreaPath" fill="url(#ceArea)" />
+          <path :d="sparkLinePath" fill="none" stroke="url(#ceLine)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3.5" fill="#8b7bff" />
         </svg>
         <div class="spark-foot">
           <span>{{ monthTotals.ce }} CE acumulados</span>
-          <span style="color:var(--text-3)">meta {{ ceNec }}</span>
+          <span class="spark-foot-meta">meta {{ ceNec }}</span>
         </div>
       </section>
     </div>
@@ -305,17 +316,17 @@ const ceDelta         = computed(() => monthTotals.value.ce - ceNeededByToday.va
 const paceBanner = computed(() => {
   const d = ceDelta.value, t = monthTotals.value
   if (d >= 5) return {
-    tagLabel: `+${d} a frente`, tagClass: 'tag-green', bannerClass: 'pace-ok',
+    tagLabel: `+${d} a frente`, toneClass: 'is-ok',
     title: 'Voce esta no ritmo para bater a meta de CE',
     sub: `${t.ce} de ${ceNec.value} feitos. Precisava de ${ceNeededByToday.value} ate hoje.`,
   }
   if (d >= 0) return {
-    tagLabel: 'no ritmo', tagClass: 'tag-amber', bannerClass: 'pace-warn',
+    tagLabel: 'no ritmo', toneClass: 'is-warn',
     title: 'No ritmo, continue focado',
     sub: `${t.ce} de ${ceNec.value} feitos. ${d} acima do necessario.`,
   }
   return {
-    tagLabel: `${Math.abs(d)} abaixo`, tagClass: 'tag-red', bannerClass: 'pace-bad',
+    tagLabel: `${Math.abs(d)} abaixo`, toneClass: 'is-bad',
     title: `${Math.abs(d)} contatos abaixo do ritmo`,
     sub: `${t.ce} de ${ceNec.value} feitos. Precisava de ${ceNeededByToday.value} ate hoje.`,
   }
@@ -369,21 +380,21 @@ const kpiPanels = computed(() => {
   const rmNeeded = Math.floor(rmNec.value  * daysGone / totalWorkdays)
   return [
     { label:'CE no mês', metric:'CE' as MetricKey, value:t.ce,
-      sub:`meta ${ceNec.value}`, subClass: t.ce >= needed ? 'metric-ok' : 'metric-bad' },
+      sub:`meta ${ceNec.value}`, cls: t.ce >= needed ? 'is-ok' : 'is-bad' },
     { label:'RM no mês', metric:'RM' as MetricKey, value:t.rm,
       sub:`tx ${monthCERMRate.value}% · meta ${rmNec.value}`,
-      subClass: t.rm >= rmNeeded ? 'metric-ok' : 'metric-warn' },
+      cls: t.rm >= rmNeeded ? 'is-ok' : 'is-warn' },
     { label:'RR no mês', metric:'RR' as MetricKey, value:t.rr,
-      sub:`RM→RR ${t.rm>0?((t.rr/t.rm)*100).toFixed(0):0}%`, subClass:'' },
+      sub:`RM→RR ${t.rm>0?((t.rr/t.rm)*100).toFixed(0):0}%`, cls:'' },
     { label:'FR no mês', metric:'FR' as MetricKey, value:t.fr,
       sub:`meta ${fechNec.value}`,
-      subClass: t.fr>=fechNec.value?'metric-ok':t.fr>0?'metric-warn':'metric-bad' },
+      cls: t.fr>=fechNec.value?'is-ok':t.fr>0?'is-warn':'is-bad' },
   ]
 })
 
 const paceRows = computed(() => {
   const t     = monthTotals.value
-  const color = (v: number, n: number) => v>=n ? 'var(--ok)' : v>=n*.8 ? 'var(--warn)' : 'var(--bad)'
+  const color = (v: number, n: number) => v>=n ? 'var(--dash-ok)' : v>=n*.8 ? 'var(--dash-warn)' : 'var(--dash-bad)'
   const pct   = (v: number, n: number) => Math.min(100, n>0 ? Math.round((v/n)*100) : 0)
   const ceN   = Math.floor(ceNec.value  * daysGone / totalWorkdays)
   const rmN   = Math.floor(rmNec.value  * daysGone / totalWorkdays)
@@ -393,7 +404,7 @@ const paceRows = computed(() => {
     { label:'Reuniões marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),
       color:color(t.rm,rmN),  note:`meta: ${rmPerDay.value}/dia` },
     { label:'Fechamentos',       current:t.fr, target:fechNec.value, pct:pct(t.fr,fechNec.value),
-      color:t.fr>=fechNec.value?'var(--ok)':'var(--bad)', note:`meta: ${fechNec.value} no mês` },
+      color:t.fr>=fechNec.value?'var(--dash-ok)':'var(--dash-bad)', note:`meta: ${fechNec.value} no mês` },
   ]
 })
 
@@ -413,30 +424,37 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
   )
   return {
     ...l,
-    sub:      diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'hoje' : 'amanhã',
-    tagClass: diff < 0 ? 'tag-red' : diff === 0 ? 'tag-amber' : 'tag-blue',
+    sub: diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'hoje' : 'amanhã',
+    cls: diff < 0 ? 'is-bad' : diff === 0 ? 'is-warn' : 'is-violet',
   }
 }))
 </script>
 
 <style scoped>
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
-.skel { background:var(--bg-subtle); border-radius:var(--radius-sm); animation:pulse 1.5s infinite; }
+.skel { background:var(--dash-card-2); border-radius:8px; animation:pulse 1.5s infinite; }
 
-.dash { max-width: 1180px; }
+/* Canvas escuro full-bleed (cancela o padding do page-container) */
+.dash {
+  margin: -30px -36px;
+  padding: 30px 36px 56px;
+  background: var(--dash-bg);
+  min-height: 100vh;
+  color: var(--dash-text-1);
+}
 
 /* ── Cabecalho ───────────────────────────────────────────── */
-.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:22px; }
-.dash-greet { font-size:26px; font-weight:600; letter-spacing:-.025em; color:var(--text-1); line-height:1.1; }
-.dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:24px; }
+.dash-greet { font-size:27px; font-weight:600; letter-spacing:-.03em; color:#fff; line-height:1.1; }
+.dash-date { font-size:13px; color:var(--dash-text-3); margin-top:7px; text-transform:capitalize; }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
-.dash-select { font-size:13px; padding:7px 11px; max-width:160px; width:auto; }
+.dash-select { font-size:13px; padding:8px 11px; max-width:170px; width:auto; background:var(--dash-card); border:1px solid var(--dash-border); color:var(--dash-text-2); border-radius:10px; }
 .dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.15; }
-.dash-days-n { font-size:20px; font-weight:600; color:var(--text-2); }
-.dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
+.dash-days-n { font-size:21px; font-weight:600; color:var(--dash-text-1); }
+.dash-days-l { font-size:11px; color:var(--dash-text-3); margin-top:2px; }
 
-/* ── Bento grid ──────────────────────────────────────────── */
-.bento { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+/* ── Bento ───────────────────────────────────────────────── */
+.bento { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
 .b-focus  { grid-column:span 3; }
 .b-hot    { grid-column:span 1; }
 .b-kpi    { grid-column:span 1; }
@@ -445,71 +463,96 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .b-follow { grid-column:span 2; }
 .b-spark  { grid-column:span 4; }
 
-.panel { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:var(--radius); padding:18px 20px; display:flex; flex-direction:column; }
-.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.panel {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0,0,0,.3);
+}
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
 .panel-actions { display:flex; align-items:center; gap:11px; }
-.panel-eyebrow { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--text-3); margin-bottom:14px; }
-.saved-flag { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ok); }
-.hint { font-size:11px; color:var(--text-3); background:var(--bg-subtle); padding:2px 7px; border-radius:var(--radius-sm); }
+.panel-eyebrow { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.11em; color:var(--dash-text-3); margin-bottom:14px; }
+.saved-flag { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dash-ok); }
+.hint { font-size:11px; color:var(--dash-text-3); background:var(--dash-card-2); padding:3px 8px; border-radius:7px; }
 
-/* ── Foco agora ──────────────────────────────────────────── */
-.b-focus { border-left:2px solid var(--accent); }
-.focus--urgent { border-left-color:var(--bad); }
-.focus--today, .focus--pace { border-left-color:var(--warn); }
-.focus--clear { border-left-color:var(--ok); }
-.b-focus .tone-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:7px; vertical-align:middle; }
-.focus--urgent .tone-dot { background:var(--bad); }
-.focus--today .tone-dot, .focus--pace .tone-dot { background:var(--warn); }
-.focus--clear .tone-dot { background:var(--ok); }
-.focus-title { font-size:20px; font-weight:600; letter-spacing:-.02em; line-height:1.25; color:var(--text-1); max-width:560px; }
-.focus-desc { font-size:13px; color:var(--text-2); margin-top:9px; line-height:1.55; max-width:520px; }
-.focus-cta { display:inline-flex; align-items:center; gap:7px; align-self:flex-start; margin-top:auto; padding-top:16px; font-size:13px; font-weight:600; color:var(--accent); text-decoration:none; transition:gap .12s; }
-.focus-cta:hover { gap:11px; }
+.cta-solid { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:10px; border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:#fff; background:var(--dash-grad); transition:opacity .12s; }
+.cta-solid:hover { opacity:.9; }
+.cta-solid:disabled { opacity:.6; cursor:not-allowed; }
+
+/* ── Foco agora (herói gradiente) ────────────────────────── */
+.b-focus { position:relative; overflow:hidden; background:var(--dash-grad); border:none; padding:24px 26px; }
+.focus-glow { position:absolute; top:-60px; right:-40px; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.22), transparent 70%); pointer-events:none; }
+.focus-content { position:relative; z-index:1; display:flex; flex-direction:column; height:100%; }
+.focus-eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.13em; color:rgba(255,255,255,.8); margin-bottom:12px; }
+.focus-title { font-size:23px; font-weight:700; letter-spacing:-.02em; line-height:1.22; color:#fff; max-width:600px; }
+.focus-desc { font-size:13px; color:rgba(255,255,255,.82); margin-top:11px; line-height:1.55; max-width:540px; }
+.focus-cta { display:inline-flex; align-items:center; gap:8px; align-self:flex-start; margin-top:auto; padding-top:20px; }
+.focus-cta { color:#fff; font-size:13px; font-weight:600; text-decoration:none; }
+.focus-cta svg { background:rgba(255,255,255,.18); border-radius:50%; padding:5px; width:26px; height:26px; transition:background .12s; }
+.focus-cta:hover svg { background:rgba(255,255,255,.32); }
 
 /* ── Lead quente ─────────────────────────────────────────── */
-.b-hot { text-decoration:none; transition:border-color .12s; }
-.b-hot:hover { border-color:var(--accent-bd); }
-.hot-name { font-size:15px; font-weight:600; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.hot-company { font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.hot-spacer { flex:1; min-height:14px; }
-.hot-value { font-size:19px; font-weight:600; color:var(--text-1); letter-spacing:-.02em; }
-.hot-status { font-size:11px; color:var(--text-3); margin-top:3px; }
-.hot-empty { font-size:12px; color:var(--text-3); line-height:1.5; margin-top:4px; }
+.b-hot { text-decoration:none; background:var(--dash-card); transition:border-color .12s; }
+.b-hot:hover { border-color:rgba(139,123,255,.5); }
+.hot-name { font-size:15px; font-weight:600; color:var(--dash-text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-company { font-size:12px; color:var(--dash-text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-spacer { flex:1; min-height:16px; }
+.hot-value { font-size:21px; font-weight:700; letter-spacing:-.02em; background:var(--dash-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.hot-status { font-size:11px; color:var(--dash-text-3); margin-top:4px; }
+.hot-empty { font-size:12px; color:var(--dash-text-3); line-height:1.5; margin-top:4px; }
 
 /* ── KPIs ────────────────────────────────────────────────── */
-.kpi-label { font-size:12px; color:var(--text-2); display:flex; align-items:center; gap:4px; }
-.kpi-num { font-size:28px; font-weight:600; color:var(--text-1); letter-spacing:-.03em; line-height:1; margin-top:10px; }
-.kpi-sub { font-size:11px; color:var(--text-3); margin-top:8px; }
+.kpi-label { font-size:12px; color:var(--dash-text-2); display:flex; align-items:center; gap:4px; }
+.kpi-num { font-size:30px; font-weight:700; color:var(--dash-text-1); letter-spacing:-.03em; line-height:1; margin-top:12px; }
+.kpi-num.is-ok { color:var(--dash-ok); }
+.kpi-num.is-warn { color:var(--dash-warn); }
+.kpi-num.is-bad { color:var(--dash-bad); }
+.kpi-sub { font-size:11px; color:var(--dash-text-3); margin-top:9px; }
 
 /* ── Registrar ───────────────────────────────────────────── */
 .reg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
 .reg-cell { text-align:center; }
-.reg-cell-label { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-3); margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:3px; }
-input.reg-input { text-align:center; font-size:22px; font-weight:600; padding:8px 4px; }
-.reg-cell-meta { font-size:10px; color:var(--text-3); margin-top:6px; }
-.reg-foot { font-size:12px; color:var(--text-2); margin-top:14px; }
-.reg-foot strong { color:var(--text-1); font-weight:600; }
+.reg-cell-label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--dash-text-3); margin-bottom:7px; display:flex; align-items:center; justify-content:center; gap:3px; }
+input.reg-input { text-align:center; font-size:23px; font-weight:700; padding:9px 4px; width:100%; background:var(--dash-card-2); border:1px solid var(--dash-border); border-radius:10px; color:var(--dash-text-1); }
+input.reg-input:focus { border-color:var(--dash-violet); box-shadow:0 0 0 3px rgba(139,123,255,.18); }
+input.reg-input::-webkit-outer-spin-button, input.reg-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.reg-cell-meta { font-size:10px; color:var(--dash-text-3); margin-top:7px; }
+.reg-foot { font-size:12px; color:var(--dash-text-2); margin-top:16px; }
+.reg-foot strong { color:var(--dash-text-1); font-weight:600; }
+
+/* ── Pill ────────────────────────────────────────────────── */
+.pill { font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; background:var(--dash-card-2); color:var(--dash-text-2); }
+.pill.is-ok { color:var(--dash-ok); background:rgba(74,222,128,.12); }
+.pill.is-warn { color:var(--dash-warn); background:rgba(255,180,84,.12); }
+.pill.is-bad { color:var(--dash-bad); background:rgba(251,113,133,.12); }
 
 /* ── Ritmo ───────────────────────────────────────────────── */
-.pace-row { margin-bottom:16px; }
+.pace-row { margin-bottom:17px; }
 .pace-row:last-child { margin-bottom:0; }
-.pace-row-head { display:flex; justify-content:space-between; font-size:13px; color:var(--text-2); margin-bottom:6px; }
-.pace-row-head span:last-child { color:var(--text-1); font-weight:500; }
-.pace-row-note { font-size:11px; margin-top:4px; }
+.pace-row-head { display:flex; justify-content:space-between; font-size:13px; color:var(--dash-text-2); margin-bottom:7px; }
+.pace-row-head span:last-child { color:var(--dash-text-1); font-weight:600; }
+.track { height:6px; background:var(--dash-card-2); border-radius:999px; overflow:hidden; }
+.track-fill { height:100%; border-radius:999px; transition:width .35s; }
+.pace-row-note { font-size:11px; margin-top:5px; }
 
 /* ── Follow-ups ──────────────────────────────────────────── */
-.follow-row { display:flex; align-items:center; gap:9px; padding:9px 0; border-bottom:1px solid var(--border-soft); text-decoration:none; }
+.follow-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--dash-border-2); text-decoration:none; }
 .follow-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.follow-dot.tag-red { background:var(--bad); }
-.follow-dot.tag-amber { background:var(--warn); }
-.follow-dot.tag-blue { background:var(--info); }
-.follow-name { font-size:13px; font-weight:500; color:var(--text-1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.follow-sub { font-size:12px; color:var(--text-3); flex-shrink:0; }
-.follow-empty { font-size:13px; color:var(--text-3); padding:14px 0; }
-.follow-all { font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; margin-top:14px; }
+.follow-dot.is-bad { background:var(--dash-bad); }
+.follow-dot.is-warn { background:var(--dash-warn); }
+.follow-dot.is-violet { background:var(--dash-violet); }
+.follow-name { font-size:13px; font-weight:500; color:var(--dash-text-1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.follow-sub { font-size:12px; color:var(--dash-text-3); flex-shrink:0; }
+.follow-empty { font-size:13px; color:var(--dash-text-3); padding:16px 0; }
+.follow-all { font-size:13px; font-weight:600; color:var(--dash-violet); text-decoration:none; margin-top:14px; }
 
 /* ── Spark ───────────────────────────────────────────────── */
-.spark-foot { display:flex; justify-content:space-between; font-size:12px; margin-top:8px; color:var(--accent); font-weight:500; }
+.spark-cap { font-size:12px; color:var(--dash-text-3); }
+.spark-foot { display:flex; justify-content:space-between; font-size:12px; margin-top:10px; color:var(--dash-text-1); font-weight:600; }
+.spark-foot-meta { color:var(--dash-text-3); font-weight:400; }
 
 @media (max-width: 920px) {
   .bento { grid-template-columns:repeat(2,1fr); }
@@ -517,9 +560,10 @@ input.reg-input { text-align:center; font-size:22px; font-weight:600; padding:8p
   .b-hot, .b-kpi { grid-column:span 1; }
 }
 @media (max-width: 540px) {
+  .dash { margin:-30px -20px; padding:24px 20px 48px; }
   .bento { grid-template-columns:1fr; }
   .b-focus, .b-hot, .b-kpi, .b-reg, .b-ritmo, .b-follow, .b-spark { grid-column:span 1; }
-  .reg-grid { grid-template-columns:repeat(5,1fr); gap:6px; }
-  input.reg-input { font-size:18px; }
+  .reg-grid { gap:7px; }
+  input.reg-input { font-size:19px; }
 }
 </style>

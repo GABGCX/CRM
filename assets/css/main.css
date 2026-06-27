@@ -33,6 +33,23 @@
   --bad:  #b14a44; --bad-bg:  #f6ece9; --bad-bd:  #e8d1cc;
   --info: #46599a; --info-bg: #eef0f6; --info-bd: #d6dceb;
 
+  /* Dashboard cockpit: dark premium estilo CentralFlow (fixo, independe do tema) */
+  --dash-bg:       #0b0b0f;
+  --dash-card:     #15151c;
+  --dash-card-2:   #1d1d26;
+  --dash-border:   rgba(255,255,255,.08);
+  --dash-border-2: rgba(255,255,255,.05);
+  --dash-text-1:   #ececf1;
+  --dash-text-2:   #a0a0ad;
+  --dash-text-3:   #6a6a78;
+  --dash-violet:   #8b7bff;
+  --dash-orange:   #ff8a4c;
+  --dash-grad:     linear-gradient(120deg, #7c5cff 0%, #ff7a45 100%);
+  --dash-grad-soft: linear-gradient(120deg, rgba(124,92,255,.16), rgba(255,122,69,.12));
+  --dash-ok:       #4ade80;
+  --dash-warn:     #ffb454;
+  --dash-bad:      #fb7185;
+
   --sb-bg:          #282828;
   --sb-border:      #333333;
   --sb-hover:       #333333;
