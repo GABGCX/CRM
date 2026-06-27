@@ -4,6 +4,7 @@ import { throwApiError } from '../../utils/apiError'
 const VALID_FONTES  = ['cold_call', 'linkedin', 'indicacao', 'evento', 'outro']
 const VALID_PORTES  = ['micro', 'pequena', 'media', 'grande']
 const VALID_RESULTS = [
+  'Novo', 'Prospecção', 'Qualificação',
   'Aguardando retorno', 'Follow-up', 'De molho', 'Reunião agendada',
   'Enviar proposta', 'Proposta enviada', 'Fechado', 'Recusado',
   'Sem interesse', 'Não atende',

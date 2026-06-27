@@ -138,6 +138,7 @@
             </div>
             <span v-else></span>
             <div style="font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:8px">
+              <UiLeadQuickActions class="lead-row-qa" :lead="l" @fu="handleToggleFU(l.id, fuDone(l))" />
               <UiMoneyPill v-if="cardPrefs.value" :value="l.valor_estimado" compact />
               <span v-if="cardPrefs.fu">{{ fuDone(l) }}/10</span>
               <span>{{ daysIn(l.created_at) }}d</span>
@@ -220,6 +221,20 @@
               <input type="checkbox" v-model="editForm.reuniao_agendada" id="reun" @change="hasUnsavedChanges = true" />
               <label for="reun" class="input-label" style="cursor:pointer">Reunião agendada</label>
             </div>
+
+            <!-- Campos personalizados -->
+            <template v-if="customDefs.length && editForm.custom_fields">
+              <div v-for="cf in customDefs" :key="cf.id" style="grid-column:span 2">
+                <div class="input-label" style="margin-bottom:4px">{{ cf.label }}</div>
+                <select v-if="cf.field_type === 'select'" v-model="editForm.custom_fields[cf.key]" @change="hasUnsavedChanges = true">
+                  <option value="">--</option>
+                  <option v-for="o in (cf.options || [])" :key="o" :value="o">{{ o }}</option>
+                </select>
+                <input v-else
+                  :type="cf.field_type === 'number' ? 'number' : cf.field_type === 'date' ? 'date' : 'text'"
+                  v-model="editForm.custom_fields[cf.key]" @input="hasUnsavedChanges = true" />
+              </div>
+            </template>
           </div>
 
           <button class="btn btn-primary" :disabled="detailSaving" @click="saveLead"
@@ -467,6 +482,16 @@
                   <label class="input-label">Cidade</label>
                   <input v-model="newForm.cidade" placeholder="São Paulo" />
                 </div>
+                <div v-for="cf in customDefs" :key="cf.id" class="form-field" style="grid-column:span 2">
+                  <label class="input-label">{{ cf.label }}</label>
+                  <select v-if="cf.field_type === 'select'" v-model="newForm.custom_fields[cf.key]">
+                    <option value="">--</option>
+                    <option v-for="o in (cf.options || [])" :key="o" :value="o">{{ o }}</option>
+                  </select>
+                  <input v-else
+                    :type="cf.field_type === 'number' ? 'number' : cf.field_type === 'date' ? 'date' : 'text'"
+                    v-model="newForm.custom_fields[cf.key]" />
+                </div>
               </template>
 
               <div style="grid-column:span 2;display:flex;justify-content:flex-end;gap:8px;padding-top:4px">
@@ -549,7 +574,16 @@ function passesExtra(l: LeadWithFU): boolean {
 
 const { tags, fetchTags, resolve: resolveTags } = useTags()
 const { prefs: cardPrefs, init: initCardPrefs } = useCardPrefs()
-onMounted(() => { fetchTags(); initCardPrefs() })
+const { defs: customDefs, load: loadCustomFields } = useCustomFields()
+const route = useRoute()
+onMounted(() => {
+  fetchTags(); initCardPrefs(); loadCustomFields()
+  // Drill-down vindo dos Relatorios (?status=...&view=list)
+  if (typeof route.query.status === 'string') {
+    filterStatus.value = route.query.status
+    if (route.query.view === 'list') viewMode.value = 'list'
+  }
+})
 const leadTags = (l: LeadWithFU) => resolveTags(l.tag_ids)
 const selectedId         = ref<string | null>(null)
 const showModal          = ref(false)
@@ -775,6 +809,7 @@ watch(selectedLead, l => {
     proposta_url: l.proposta_url||'',
     valor_estimado: l.valor_estimado||null, motivo_perda: l.motivo_perda||'',
     tag_ids: [...(l.tag_ids || [])],
+    custom_fields: { ...(l.custom_fields || {}) },
   })
   templatePreview.value = null
   hasUnsavedChanges.value = false
@@ -830,16 +865,30 @@ const detailFields = [
   { key:'proposta_url',   label:'URL da proposta', type:'url', wide:true },
 ]
 
+// Campos opcionais que, vazios (''), devem virar null antes de salvar.
+// Sem isso, data_retorno='' quebra a coluna date e o patch inteiro falha (nada salva).
+const SAVE_NULLABLE = [
+  'telefone','negocio','instagram','nome_ponte','data_retorno','info',
+  'turno','horario','proposta_url','motivo_perda','valor_estimado','num_vendedores',
+]
+
 async function saveLead() {
   if (!selectedLead.value) return
   detailSaving.value = true
   try {
     // tag_ids salva separado (onTagsChange, instantaneo); fora do payload generico.
-    const payload = { ...editForm }
+    const payload: Record<string, any> = { ...editForm }
     delete payload.tag_ids
+    for (const k of SAVE_NULLABLE) if (payload[k] === '') payload[k] = null
+    // mantem so os campos personalizados preenchidos
+    payload.custom_fields = Object.fromEntries(
+      Object.entries(payload.custom_fields || {}).filter(([, v]) => v !== '' && v != null)
+    )
     await patchLead(selectedLead.value.id, payload)
     hasUnsavedChanges.value = false
     showToast('Salvo!')
+  } catch {
+    showToast('Erro ao salvar. Verifique os campos.')
   } finally {
     detailSaving.value = false
   }
@@ -858,8 +907,9 @@ async function handleToggleFU(leadId: string, idx: number) {
 
 const newForm = reactive<Record<string,any>>({
   decisor:'', telefone:'', negocio:'', instagram:'', num_vendedores:null,
-  nome_ponte:'', resultado:'Aguardando retorno', data_retorno:'', info:'',
+  nome_ponte:'', resultado:'Novo', data_retorno:'', info:'',
   fonte:'', segmento:'', cidade:'', estado:'', porte:'', cadence_id:'',
+  custom_fields:{},
 })
 const showExtra = ref(false)
 const cadences  = ref<Cadence[]>([])
@@ -894,13 +944,18 @@ async function handleCreateLead() {
     const NULLABLE = ['telefone','negocio','instagram','nome_ponte','data_retorno','info','fonte','segmento','cidade','estado','porte','cadence_id']
     const payload: Record<string, any> = { ...newForm, reuniao_agendada: false }
     for (const k of NULLABLE) if (payload[k] === '') payload[k] = null
+    // mantem so os campos personalizados preenchidos
+    payload.custom_fields = Object.fromEntries(
+      Object.entries(payload.custom_fields || {}).filter(([, v]) => v !== '' && v != null)
+    )
     await createLeadComposable(payload)
     showModal.value = false
     showToast('Lead criado!')
     Object.assign(newForm, {
       decisor:'', telefone:'', negocio:'', instagram:'', num_vendedores:null,
-      nome_ponte:'', resultado:'Aguardando retorno', data_retorno:'', info:'',
+      nome_ponte:'', resultado:'Novo', data_retorno:'', info:'',
       fonte:'', segmento:'', cidade:'', estado:'', porte:'', cadence_id:'',
+      custom_fields:{},
     })
     showExtra.value = false
   } catch (e: any) {
@@ -1115,6 +1170,9 @@ async function handleCreateLead() {
 }
 .lead-row:hover       { border-color: var(--border); }
 .lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(25,52,151,.12); }
+.lead-row-qa          { opacity: 0; transition: opacity .12s; }
+.lead-row:hover .lead-row-qa,
+.lead-row:focus-within .lead-row-qa { opacity: 1; }
 
 .detail-tabs {
   display: flex;

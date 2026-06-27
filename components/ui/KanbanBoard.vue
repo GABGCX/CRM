@@ -99,6 +99,9 @@ const leadTags = (lead: LeadWithFU) => resolve(lead.tag_ids)
 
 // Ordem das colunas = fluxo do funil
 const COLUMN_DEFS: { status: LeadStatus; label: string; color: string }[] = [
+  { status: 'Novo',               label: 'Novo',             color: '#64748b' },
+  { status: 'Prospecção',         label: 'Prospecção',       color: '#6366f1' },
+  { status: 'Qualificação',       label: 'Qualificação',     color: '#0ea5e9' },
   { status: 'Aguardando retorno', label: 'Aguardando',      color: '#d97706' },
   { status: 'Follow-up',          label: 'Follow-up',        color: '#2563eb' },
   { status: 'De molho',           label: 'De molho',         color: '#7c3aed' },
