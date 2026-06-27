@@ -381,10 +381,12 @@ definePageMeta({ layout: 'dashboard' })
 
 const { profile, org } = useProfile()
 
-// Cores de serie/grafico (consts, nao literais em style="" para a trava de cores)
+// Cores de serie/grafico — paleta categorica Carbon (hex literal: vao em
+// atributos SVG fill/stroke, onde var(--...) nao resolve). Consts, nao
+// literais em style="" para a trava de cores.
 const C = {
-  ld: '#64748b', ce: '#193497', rm: '#7c3aed', rr: '#d97706', fr: '#16a34a',
-  bad: '#dc2626', axis: '#94a3b8', donutBg: '#f1f5f9',
+  ld: '#8d8d8d', ce: '#0f62fe', rm: '#8a3ffc', rr: '#009d9a', fr: '#24a148',
+  bad: '#da1e28', axis: '#a8a8a8', donutBg: '#e0e0e0',
 }
 const TREND_SERIES = [
   { key: 'ce' as const, label: 'CE', color: C.ce },
@@ -638,7 +640,7 @@ const dowMax = computed(() => Math.max(1, ...dowData.value.map(d => d.ce)))
 function heatColor(ce: number) {
   if (ce <= 0) return 'var(--bg-subtle)'
   const a = 0.12 + (ce / dowMax.value) * 0.5
-  return `rgba(25,52,151,${a.toFixed(2)})`
+  return `rgba(15,98,254,${a.toFixed(2)})`
 }
 
 // ── Aging ───────────────────────────────────────────────────────────────
@@ -646,10 +648,10 @@ const agingTotal = computed(() => agingData.value.reduce((s, a) => s + a.count, 
 
 // ── Donut status ────────────────────────────────────────────────────────
 const STATUS_COLORS: Record<string, string> = {
-  'Novo': '#64748b', 'Prospecção': '#6366f1', 'Qualificação': '#0ea5e9',
-  'Aguardando retorno': '#f59e0b', 'Follow-up': '#3b82f6', 'De molho': '#8b5cf6',
-  'Reunião agendada': '#14b8a6', 'Enviar proposta': '#f97316', 'Proposta enviada': '#6366f1',
-  'Fechado': '#22c55e', 'Recusado': '#ef4444', 'Sem interesse': '#94a3b8', 'Não atende': '#cbd5e1',
+  'Novo': '#8a857d', 'Prospecção': '#5b6bb0', 'Qualificação': '#4f7fa8',
+  'Aguardando retorno': '#a87b35', 'Follow-up': '#46599a', 'De molho': '#7a6f9c',
+  'Reunião agendada': '#3f7a74', 'Enviar proposta': '#a8693f', 'Proposta enviada': '#4f7d8a',
+  'Fechado': '#4e8c6a', 'Recusado': '#b14a44', 'Sem interesse': '#8a857d', 'Não atende': '#a8a39b',
 }
 function statusColor(s: string) { return STATUS_COLORS[s] || '#e2e8f0' }
 const CIRCUM = 2 * Math.PI * 38
@@ -736,7 +738,7 @@ function goToStatus(status: string) {
 .kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:14px; }
 .kpi-label { font-size:12px; color:var(--text-2); margin-bottom:6px; }
 .kpi-value-row { display:flex; align-items:baseline; gap:8px; }
-.kpi-value { font-size:26px; font-weight:700; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-.02em; }
+.kpi-value { font-size:var(--num-hero); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-.01em; font-family:var(--font-mono); }
 .kpi-delta { font-size:12px; font-weight:600; }
 .kpi-sub { font-size:11px; color:var(--text-3); margin-top:6px; }
 
@@ -754,12 +756,12 @@ function goToStatus(status: string) {
 .gauge-fill { height:100%; border-radius:99px; transition:width .35s; }
 .rev-row { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
 .rev-k { font-size:12px; color:var(--text-2); }
-.rev-v { font-size:17px; font-weight:700; color:var(--text-1); font-variant-numeric:tabular-nums; }
+.rev-v { font-size:18px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; font-family:var(--font-mono); letter-spacing:-.01em; }
 .rev-hint { font-size:11px; color:var(--text-3); }
 
 .vol-item  { background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px; }
 .vol-label { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; font-weight:600; margin-bottom:6px; }
-.vol-value { font-size:24px; font-weight:700; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; }
+.vol-value { font-size:var(--num-lg); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; font-family:var(--font-mono); letter-spacing:-.01em; }
 .vol-hint  { font-size:11px; color:var(--text-3); margin-top:5px; }
 
 .bars-row { display:flex; align-items:flex-end; gap:3px; height:90px; }

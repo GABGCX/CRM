@@ -85,9 +85,9 @@
 
         <div v-if="nextCadenceStep(lead)"
           style="font-size:12px;background:var(--accent-soft);border:1px solid var(--accent-bd);border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0f2480" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" v-html="channelIconHtml(nextCadenceStep(lead)!.channel)" />
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0353e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" v-html="channelIconHtml(nextCadenceStep(lead)!.channel)" />
           <div>
-            <span style="font-weight:600;color:#0f2480">Dia {{ nextCadenceStep(lead)!.day_offset }} via {{ nextCadenceStep(lead)!.channel }}</span>
+            <span style="font-weight:600;color:#0353e9">Dia {{ nextCadenceStep(lead)!.day_offset }} via {{ nextCadenceStep(lead)!.channel }}</span>
             <template v-if="nextCadenceStep(lead)!.instruction">
               <span style="color:var(--text-2);margin-left:5px">· {{ nextCadenceStep(lead)!.instruction }}</span>
             </template>
@@ -162,28 +162,28 @@ function daysUntil(d: string) {
 }
 
 function urgencyColor(lead: LeadWithFU): string {
-  if (!lead.data_retorno) return '#e2e8f0'
+  if (!lead.data_retorno) return 'var(--border)'
   const diff = daysUntil(lead.data_retorno)
-  if (diff < 0) return '#ef4444'
-  if (diff === 0) return '#f59e0b'
-  if (diff <= 3) return '#193497'
-  return '#e2e8f0'
+  if (diff < 0) return 'var(--bad)'
+  if (diff === 0) return 'var(--warn)'
+  if (diff <= 3) return 'var(--accent)'
+  return 'var(--border)'
 }
 
 function initialStyle(lead: LeadWithFU): Record<string, string> {
-  if (!lead.data_retorno) return { background: '#f1f5f9', color: '#475569' }
+  if (!lead.data_retorno) return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
   const diff = daysUntil(lead.data_retorno)
-  if (diff < 0)  return { background: '#fef2f2', color: '#dc2626' }
-  if (diff === 0) return { background: '#fffbeb', color: '#d97706' }
-  if (diff <= 3) return { background: '#eaefff', color: '#193497' }
-  return { background: '#f1f5f9', color: '#475569' }
+  if (diff < 0)  return { background: 'var(--bad-bg)', color: 'var(--bad)' }
+  if (diff === 0) return { background: 'var(--warn-bg)', color: 'var(--warn)' }
+  if (diff <= 3) return { background: 'var(--accent-soft)', color: 'var(--accent)' }
+  return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
 }
 
 function retStyle(d: string): Record<string, string> {
   const diff = daysUntil(d)
-  if (diff < 0)  return { background: '#fef2f2', color: '#dc2626' }
-  if (diff === 0) return { background: '#fffbeb', color: '#d97706' }
-  return { background: '#f1f5f9', color: '#475569' }
+  if (diff < 0)  return { background: 'var(--bad-bg)', color: 'var(--bad)' }
+  if (diff === 0) return { background: 'var(--warn-bg)', color: 'var(--warn)' }
+  return { background: 'var(--bg-subtle)', color: 'var(--text-2)' }
 }
 
 function retLabel(d: string): string {

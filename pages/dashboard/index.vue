@@ -1,201 +1,174 @@
-﻿<template>
-  <div>
-    <!-- Page header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+<template>
+  <div class="dash">
+    <header class="dash-head">
       <div>
-        <div class="page-title">Bom {{ greeting }}, {{ firstName }}</div>
-        <div class="page-sub">{{ todayLabel }} · semana {{ currentWeek }} de 4</div>
+        <h1 class="dash-greet">Bom {{ greeting }}, {{ firstName }}</h1>
+        <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <select
-          v-if="canFilterUsers && orgMembers?.length"
-          v-model="selectedUserId"
-          style="font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);color:var(--text-2);cursor:pointer;max-width:160px">
+      <div class="dash-head-right">
+        <select v-if="canFilterUsers && orgMembers?.length" v-model="selectedUserId" class="dash-select">
           <option :value="null">Toda equipe</option>
           <option v-for="m in orgMembers" :key="m.id" :value="m.id">{{ m.name || m.id.slice(0,8) }}</option>
         </select>
-        <div style="font-size:12px;color:var(--text-3);text-align:right;line-height:1.5">
-          <div>{{ workdaysLeft }} dias úteis restantes</div>
-          <div>{{ totalWorkdays }} dias úteis no mês</div>
+        <div class="dash-days">
+          <span class="dash-days-n tabular">{{ workdaysLeft }}</span>
+          <span class="dash-days-l">dias uteis restantes</span>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Foco agora: proxima acao concreta -->
-    <div class="focus-hero" :class="`focus-hero--${focusAction.tone}`">
-      <div class="focus-main">
-        <div class="focus-eyebrow">
-          <span class="focus-dot"></span>
-          Foco agora
+    <div class="grid">
+      <!-- Foco agora -->
+      <section class="tile t-focus">
+        <div class="tile-head">
+          <svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.target" />
+          <span>Foco agora</span>
+          <span class="pill" :class="`is-${focusTone}`" style="margin-left:auto">{{ focusToneLabel }}</span>
         </div>
-        <div class="focus-title">{{ focusAction.title }}</div>
-        <div class="focus-sub">{{ focusAction.sub }}</div>
-        <NuxtLink :to="focusAction.to" class="focus-cta">
+        <h2 class="focus-title">{{ focusAction.title }}</h2>
+        <p class="focus-desc">{{ focusAction.sub }}</p>
+        <NuxtLink :to="focusAction.to" class="btn btn-primary focus-cta">
           {{ focusAction.cta }}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </NuxtLink>
-      </div>
-      <NuxtLink v-if="hottestLead" :to="`/dashboard/pipeline?highlight=${hottestLead.id}`" class="focus-hot">
-        <div class="focus-hot-label">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="margin-right:3px">
-            <path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2.5-1-4 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-10z"/>
-          </svg>
-          Lead mais quente
-        </div>
-        <div class="focus-hot-name">{{ hottestLead.decisor }}</div>
-        <div class="focus-hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
-        <div class="focus-hot-footer">
-          <span class="focus-hot-value">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</span>
-          <span class="focus-hot-status">{{ hottestLead.resultado }}</span>
-        </div>
-      </NuxtLink>
-    </div>
+      </section>
 
-    <!-- ── HOJE ─────────────────────────────────────────── -->
-    <div class="ck-label">Hoje · {{ todayFormatted }}</div>
-    <div class="cockpit-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
-      <!-- Registrar hoje (acao diaria, prioritaria) -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="card-label" style="margin-bottom:0">Registrar dia</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:11px;color:var(--text-3);background:var(--bg-subtle);padding:2px 7px;border-radius:4px">Ctrl+S</span>
-            <span v-if="alreadySaved" style="font-size:12px;color:#16a34a;font-weight:500">Salvo</span>
-          </div>
+      <!-- Gauge: meta de CE -->
+      <section class="tile t-gauge">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.gauge" /><span>Meta de CE</span></div>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 120 120" class="gauge-svg">
+            <circle cx="60" cy="60" r="50" fill="none" style="stroke:var(--bg-subtle)" stroke-width="10" />
+            <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"
+              :stroke-dasharray="GAUGE_C" :stroke-dashoffset="gaugeOffset" transform="rotate(-90 60 60)"
+              :style="{ stroke: paceColor, transition:'stroke-dashoffset .5s' }" />
+            <text x="60" y="58" text-anchor="middle" class="gauge-pct">{{ gaugePct }}%</text>
+            <text x="60" y="76" text-anchor="middle" class="gauge-cap">da meta</text>
+          </svg>
         </div>
-        <div class="cockpit-quick-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
-          <div v-for="f in quickFields" :key="f.key" style="text-align:center">
-            <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center">
-              <UiMetricTooltip v-if="['LD','CE','RM','RR','FR'].includes(f.label)" :metric="(f.label as MetricKey)" />
-              <span v-else>{{ f.label }}</span>
+        <div class="gauge-foot">
+          <span class="tabular">{{ monthTotals.ce }}</span> de <span class="tabular">{{ ceNec }}</span> CE ·
+          <span :style="{ color: paceColor }">{{ ceDelta >= 0 ? '+'+ceDelta : ceDelta }} vs ritmo</span>
+        </div>
+      </section>
+
+      <!-- Funil do mes -->
+      <section class="tile t-funnel">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.funnel" /><span>Funil do mes</span><span class="tile-cap">{{ MONTH_NAMES[currentMonth-1] }}</span></div>
+        <div v-if="!monthTotals.ld && !monthTotals.ce" class="empty-mini">Sem atividade registrada no mes.</div>
+        <div v-else class="fn-bars">
+          <template v-for="(row, i) in funnelRows" :key="row.key">
+            <div v-if="i > 0" class="fn-gap">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="fn-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+              <span v-if="row.rate !== null" class="fn-rate tabular">{{ row.rate.toFixed(row.rate < 10 ? 1 : 0) }}%</span>
             </div>
-            <input type="number" v-model.number="quickForm[f.key]" min="0"
-              style="text-align:center;font-size:20px;font-weight:600;padding:8px 4px;color:var(--text-1)" />
-            <div style="font-size:11px;color:var(--text-3);margin-top:2px">meta: {{ f.meta }}</div>
+            <div class="fn-row">
+              <span class="fn-lbl">{{ row.label }}</span>
+              <div class="fn-track">
+                <div class="fn-fill" :style="{ width: row.pct + '%' }" />
+              </div>
+              <span class="fn-val tabular">{{ row.v.toLocaleString('pt-BR') }}</span>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <!-- Lead quente -->
+      <component :is="hottestLead ? 'NuxtLink' : 'section'"
+        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined" class="tile t-hot">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.flame" /><span>Lead mais quente</span></div>
+        <template v-if="hottestLead">
+          <div class="hot-name">{{ hottestLead.decisor }}</div>
+          <div class="hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
+          <div class="hot-spacer" />
+          <div class="hot-value tabular">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</div>
+          <div class="hot-status"><span class="dot" /> {{ hottestLead.resultado }}</div>
+        </template>
+        <div v-else class="empty-mini" style="text-align:left">Nenhuma oportunidade aberta com valor.</div>
+      </component>
+
+      <!-- KPIs do mes com sparkline -->
+      <section class="tile t-kpis">
+        <div class="kpi-row">
+          <div v-for="k in kpiStrip" :key="k.key" class="kpi">
+            <div class="kpi-top">
+              <svg class="kpi-ic" viewBox="0 0 24 24" v-html="k.icon" />
+              <span class="kpi-name">{{ k.metric }}</span>
+            </div>
+            <div class="kpi-num tabular" :class="k.cls">{{ k.value.toLocaleString('pt-BR') }}</div>
+            <svg v-if="k.spark" class="kpi-spark" viewBox="0 0 64 20" preserveAspectRatio="none">
+              <path :d="k.spark" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div v-else class="kpi-spark-empty" />
+            <div class="kpi-sub">{{ k.label }}</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px;color:var(--text-2)">
-            CE→RM hoje: <strong>{{ todayCERMRate }}%</strong> &nbsp;·&nbsp; mês: <strong>{{ monthCERMRate }}%</strong>
+      </section>
+
+      <!-- Registrar hoje -->
+      <section class="tile t-reg">
+        <div class="tile-head">
+          <svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.edit" /><span>Registrar hoje</span>
+          <div class="reg-actions">
+            <span v-if="alreadySaved && !saving" class="saved-flag">salvo</span>
+            <button class="btn btn-primary" :disabled="saving" @click="saveQuick">{{ saving ? 'Salvando...' : 'Salvar dia' }}</button>
           </div>
-          <button class="btn btn-primary" :disabled="saving" @click="saveQuick">
-            {{ saving ? 'Salvando...' : 'Salvar dia' }}
-          </button>
         </div>
-      </div>
+        <div class="reg-grid">
+          <label v-for="f in quickFields" :key="f.key" class="reg-cell">
+            <span class="reg-cell-label">{{ f.label }}</span>
+            <input type="number" min="0" v-model.number="quickForm[f.key]" class="reg-input tabular" />
+            <span class="reg-cell-meta">meta {{ f.meta }}</span>
+          </label>
+        </div>
+        <div class="reg-foot">CE&rarr;RM hoje <strong>{{ todayCERMRate }}%</strong> · mes <strong>{{ monthCERMRate }}%</strong> · <span class="hint">Ctrl+S salva</span></div>
+      </section>
 
       <!-- Follow-ups hoje -->
-      <div class="card">
-        <div class="card-label">Follow-ups hoje</div>
-        <div v-if="!todayTasks.length" style="text-align:center;padding:28px 0;color:var(--text-3);font-size:13px">
-          Nenhum retorno urgente.
-        </div>
-        <div v-for="t in todayTasks" :key="t.id"
-          style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-soft)">
-          <div>
-            <div style="font-size:13px;font-weight:500;color:var(--text-1)">{{ t.decisor }}</div>
-            <div style="font-size:12px;color:var(--text-2)">{{ t.sub }}</div>
-          </div>
-          <span class="tag" :class="t.tagClass">{{ t.tagLabel }}</span>
-        </div>
-        <NuxtLink to="/dashboard/followup" style="display:block;margin-top:12px;font-size:13px;color:var(--accent);text-decoration:none;font-weight:500">
-          Ver todos →
+      <section class="tile t-follow">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.bell" /><span>Follow-ups hoje</span></div>
+        <div v-if="!todayTasks.length" class="empty-mini" style="text-align:left">Nenhum retorno urgente.</div>
+        <NuxtLink v-for="t in todayTasks" :key="t.id" to="/dashboard/followup" class="follow-row">
+          <span class="follow-dot" :class="t.cls" />
+          <span class="follow-name">{{ t.decisor }}</span>
+          <span class="follow-sub">{{ t.sub }}</span>
         </NuxtLink>
-      </div>
-    </div>
+        <NuxtLink to="/dashboard/followup" class="follow-all">Ver fila completa &rarr;</NuxtLink>
+      </section>
 
-    <!-- ── ESTE MÊS ─────────────────────────────────────── -->
-    <div class="ck-head">
-      <div class="ck-label" style="margin:0">Este mês · {{ MONTH_NAMES[currentMonth-1] }}</div>
-      <span class="tag" :class="paceBanner.tagClass">{{ paceBanner.tagLabel }}</span>
-    </div>
-
-    <!-- Pace banner -->
-    <div class="pace-banner" :class="paceBanner.bannerClass"
-      style="border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;border:1px solid">
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:500">{{ paceBanner.title }}</div>
-        <div style="font-size:12px;margin-top:3px;opacity:.8">{{ paceBanner.sub }}</div>
-      </div>
-    </div>
-
-    <!-- Metric cards -->
-    <div class="cockpit-kpi-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
-      <div v-if="diaryPending" v-for="i in 4" :key="i"
-        class="metric-card" style="animation:pulse 1.5s infinite;min-height:88px">
-        <div style="height:10px;background:var(--bg-subtle);border-radius:3px;margin-bottom:10px;width:55%" />
-        <div style="height:30px;background:var(--bg-subtle);border-radius:3px;width:40%" />
-      </div>
-      <UiMetricCard v-else v-for="m in metricCards" :key="m.label" :value="m.value" :sub="m.sub" :sub-class="m.subClass">
-        <template #label>
-          <span style="display:flex;align-items:center;gap:4px">
-            <UiMetricTooltip v-if="['CE no mês','RM no mês','RR no mês','FR no mês'].includes(m.label)"
-              :metric="(m.label.split(' ')[0] as MetricKey)" />
-            <span v-else>{{ m.label }}</span>
-            <span v-if="['CE no mês','RM no mês','RR no mês','FR no mês'].includes(m.label)"
-              style="font-size:11px;color:var(--text-3);font-weight:400"> no mês</span>
-          </span>
-        </template>
-      </UiMetricCard>
-    </div>
-
-    <!-- Charts row -->
-    <div class="cockpit-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <!-- Pace bars -->
-      <div class="card">
-        <div class="card-label">Ritmo · {{ MONTH_NAMES[currentMonth-1] }}</div>
-        <div v-for="r in paceRows" :key="r.label" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-            <span style="font-size:13px;color:var(--text-2)">{{ r.label }}</span>
-            <span style="font-size:13px;font-weight:500;color:var(--text-1)" class="tabular">{{ r.current }} / {{ r.target }}</span>
+      <!-- Ritmo -->
+      <section class="tile t-ritmo">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.activity" /><span>Ritmo do mes</span></div>
+        <div v-for="r in paceRows" :key="r.label" class="pace-row">
+          <div class="pace-row-head">
+            <span>{{ r.label }}</span>
+            <span class="tabular">{{ r.current }} / {{ r.target }}</span>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: r.pct + '%', background: r.color }"></div>
-          </div>
-          <div style="font-size:11px;margin-top:3px" :style="{ color: r.color }">{{ r.note }}</div>
+          <div class="track"><div class="track-fill" :style="{ width: r.pct + '%', background: r.color }" /></div>
         </div>
-      </div>
+      </section>
 
-      <!-- Sparkline CE -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="card-label" style="margin-bottom:0">Evolução CE no mês</div>
-          <span style="font-size:12px;color:var(--text-3)">acumulado vs meta</span>
-        </div>
-        <div v-if="diaryPending"
-          style="height:80px;background:var(--bg-subtle);border-radius:8px;animation:pulse 1.5s infinite" />
-        <svg v-else viewBox="0 0 240 80" style="width:100%;height:80px;overflow:visible">
-          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY"
-            stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 2" />
-          <text x="2" :y="ceGoalY - 3" fill="#94a3b8" font-size="8">meta</text>
-          <path :d="sparkAreaPath" fill="#193497" fill-opacity="0.08" />
-          <path :d="sparkLinePath" fill="none" stroke="#193497" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round" />
-          <circle v-if="sparkPoints.length"
-            :cx="sparkPoints[sparkPoints.length-1].x"
-            :cy="sparkPoints[sparkPoints.length-1].y"
-            r="3" fill="#193497" />
-          <text v-if="sparkPoints.length > 0"
-            :x="sparkPoints[0].x" y="78" fill="#94a3b8" font-size="7" text-anchor="middle">1</text>
-          <text v-if="sparkPoints.length > 1"
-            :x="sparkPoints[Math.floor(sparkPoints.length/2)].x" y="78"
-            fill="#94a3b8" font-size="7" text-anchor="middle">{{ Math.floor(sparkPoints.length/2) + 1 }}</text>
-          <text v-if="sparkPoints.length > 2"
-            :x="sparkPoints[sparkPoints.length-1].x" y="78"
-            fill="#94a3b8" font-size="7" text-anchor="middle">{{ sparkPoints.length }}</text>
+      <!-- Evolucao CE -->
+      <section class="tile t-spark">
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.trend" /><span>Evolucao CE no mes</span><span class="tile-cap">acumulado vs meta {{ ceNec }}</span></div>
+        <div v-if="diaryPending" class="skel" style="height:100px" />
+        <svg v-else viewBox="0 0 240 90" preserveAspectRatio="none" class="ce-chart">
+          <defs>
+            <linearGradient id="ceArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0f62fe" stop-opacity="0.16"/>
+              <stop offset="100%" stop-color="#0f62fe" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line :x1="0" :y1="ceGoalY" :x2="240" :y2="ceGoalY" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3 3" />
+          <path :d="sparkAreaPath" fill="url(#ceArea)" />
+          <path :d="sparkLinePath" fill="none" stroke="#0f62fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <circle v-if="sparkPoints.length" :cx="sparkPoints[sparkPoints.length-1].x" :cy="sparkPoints[sparkPoints.length-1].y" r="3" fill="#0f62fe" />
         </svg>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px">
-          <span style="color:#193497;font-weight:500">{{ monthTotals.ce }} CE acumulados</span>
-          <span style="color:var(--text-3)">meta: {{ ceNec }}</span>
-        </div>
-      </div>
+        <div class="spark-foot"><span class="tabular">{{ monthTotals.ce }}</span> CE acumulados · meta <span class="tabular">{{ ceNec }}</span></div>
+      </section>
     </div>
 
-    <Transition name="toast">
-      <div v-if="toast" class="toast">{{ toast }}</div>
-    </Transition>
+    <Transition name="toast"><div v-if="toast" class="toast">{{ toast }}</div></Transition>
   </div>
 </template>
 
@@ -213,11 +186,8 @@ const ticketMedio = computed(() => org.value?.settings?.ticket_medio || 2000)
 const { fechNec, rrNec, rmNec, ceNec, cePerDay, rmPerDay } = useOutboundMath(metaMensal, ticketMedio)
 const { leads, overdueLeads } = useLeads()
 
-// Lead mais quente: maior valor estimado em status avancado
 const hottestLead = computed(() => {
-  const pool = (leads.value || []).filter(l =>
-    isHot(l) && l.valor_estimado && l.valor_estimado > 0
-  )
+  const pool = (leads.value || []).filter(l => isHot(l) && l.valor_estimado && l.valor_estimado > 0)
   if (!pool.length) return null
   return [...pool].sort((a, b) => (b.valor_estimado || 0) - (a.valor_estimado || 0))[0]
 })
@@ -228,7 +198,6 @@ const now          = new Date()
 const currentMonth = now.getMonth() + 1
 const currentYear  = now.getFullYear()
 const todayStr     = now.toISOString().slice(0, 10)
-const todayFormatted = now.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' })
 const toast        = ref<string|null>(null)
 const saving       = ref(false)
 const alreadySaved = ref(false)
@@ -243,13 +212,9 @@ const currentWeek = Math.ceil(now.getDate() / 7)
 function countWorkdays(y: number, m: number, from = 1, to?: number) {
   const last = to || new Date(y, m, 0).getDate()
   let n = 0
-  for (let i = from; i <= last; i++) {
-    const d = new Date(y, m-1, i).getDay()
-    if (d > 0 && d < 6) n++
-  }
+  for (let i = from; i <= last; i++) { const d = new Date(y, m-1, i).getDay(); if (d > 0 && d < 6) n++ }
   return n
 }
-
 const totalWorkdays = countWorkdays(currentYear, currentMonth)
 const daysGone      = countWorkdays(currentYear, currentMonth, 1, now.getDate())
 const workdaysLeft  = totalWorkdays - daysGone
@@ -257,34 +222,24 @@ const workdaysLeft  = totalWorkdays - daysGone
 const selectedUserId = ref<string | null>(null)
 const canFilterUsers = computed(() => ['owner', 'admin'].includes(profile.value?.role || ''))
 
-const { data: orgMembers } = await useAsyncData(
-  'cockpit-members',
-  async () => {
-    if (!canFilterUsers.value) return []
-    try { return await $fetch<Profile[]>('/api/settings/members') }
-    catch { return [] }
-  },
-  { watch: [canFilterUsers] }
-)
+const { data: orgMembers } = await useAsyncData('cockpit-members', async () => {
+  if (!canFilterUsers.value) return []
+  try { return await $fetch<Profile[]>('/api/settings/members') } catch { return [] }
+}, { watch: [canFilterUsers] })
 
-const { data: diaryRows, refresh: refreshDiary, pending: diaryPending } = await useAsyncData(
-  'cockpit-diary',
-  async () => {
-    const params: Record<string, string> = { month: String(currentMonth), year: String(currentYear) }
-    if (selectedUserId.value) params.user_id = selectedUserId.value
-    return await $fetch<DiaryEntry[]>('/api/diary', { query: params }).catch(() => [])
-  },
-  { watch: [selectedUserId] }
-)
+const { data: diaryRows, refresh: refreshDiary, pending: diaryPending } = await useAsyncData('cockpit-diary', async () => {
+  const params: Record<string, string> = { month: String(currentMonth), year: String(currentYear) }
+  if (selectedUserId.value) params.user_id = selectedUserId.value
+  return await $fetch<DiaryEntry[]>('/api/diary', { query: params }).catch(() => [])
+}, { watch: [selectedUserId] })
 
 const monthTotals = computed(() => (diaryRows.value||[]).reduce(
-  (a, e) => ({ ce:a.ce+e.ce, rm:a.rm+e.rm, rr:a.rr+e.rr, fr:a.fr+e.fr }),
-  { ce:0, rm:0, rr:0, fr:0 }
+  (a, e) => ({ ld:a.ld+(e.ld||0), ce:a.ce+e.ce, rm:a.rm+e.rm, rr:a.rr+e.rr, fr:a.fr+e.fr }),
+  { ld:0, ce:0, rm:0, rr:0, fr:0 }
 ))
 
 const todayEntry = computed(() => (diaryRows.value||[]).find(e => e.date === todayStr))
 const quickForm  = reactive<Record<string,number>>({ ld:0, ce:0, rm:0, rr:0, fr:0 })
-
 watch(todayEntry, e => {
   if (e) { quickForm.ld=e.ld||0; quickForm.ce=e.ce; quickForm.rm=e.rm; quickForm.rr=e.rr; quickForm.fr=e.fr; alreadySaved.value=true }
 }, { immediate: true })
@@ -297,296 +252,280 @@ const quickFields = computed(() => [
   { key:'fr', label:'FR', meta: String(fechNec.value) },
 ])
 
-const todayCERMRate = computed(() =>
-  quickForm.ce > 0 ? ((quickForm.rm / quickForm.ce) * 100).toFixed(1) : '0.0'
-)
-const monthCERMRate = computed(() =>
-  monthTotals.value.ce > 0 ? ((monthTotals.value.rm / monthTotals.value.ce) * 100).toFixed(1) : '0.0'
-)
+const todayCERMRate = computed(() => quickForm.ce > 0 ? ((quickForm.rm / quickForm.ce) * 100).toFixed(1) : '0.0')
+const monthCERMRate = computed(() => monthTotals.value.ce > 0 ? ((monthTotals.value.rm / monthTotals.value.ce) * 100).toFixed(1) : '0.0')
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 function onKeydown(e: KeyboardEvent) {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault()
-    if (!saving.value) saveQuick()
-  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (!saving.value) saveQuick() }
 }
-
 async function saveQuick() {
   saving.value = true
   try {
     await $fetch('/api/diary', { method:'POST', body:{ date:todayStr, ...quickForm } })
-    alreadySaved.value = true
-    await refreshDiary()
-    showToast('Dia registrado!')
-  } finally {
-    saving.value = false
-  }
+    alreadySaved.value = true; await refreshDiary(); showToast('Dia registrado!')
+  } finally { saving.value = false }
 }
 
-// ── Sparkline ───────────────────────────────────────────────────────────
-const CHART_W = 240, CHART_H = 68, CHART_PAD = 4
+// ── Icones SVG ──────────────────────────────────────────────────────────
+const ICON = {
+  target:  '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  gauge:   '<path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  funnel:  '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  flame:   '<path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2.5-1-4 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-10z"/>',
+  edit:    '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  bell:    '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  trend:   '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  phone:   '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  msg:     '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+  cal:     '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  users:   '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+  trophy:  '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+}
 
+// ── Sparkline CE ────────────────────────────────────────────────────────
+const CHART_W = 240, CHART_H = 80, CHART_PAD = 5
 const sparkPoints = computed(() => {
   const rows = diaryRows.value || []
   if (!rows.length) return []
   const max  = Math.max(ceNec.value, ...rows.map(r => r.ce), 1)
   const step = rows.length > 1 ? (CHART_W - CHART_PAD * 2) / (rows.length - 1) : CHART_W / 2
-  return rows.map((r, i) => ({
-    x: CHART_PAD + i * step,
-    y: CHART_H - CHART_PAD - ((r.ce / max) * (CHART_H - CHART_PAD * 2)),
-  }))
+  return rows.map((r, i) => ({ x: CHART_PAD + i * step, y: CHART_H - CHART_PAD - ((r.ce / max) * (CHART_H - CHART_PAD * 2)) }))
 })
-
 const ceGoalY = computed(() => {
   const rows = diaryRows.value || []
   const max  = Math.max(ceNec.value, ...rows.map(r => r.ce), 1)
   return CHART_H - CHART_PAD - ((ceNec.value / max) * (CHART_H - CHART_PAD * 2))
 })
-
-const sparkLinePath = computed(() => {
-  const pts = sparkPoints.value
-  if (!pts.length) return ''
-  return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-})
-
+const sparkLinePath = computed(() => sparkPoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '))
 const sparkAreaPath = computed(() => {
   const pts = sparkPoints.value
   if (!pts.length) return ''
-  const line  = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-  const last  = pts[pts.length - 1]
-  const first = pts[0]
-  return `${line} L${last.x.toFixed(1)},${(CHART_H - CHART_PAD).toFixed(1)} L${first.x.toFixed(1)},${(CHART_H - CHART_PAD).toFixed(1)} Z`
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  return `${line} L${pts[pts.length-1].x.toFixed(1)},${(CHART_H-CHART_PAD).toFixed(1)} L${pts[0].x.toFixed(1)},${(CHART_H-CHART_PAD).toFixed(1)} Z`
 })
 
-// ── Pace banner ─────────────────────────────────────────────────────────
+// ── Mini sparkline por KPI ──────────────────────────────────────────────
+function kpiSpark(key: 'ld'|'ce'|'rm'|'rr'|'fr') {
+  const rows = diaryRows.value || []
+  if (rows.length < 2) return ''
+  const vals = rows.map(r => (r as any)[key] ?? 0)
+  const max = Math.max(...vals, 1), W = 64, H = 20, step = W / (vals.length - 1)
+  return vals.map((v, i) => `${i === 0 ? 'M' : 'L'}${(i*step).toFixed(1)},${(H - (v/max)*(H-2) - 1).toFixed(1)}`).join(' ')
+}
+
+// ── Pace ────────────────────────────────────────────────────────────────
 const ceNeededByToday = computed(() => cePerDay.value * daysGone)
 const ceDelta         = computed(() => monthTotals.value.ce - ceNeededByToday.value)
+const focusTone       = computed(() => focusAction.value.tone)
+const focusToneLabel  = computed(() => ({ urgent:'urgente', today:'hoje', pace:'ritmo', hot:'oportunidade', clear:'em dia' }[focusAction.value.tone] || ''))
 
-const paceBanner = computed(() => {
-  const d = ceDelta.value, t = monthTotals.value
-  if (d >= 5) return {
-    tagLabel: `+${d} a frente`, tagClass: 'tag-green', bannerClass: 'pace-ok',
-    title: 'Voce esta no ritmo para bater a meta de CE',
-    sub: `${t.ce} de ${ceNec.value} feitos. Precisava de ${ceNeededByToday.value} ate hoje.`,
-  }
-  if (d >= 0) return {
-    tagLabel: 'no ritmo', tagClass: 'tag-amber', bannerClass: 'pace-warn',
-    title: 'No ritmo, continue focado',
-    sub: `${t.ce} de ${ceNec.value} feitos. ${d} acima do necessario.`,
-  }
-  return {
-    tagLabel: `${Math.abs(d)} abaixo`, tagClass: 'tag-red', bannerClass: 'pace-bad',
-    title: `${Math.abs(d)} contatos abaixo do ritmo`,
-    sub: `${t.ce} de ${ceNec.value} feitos. Precisava de ${ceNeededByToday.value} ate hoje.`,
-  }
+// ── Gauge ───────────────────────────────────────────────────────────────
+const GAUGE_C = 2 * Math.PI * 50
+const gaugePct = computed(() => Math.min(100, Math.round(monthTotals.value.ce / Math.max(ceNec.value, 1) * 100)))
+const gaugeOffset = computed(() => GAUGE_C * (1 - gaugePct.value / 100))
+const paceColor = computed(() => ceDelta.value >= 5 ? 'var(--ok)' : ceDelta.value >= 0 ? 'var(--warn)' : 'var(--bad)')
+
+// ── Funil ────────────────────────────────────────────────────────────────
+const funnelRows = computed(() => {
+  const t = monthTotals.value
+  const stages = [
+    { key:'LD', label:'Ligacoes',        v: t.ld },
+    { key:'CE', label:'Contato efetivo', v: t.ce },
+    { key:'RM', label:'Reuniao marcada', v: t.rm },
+    { key:'RR', label:'Reuniao realiz.', v: t.rr },
+    { key:'FR', label:'Fechamento',      v: t.fr },
+  ]
+  const maxV = Math.max(...stages.map(s => s.v), 1)
+  return stages.map((s, i) => ({
+    ...s,
+    pct: s.v > 0 ? Math.max(3, Math.round((s.v / maxV) * 100)) : 0,
+    rate: i > 0 && stages[i-1].v > 0 ? (s.v / stages[i-1].v * 100) : null,
+  }))
 })
 
-// ── Foco agora: proxima acao prioritaria ────────────────────────────────
+// ── Foco agora ──────────────────────────────────────────────────────────
 const focusAction = computed(() => {
   const ov = overdueLeads.value.length
-  if (ov > 0) return {
-    tone:  'urgent',
-    title: `${ov} retorno${ov > 1 ? 's' : ''} vencido${ov > 1 ? 's' : ''} para ligar agora`,
-    sub:   'Lead parado perde temperatura a cada dia. Comece pelos mais antigos.',
-    cta:   'Trabalhar fila de vencidos',
-    to:    '/dashboard/followup',
-  }
+  if (ov > 0) return { tone:'urgent', title:`${ov} retorno${ov>1?'s':''} vencido${ov>1?'s':''} para ligar agora`, sub:'Lead parado perde temperatura a cada dia. Comece pelos mais antigos.', cta:'Trabalhar fila de vencidos', to:'/dashboard/followup' }
   const dt = (urgentLeadsData.value || []).filter(l => l.data_retorno === todayStr).length
-  if (dt > 0) return {
-    tone:  'today',
-    title: `${dt} retorno${dt > 1 ? 's' : ''} agendado${dt > 1 ? 's' : ''} para hoje`,
-    sub:   'Mantenha a cadencia em dia para nao acumular amanha.',
-    cta:   'Ver retornos de hoje',
-    to:    '/dashboard/followup',
-  }
-  if (ceDelta.value < 0) return {
-    tone:  'pace',
-    title: `Faltam ${Math.abs(ceDelta.value)} contatos para o ritmo de hoje`,
-    sub:   `Voce fez ${monthTotals.value.ce} CE no mes. O ritmo pede ${ceNeededByToday.value} ate agora.`,
-    cta:   'Registrar contatos',
-    to:    '/dashboard/diario',
-  }
-  if (hottestLead.value) return {
-    tone:  'hot',
-    title: `Avance ${hottestLead.value.decisor} no funil`,
-    sub:   `Maior oportunidade aberta: R$ ${(hottestLead.value.valor_estimado || 0).toLocaleString('pt-BR')} em ${hottestLead.value.resultado}.`,
-    cta:   'Abrir no pipeline',
-    to:    `/dashboard/pipeline?highlight=${hottestLead.value.id}`,
-  }
-  return {
-    tone:  'clear',
-    title: 'Tudo em dia. Hora de prospectar.',
-    sub:   'Sem pendencias urgentes. Gere novos contatos para alimentar o funil.',
-    cta:   'Adicionar leads',
-    to:    '/dashboard/pipeline',
-  }
+  if (dt > 0) return { tone:'today', title:`${dt} retorno${dt>1?'s':''} agendado${dt>1?'s':''} para hoje`, sub:'Mantenha a cadencia em dia para nao acumular amanha.', cta:'Ver retornos de hoje', to:'/dashboard/followup' }
+  if (ceDelta.value < 0) return { tone:'pace', title:`Faltam ${Math.abs(ceDelta.value)} contatos para o ritmo de hoje`, sub:`Voce fez ${monthTotals.value.ce} CE no mes. O ritmo pede ${ceNeededByToday.value} ate agora.`, cta:'Registrar contatos', to:'/dashboard/diario' }
+  if (hottestLead.value) return { tone:'hot', title:`Avance ${hottestLead.value.decisor} no funil`, sub:`Maior oportunidade aberta: R$ ${(hottestLead.value.valor_estimado || 0).toLocaleString('pt-BR')} em ${hottestLead.value.resultado}.`, cta:'Abrir no pipeline', to:`/dashboard/pipeline?highlight=${hottestLead.value.id}` }
+  return { tone:'clear', title:'Tudo em dia. Hora de prospectar.', sub:'Sem pendencias urgentes. Gere novos contatos para alimentar o funil.', cta:'Adicionar leads', to:'/dashboard/pipeline' }
 })
 
-// ── Metric cards ────────────────────────────────────────────────────────
-const metricCards = computed(() => {
+// ── KPIs ────────────────────────────────────────────────────────────────
+const kpiStrip = computed(() => {
   const t = monthTotals.value
-  const needed   = Math.floor(ceNec.value  * daysGone / totalWorkdays)
-  const rmNeeded = Math.floor(rmNec.value  * daysGone / totalWorkdays)
+  const need = Math.floor(ceNec.value * daysGone / totalWorkdays)
+  const rmNeed = Math.floor(rmNec.value * daysGone / totalWorkdays)
   return [
-    { label:'CE no mês',  value:t.ce,
-      sub:`meta: ${ceNec.value}`, subClass: t.ce >= needed ? 'metric-ok' : 'metric-bad' },
-    { label:'RM no mês',  value:t.rm,
-      sub:`tx: ${monthCERMRate.value}% · meta: ${rmNec.value}`,
-      subClass: t.rm >= rmNeeded ? 'metric-ok' : 'metric-warn' },
-    { label:'RR no mês',  value:t.rr,
-      sub:`tx RM→RR: ${t.rm>0?((t.rr/t.rm)*100).toFixed(0):0}%`, subClass:'' },
-    { label:'FR no mês',  value:t.fr,
-      sub:`meta: ${fechNec.value}`,
-      subClass: t.fr>=fechNec.value?'metric-ok':t.fr>0?'metric-warn':'metric-bad' },
+    { key:'ld', metric:'LD', label:'Ligacoes',        value:t.ld, icon:ICON.phone,  cls:'', spark:kpiSpark('ld') },
+    { key:'ce', metric:'CE', label:'Contato efetivo', value:t.ce, icon:ICON.msg,    cls: t.ce>=need ? 'is-ok' : 'is-bad', spark:kpiSpark('ce') },
+    { key:'rm', metric:'RM', label:'Reuniao marcada', value:t.rm, icon:ICON.cal,    cls: t.rm>=rmNeed ? 'is-ok' : 'is-warn', spark:kpiSpark('rm') },
+    { key:'rr', metric:'RR', label:'Reuniao realiz.', value:t.rr, icon:ICON.users,  cls:'', spark:kpiSpark('rr') },
+    { key:'fr', metric:'FR', label:'Fechamento',      value:t.fr, icon:ICON.trophy, cls: t.fr>0 ? 'is-ok' : '', spark:kpiSpark('fr') },
   ]
 })
 
 const paceRows = computed(() => {
-  const t     = monthTotals.value
-  const color = (v: number, n: number) => v>=n ? '#16a34a' : v>=n*.8 ? '#d97706' : '#dc2626'
+  const t = monthTotals.value
+  const color = (v: number, n: number) => v>=n ? 'var(--ok)' : v>=n*.8 ? 'var(--warn)' : 'var(--bad)'
   const pct   = (v: number, n: number) => Math.min(100, n>0 ? Math.round((v/n)*100) : 0)
-  const ceN   = Math.floor(ceNec.value  * daysGone / totalWorkdays)
-  const rmN   = Math.floor(rmNec.value  * daysGone / totalWorkdays)
+  const ceN = Math.floor(ceNec.value * daysGone / totalWorkdays)
+  const rmN = Math.floor(rmNec.value * daysGone / totalWorkdays)
   return [
-    { label:'Contatos efetivos', current:t.ce, target:ceNec.value,  pct:pct(t.ce,ceNec.value),
-      color:color(t.ce,ceN),  note:`${cePerDay.value}/dia · hoje: ${quickForm.ce||0}` },
-    { label:'Reuniões marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),
-      color:color(t.rm,rmN),  note:`meta: ${rmPerDay.value}/dia` },
-    { label:'Fechamentos',       current:t.fr, target:fechNec.value, pct:pct(t.fr,fechNec.value),
-      color:t.fr>=fechNec.value?'#16a34a':'#dc2626', note:`meta: ${fechNec.value} no mês` },
+    { label:'Contatos efetivos', current:t.ce, target:ceNec.value,  pct:pct(t.ce,ceNec.value),  color:color(t.ce,ceN) },
+    { label:'Reunioes marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),  color:color(t.rm,rmN) },
+    { label:'Fechamentos',       current:t.fr, target:fechNec.value, pct:pct(t.fr,fechNec.value), color:t.fr>=fechNec.value?'var(--ok)':'var(--bad)' },
   ]
 })
 
-// ── Today tasks ─────────────────────────────────────────────────────────
 const { data: urgentLeadsData } = await useAsyncData('urgent-leads', async () => {
   const { data } = await supabase.from('leads').select('id,decisor,data_retorno,resultado')
     .not('resultado', 'in', '("Fechado","Recusado","Sem interesse")')
     .not('data_retorno', 'is', null)
     .lte('data_retorno', new Date(Date.now() + 2*86400000).toISOString().slice(0,10))
-    .order('data_retorno').limit(4)
+    .order('data_retorno').limit(5)
   return data || []
 })
-
 const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
-  const diff = Math.floor(
-    (new Date(l.data_retorno!).setHours(0,0,0,0) - new Date(todayStr).setHours(0,0,0,0)) / 86400000
-  )
-  return {
-    ...l,
-    sub:      diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'retorno hoje' : 'retorno amanhã',
-    tagLabel: diff < 0 ? 'vencido' : diff === 0 ? 'hoje' : 'amanhã',
-    tagClass: diff < 0 ? 'tag-red' : diff === 0 ? 'tag-amber' : 'tag-blue',
-  }
+  const diff = Math.floor((new Date(l.data_retorno!).setHours(0,0,0,0) - new Date(todayStr).setHours(0,0,0,0)) / 86400000)
+  return { ...l, sub: diff < 0 ? `atrasado ${Math.abs(diff)}d` : diff === 0 ? 'hoje' : 'amanhã', cls: diff < 0 ? 'is-bad' : diff === 0 ? 'is-warn' : 'is-info' }
 }))
 </script>
 
-<style>
+<style scoped>
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+.skel { background:var(--bg-subtle); animation:pulse 1.5s infinite; }
+.dash { max-width: 1200px; }
 
-.pace-ok   { background:var(--ok-bg); border-color:var(--ok-bd) !important; color:var(--ok); }
-.pace-warn { background:var(--warn-bg); border-color:var(--warn-bd) !important; color:var(--warn); }
-.pace-bad  { background:var(--bad-bg); border-color:var(--bad-bd) !important; color:var(--bad); }
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:20px; }
+.dash-greet { font-size:22px; font-weight:600; letter-spacing:-.02em; color:var(--text-1); line-height:1.1; }
+.dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
+.dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
+.dash-select { font-size:13px; padding:7px 11px; max-width:170px; width:auto; }
+.dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.1; }
+.dash-days-n { font-size:var(--num-md); font-weight:600; color:var(--text-2); }
+.dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
-.ck-label { font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px; }
-.ck-head  { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px; }
+/* ── Grid 12 col ─────────────────────────────────────────── */
+.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+.t-focus  { grid-column:span 8; }
+.t-gauge  { grid-column:span 4; }
+.t-funnel { grid-column:span 8; }
+.t-hot    { grid-column:span 4; }
+.t-kpis   { grid-column:span 12; }
+.t-reg    { grid-column:span 8; }
+.t-follow { grid-column:span 4; }
+.t-ritmo  { grid-column:span 6; }
+.t-spark  { grid-column:span 6; }
 
-/* ── Foco agora (hero acionavel) ─────────────────────────── */
-.focus-hero {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+.tile { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; display:flex; flex-direction:column; }
+.tile-head { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-2); }
+.tile-ic { width:15px; height:15px; flex-shrink:0; fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.tile-cap { margin-left:auto; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-3); }
+.pill { font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--bg-subtle); color:var(--text-2); text-transform:uppercase; letter-spacing:.04em; }
+.pill.is-urgent, .pill.is-bad { color:var(--bad); background:var(--bad-bg); }
+.pill.is-today, .pill.is-pace, .pill.is-warn { color:var(--warn); background:var(--warn-bg); }
+.pill.is-clear, .pill.is-ok { color:var(--ok); background:var(--ok-bg); }
+.pill.is-hot { color:var(--accent); background:var(--accent-soft); }
+
+/* ── Foco ────────────────────────────────────────────────── */
+.focus-title { font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:1.3; color:var(--text-1); max-width:580px; }
+.focus-desc { font-size:13px; color:var(--text-2); margin-top:10px; line-height:1.6; max-width:540px; }
+.focus-cta { align-self:flex-start; margin-top:20px; }
+
+/* ── Gauge ───────────────────────────────────────────────── */
+.t-gauge { align-items:center; }
+.gauge-wrap { display:flex; justify-content:center; padding:4px 0; }
+.gauge-svg { width:120px; height:120px; }
+.gauge-pct { font-family:var(--font-mono); font-size:var(--num-hero); font-weight:600; fill:var(--text-1); }
+.gauge-cap { font-size:9px; fill:var(--text-3); text-transform:uppercase; letter-spacing:.08em; }
+.gauge-foot { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center; }
+
+/* ── Funil ───────────────────────────────────────────────── */
+.fn-bars { display:flex; flex-direction:column; flex:1; justify-content:center; padding:4px 0; }
+.fn-row { display:flex; align-items:center; gap:10px; }
+.fn-lbl { font-size:11px; color:var(--text-2); width:114px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:1px; overflow:hidden; }
+.fn-fill { height:100%; background:var(--accent); border-radius:1px; opacity:.88; transition:width .5s ease; }
+.fn-val { font-size:12px; font-weight:600; color:var(--text-1); width:42px; text-align:right; flex-shrink:0; }
+.fn-gap { display:flex; align-items:center; gap:5px; padding:3px 0 3px 124px; }
+.fn-chevron { color:var(--text-3); flex-shrink:0; }
+.fn-rate { font-size:10px; font-weight:500; color:var(--text-3); }
+.empty-mini { font-size:12px; color:var(--text-3); padding:24px 0; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; }
+
+/* ── Lead quente ─────────────────────────────────────────── */
+.t-hot { text-decoration:none; transition:border-color .12s; }
+.t-hot:hover { border-color:var(--accent); }
+.hot-name { font-size:15px; font-weight:600; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-company { font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hot-spacer { flex:1; min-height:14px; }
+.hot-value { font-size:var(--num-lg); font-weight:600; color:var(--accent); letter-spacing:-.01em; }
+.hot-status { font-size:11px; color:var(--text-3); margin-top:5px; display:flex; align-items:center; gap:6px; }
+.hot-status .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+/* ── KPIs ────────────────────────────────────────────────── */
+.kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:0; }
+.kpi { padding:0 18px; border-left:1px solid var(--border-soft); display:flex; flex-direction:column; }
+.kpi:first-child { padding-left:0; border-left:none; }
+.kpi-top { display:flex; align-items:center; gap:6px; color:var(--text-2); }
+.kpi-ic { width:14px; height:14px; fill:none; stroke:var(--text-3); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.kpi-name { font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--text-2); }
+.kpi-num { font-size:var(--num-hero); font-weight:600; color:var(--text-1); letter-spacing:-.02em; line-height:1; margin-top:10px; }
+.kpi-num.is-ok { color:var(--ok); } .kpi-num.is-warn { color:var(--warn); } .kpi-num.is-bad { color:var(--bad); }
+.kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.7; }
+.kpi-spark-empty { height:20px; margin-top:8px; }
+.kpi-sub { font-size:11px; color:var(--text-3); margin-top:7px; }
+
+/* ── Registrar ───────────────────────────────────────────── */
+.reg-actions { margin-left:auto; display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0; }
+.saved-flag { font-size:11px; color:var(--ok); }
+.reg-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.reg-cell { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.reg-cell-label { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-3); }
+input.reg-input { text-align:center; font-size:var(--num-md); font-weight:600; padding:9px 4px; }
+.reg-cell-meta { font-size:10px; color:var(--text-3); }
+.reg-foot { font-size:12px; color:var(--text-2); margin-top:14px; }
+.reg-foot strong { color:var(--text-1); font-weight:600; }
+.hint { font-size:11px; color:var(--text-3); }
+
+/* ── Follow-ups ──────────────────────────────────────────── */
+.follow-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border-soft); text-decoration:none; }
+.follow-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.follow-dot.is-bad { background:var(--bad); } .follow-dot.is-warn { background:var(--warn); } .follow-dot.is-info { background:var(--info); }
+.follow-name { font-size:13px; font-weight:500; color:var(--text-1); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.follow-sub { font-size:12px; color:var(--text-3); flex-shrink:0; }
+.follow-all { font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; margin-top:14px; }
+
+/* ── Ritmo ───────────────────────────────────────────────── */
+.pace-row { margin-bottom:16px; }
+.pace-row:last-child { margin-bottom:0; }
+.pace-row-head { display:flex; justify-content:space-between; font-size:13px; color:var(--text-2); margin-bottom:7px; }
+.pace-row-head span:last-child { color:var(--text-1); font-weight:600; }
+.track { height:6px; background:var(--bg-subtle); overflow:hidden; }
+.track-fill { height:100%; transition:width .4s; }
+
+/* ── Spark ───────────────────────────────────────────────── */
+.ce-chart { width:100%; height:100px; }
+.spark-foot { font-size:12px; color:var(--text-2); margin-top:10px; }
+
+@media (max-width: 1000px) {
+  .grid { grid-template-columns:repeat(6,1fr); }
+  .t-focus, .t-funnel, .t-reg { grid-column:span 6; }
+  .t-gauge, .t-hot { grid-column:span 3; }
+  .t-kpis { grid-column:span 6; }
+  .t-follow, .t-ritmo, .t-spark { grid-column:span 6; }
 }
-.focus-hero:has(.focus-hot) { grid-template-columns: 1fr 220px; }
-.focus-main { display: flex; flex-direction: column; min-width: 0; }
-.focus-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--text-3);
-  margin-bottom: 8px;
-}
-.focus-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-.focus-title { font-size: 18px; font-weight: 600; color: var(--text-1); letter-spacing: -.02em; line-height: 1.25; }
-.focus-sub { font-size: 13px; color: var(--text-2); margin-top: 5px; line-height: 1.5; }
-.focus-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  align-self: flex-start;
-  margin-top: 14px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background .12s;
-}
-.focus-cta:hover { background: var(--accent-dark); }
-
-/* Tom por urgencia: borda esquerda + cor do dot/cta */
-.focus-hero--urgent { border-left: 3px solid #dc2626; }
-.focus-hero--urgent .focus-dot, .focus-hero--urgent .focus-cta { background: #dc2626; }
-.focus-hero--urgent .focus-cta:hover { background: var(--bad); }
-.focus-hero--today  { border-left: 3px solid #d97706; }
-.focus-hero--today .focus-dot, .focus-hero--today .focus-cta { background: #d97706; }
-.focus-hero--today .focus-cta:hover { background: var(--warn); }
-.focus-hero--pace   { border-left: 3px solid #d97706; }
-.focus-hero--pace .focus-dot, .focus-hero--pace .focus-cta { background: #d97706; }
-.focus-hero--pace .focus-cta:hover { background: var(--warn); }
-.focus-hero--hot    { border-left: 3px solid var(--accent); }
-.focus-hero--clear  { border-left: 3px solid #16a34a; }
-.focus-hero--clear .focus-dot, .focus-hero--clear .focus-cta { background: #16a34a; }
-.focus-hero--clear .focus-cta:hover { background: var(--ok); }
-
-/* Card do lead mais quente */
-.focus-hot {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-soft);
-  text-decoration: none;
-  transition: border-color .12s;
-}
-.focus-hot:hover { border-color: var(--accent); }
-.focus-hot-label {
-  display: inline-flex;
-  align-items: center;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: #d97706;
-  margin-bottom: 4px;
-}
-.focus-hot-name { font-size: 14px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.focus-hot-company { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.focus-hot-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; }
-.focus-hot-value { font-size: 15px; font-weight: 700; color: #16a34a; letter-spacing: -.01em; }
-.focus-hot-status { font-size: 10px; font-weight: 500; color: var(--text-2); background: var(--bg-card); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-
-@media (max-width: 640px) {
-  .focus-hero, .focus-hero:has(.focus-hot) { grid-template-columns: 1fr !important; }
-}
-
-@media (max-width: 640px) {
-  .cockpit-kpi-grid   { grid-template-columns: repeat(2, 1fr) !important; }
-  .cockpit-quick-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .cockpit-charts     { grid-template-columns: 1fr !important; }
+@media (max-width: 600px) {
+  .grid { grid-template-columns:1fr; gap:10px; }
+  .grid > section, .grid > a { grid-column:span 1 !important; }
+  .kpi-row { grid-template-columns:repeat(2,1fr); gap:14px 0; }
+  .kpi:nth-child(odd) { padding-left:0; border-left:none; }
+  .kpi:nth-child(even) { padding-left:14px; }
 }
 </style>

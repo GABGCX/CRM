@@ -4,19 +4,19 @@
 
       <!-- Brand -->
       <div style="text-align:center;margin-bottom:28px">
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:#193497;border-radius:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(25,52,151,.3)">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#0f62fe;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 14px rgba(15,98,254,.18)">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
             <circle cx="12" cy="12" r="4" fill="white"/>
             <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 style="font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin:0 0 6px">Criar conta no Prospecta</h1>
+        <h1 style="font-size:23px;font-weight:600;color:var(--text-1);letter-spacing:-.03em;margin:0 0 7px">Criar conta no Prospecta</h1>
         <p style="font-size:14px;color:var(--text-2);margin:0">Configure sua prospecção em minutos</p>
       </div>
 
       <form @submit.prevent="handleRegister"
-        style="background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:14px">
+        style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:14px">
 
         <div v-if="error"
           style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
@@ -64,7 +64,7 @@
               .{{ appDomain }}
             </span>
           </div>
-          <p v-if="form.slug" style="font-size:12px;color:#193497;margin:4px 0 0;font-weight:500">
+          <p v-if="form.slug" style="font-size:12px;color:#0f62fe;margin:4px 0 0;font-weight:500">
             Acesso em: <strong>{{ form.slug }}.{{ appDomain }}</strong>
           </p>
         </div>
@@ -81,7 +81,7 @@
 
       <p style="text-align:center;font-size:13px;color:var(--text-2);margin-top:20px">
         Já tem conta?
-        <NuxtLink to="/login" style="color:#193497;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
+        <NuxtLink to="/login" style="color:#0f62fe;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
       </p>
     </div>
   </div>

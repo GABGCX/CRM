@@ -193,7 +193,7 @@ function goBdr(id: string) { navigateTo(`/dashboard/gestao/${id}`) }
 .gm-summary { display:flex;align-items:stretch;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 4px;margin-bottom:14px;flex-wrap:wrap }
 .gm-sum-item { display:flex;flex-direction:column;gap:2px;padding:0 18px;flex:1;min-width:120px }
 .gm-sum-label { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3) }
-.gm-sum-value { font-size:20px;font-weight:600;color:var(--text-1);letter-spacing:-.02em;line-height:1.1 }
+.gm-sum-value { font-size:var(--num-lg);font-weight:600;color:var(--text-1);letter-spacing:-.01em;line-height:1.1;font-family:var(--font-mono);font-variant-numeric:tabular-nums }
 .gm-sum-hint { font-size:11px;color:var(--text-3) }
 .gm-sum-div { width:1px;background:var(--border-soft) }
 

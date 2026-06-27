@@ -25,7 +25,7 @@
       <div class="pipe-summary-divider"></div>
       <div class="pipe-summary-item">
         <span class="pipe-summary-label">Previsao ponderada</span>
-        <span class="pipe-summary-value" style="color:#16a34a">R$ {{ fmtMoney(Math.round(weightedForecast)) }}</span>
+        <span class="pipe-summary-value" style="color:var(--ok)">R$ {{ fmtMoney(Math.round(weightedForecast)) }}</span>
         <span class="pipe-summary-hint">por probabilidade de estagio</span>
       </div>
       <div class="pipe-summary-divider"></div>
@@ -200,7 +200,7 @@
               </div>
               <div v-if="i < FUNNEL_STAGES.length - 1"
                 style="width:16px;height:2px;flex-shrink:0"
-                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#193497' : 'var(--border)' }" />
+                :style="{ background: funnelStagePassed(selectedLead.resultado, i) ? '#0f62fe' : 'var(--border)' }" />
             </template>
           </div>
 
@@ -426,7 +426,7 @@
                 <label class="input-label">
                   Data de retorno
                   <button type="button" @click="suggestRetorno"
-                    style="border:none;background:none;color:#193497;font-size:11px;cursor:pointer;padding:0 0 0 4px;font-family:inherit">
+                    style="border:none;background:none;color:#0f62fe;font-size:11px;cursor:pointer;padding:0 0 0 4px;font-family:inherit">
                     +2d
                   </button>
                 </label>
@@ -448,7 +448,7 @@
 
               <div style="grid-column:span 2">
                 <button type="button" @click="showExtra = !showExtra"
-                  style="background:none;border:none;color:#193497;font-size:12px;cursor:pointer;padding:0;font-family:inherit;font-weight:500">
+                  style="background:none;border:none;color:#0f62fe;font-size:12px;cursor:pointer;padding:0;font-family:inherit;font-weight:500">
                   {{ showExtra ? '▲ Ocultar dados adicionais' : '▼ Dados adicionais (ICP)' }}
                 </button>
               </div>
@@ -981,39 +981,41 @@ async function handleCreateLead() {
   gap: 0;
   background: var(--bg-card, #fff);
   border: 1px solid var(--border, var(--border-soft));
-  border-radius: 10px;
-  padding: 12px 4px;
-  margin-bottom: 12px;
+  border-radius: var(--radius);
+  padding: 16px 6px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
 }
 .pipe-summary-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 18px;
+  gap: 6px;
+  padding: 0 22px;
   flex: 1;
-  min-width: 140px;
+  min-width: 150px;
 }
 .pipe-summary-label {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: .08em;
   color: var(--text-3, var(--text-3));
 }
 .pipe-summary-value {
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text-1, var(--text-1));
-  letter-spacing: -.02em;
-  line-height: 1.1;
+  letter-spacing: -.01em;
+  line-height: 1.05;
+  font-family: var(--font-mono);
 }
 .pipe-summary-hint { font-size: 11px; color: var(--text-3, var(--text-3)); }
 .pipe-summary-divider { width: 1px; background: var(--border-soft, var(--border-soft)); align-self: stretch; }
 
 .lead-value {
   font-weight: 600;
-  color: #16a34a;
+  color: var(--ok);
   background: var(--ok-bg);
   border: 1px solid var(--ok-bd);
   border-radius: 4px;
@@ -1055,8 +1057,8 @@ async function handleCreateLead() {
 .pipe-view:hover { color: var(--text-1); }
 .pipe-view.active {
   background: var(--bg-card, #fff);
-  color: var(--accent);
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
 }
 .pipe-filters {
   display: flex;
@@ -1169,7 +1171,7 @@ async function handleCreateLead() {
   transition: all .12s;
 }
 .lead-row:hover       { border-color: var(--border); }
-.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(25,52,151,.12); }
+.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.12); }
 .lead-row-qa          { opacity: 0; transition: opacity .12s; }
 .lead-row:hover .lead-row-qa,
 .lead-row:focus-within .lead-row-qa { opacity: 1; }

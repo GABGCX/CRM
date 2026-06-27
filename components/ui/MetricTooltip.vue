@@ -83,7 +83,7 @@ const show  = ref(false)
 .metric-tip-trigger:hover,
 .metric-tip-trigger:focus {
   background: var(--accent-bd);
-  color: #193497;
+  color: #0f62fe;
 }
 
 .metric-tip-popover {

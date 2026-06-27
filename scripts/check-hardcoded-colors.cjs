@@ -11,7 +11,8 @@ const path = require('path')
 // (dots de status, cores de funil, branco-sobre-cor, preto de sombra ja e rgba).
 const ALLOW = new Set([
   '#fff', '#ffffff',            // texto branco sobre fundo colorido
-  '#193497', '#0f2480',         // cobalt (marca) - usado em SVG/markup
+  '#193497', '#0f2480',         // cobalt (legado)
+  '#0f62fe', '#0353e9',         // azul IBM Carbon (marca atual)
   '#16a34a', '#dc2626', '#d97706', '#f59e0b', '#ef4444', // status (quando literal em SVG/JS-driven)
   '#2563eb', '#7c3aed', '#0d9488', '#8b5cf6', '#14b8a6',
   '#f97316', '#06b6d4', '#3b82f6', '#6366f1', '#64748b',

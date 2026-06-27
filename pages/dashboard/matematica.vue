@@ -52,13 +52,13 @@
           </div>
           <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
             <span style="font-size:20px;font-weight:600" class="tabular"
-              :style="{ color: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
+              :style="{ color: r.status === 'ok' ? 'var(--ok)' : r.status === 'warn' ? 'var(--warn)' : 'var(--bad)' }">
               {{ r.value }}%
             </span>
             <div style="width:120px;height:6px;background:var(--border-soft);border-radius:3px;overflow:hidden">
               <div style="height:100%;border-radius:3px;transition:width .4s"
                 :style="{ width: Math.min(100, r.raw / r.benchmarkRaw * 100) + '%',
-                  background: r.status === 'ok' ? '#16a34a' : r.status === 'warn' ? '#d97706' : '#dc2626' }">
+                  background: r.status === 'ok' ? 'var(--ok)' : r.status === 'warn' ? 'var(--warn)' : 'var(--bad)' }">
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@
         <div style="padding:16px;border-right:1px solid var(--border)">
           <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">Pipeline quente</div>
           <div class="metric-value" style="font-size:22px"
-            :style="{ color: hotPipeline > 0 ? '#16a34a' : 'var(--text-1)' }">
+            :style="{ color: hotPipeline > 0 ? 'var(--ok)' : 'var(--text-1)' }">
             {{ hotPipeline > 0 ? 'R$ ' + hotPipeline.toLocaleString('pt-BR') : '--' }}
           </div>
           <div style="font-size:11px;color:var(--text-3);margin-top:4px">Reuniao + Proposta enviada</div>
@@ -99,7 +99,7 @@
         <div style="padding:16px">
           <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">vs. Meta mensal</div>
           <div class="metric-value" style="font-size:22px"
-            :style="{ color: forecastVsMeta >= 100 ? '#16a34a' : forecastVsMeta >= 60 ? '#d97706' : '#dc2626' }">
+            :style="{ color: forecastVsMeta >= 100 ? 'var(--ok)' : forecastVsMeta >= 60 ? 'var(--warn)' : 'var(--bad)' }">
             {{ hotPipeline > 0 ? forecastVsMeta.toFixed(0) + '%' : '--' }}
           </div>
           <div style="font-size:11px;color:var(--text-3);margin-top:4px">Meta: R$ {{ localMeta.toLocaleString('pt-BR') }}</div>
@@ -187,7 +187,7 @@ const bottleneck = computed(() => {
     title:     'Gargalo: conversão de reunião em fechamento (RR→FR)',
     body:      `Taxa atual: ${realRRFR.value.toFixed(0)}% contra benchmark de 40%.`,
     action:    'Foco: técnica de negociação e fechamento, não em prospecção.',
-    style:     'background:#fef2f2;border-color:#fecaca;color:#7f1d1d',
+    style:     'background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad)',
     icon:      ICON_ALERT,
     iconLabel: 'Gargalo identificado',
   }
@@ -195,7 +195,7 @@ const bottleneck = computed(() => {
     title:     'Gargalo: conversão de contato em reunião (CE→RM)',
     body:      `Taxa CE→RM atual: ${realCERM.value.toFixed(1)}% contra benchmark de 2.7%.`,
     action:    'Foco: script de abertura e geração de interesse.',
-    style:     'background:#fffbeb;border-color:#fde68a;color:#78350f',
+    style:     'background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn)',
     icon:      ICON_ALERT,
     iconLabel: 'Gargalo identificado',
   }
@@ -203,7 +203,7 @@ const bottleneck = computed(() => {
     title:     'Taxas dentro do benchmark',
     body:      `CE→RM: ${realCERM.value.toFixed(1)}% · RM→RR: ${realRMRR.value.toFixed(0)}%. Continue no ritmo.`,
     action:    'Mantenha o volume diário de contatos.',
-    style:     'background:#f0fdf4;border-color:#bbf7d0;color:#14532d',
+    style:     'background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)',
     icon:      ICON_CHECK,
     iconLabel: 'No ritmo certo',
   }
@@ -267,9 +267,9 @@ async function debounceSave() {
 
 /* ── Funil horizontal de numeros de ouro ─────────────────── */
 .mr-chain { display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0 }
-.mr-chain-step { flex:1;min-width:110px;text-align:center;padding:10px 8px;border:1px solid var(--border-soft);border-radius:10px;background:var(--bg-subtle);display:flex;flex-direction:column;gap:3px;justify-content:center }
+.mr-chain-step { flex:1;min-width:120px;text-align:center;padding:10px 8px;border:1px solid var(--border-soft);border-radius:10px;background:var(--bg-subtle);display:flex;flex-direction:column;gap:3px;justify-content:center }
 .mr-chain-label { font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap }
-.mr-chain-value { font-size:26px;font-weight:700;color:var(--text-1);letter-spacing:-.02em;line-height:1.1 }
+.mr-chain-value { font-size:var(--num-lg);font-weight:600;color:var(--text-1);letter-spacing:-.01em;line-height:1.1;font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap }
 .mr-chain-perday { font-size:11px;color:var(--accent);font-weight:600 }
 .mr-chain-note { font-size:10px;color:var(--text-3) }
 .mr-chain-arrow { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-3);flex-shrink:0;padding:0 4px }

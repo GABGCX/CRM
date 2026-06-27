@@ -42,7 +42,7 @@ const STEPS = [
   {
     title: 'Seu pipeline de leads',
     body: `Em <strong>Pipeline</strong> você vê todos os seus leads e avança cada um pelo funil:<br><br>
-      <span style="color:#193497">Contato</span> &gt;
+      <span style="color:#0f62fe">Contato</span> &gt;
       <span style="color:#7c3aed">Reunião</span> &gt;
       <span style="color:#d97706">Proposta</span> &gt;
       <span style="color:#16a34a">Fechamento</span><br><br>
@@ -51,7 +51,7 @@ const STEPS = [
   {
     title: 'Os 4 números que importam',
     body: `Todo dia você registra 4 métricas em <strong>Meu Dia</strong>:<br><br>
-      <strong style="color:#193497">CE</strong>: Contato Efetivo, o decisor atendeu e conversou.<br>
+      <strong style="color:#0f62fe">CE</strong>: Contato Efetivo, o decisor atendeu e conversou.<br>
       <strong style="color:#7c3aed">RM</strong>: Reunião Marcada, lead aceitou agendar.<br>
       <strong style="color:#0d9488">RR</strong>: Reunião Realizada, a reunião aconteceu de fato.<br>
       <strong style="color:#d97706">FR</strong>: Fechamento, contrato assinado.<br><br>
@@ -134,7 +134,7 @@ function finish() {
 }
 
 .tour-dot.active {
-  background: #193497;
+  background: #0f62fe;
   transform: scale(1.25);
 }
 
@@ -182,7 +182,7 @@ function finish() {
   padding: 10px 16px;
   border: none;
   border-radius: 8px;
-  background: #193497;
+  background: #0f62fe;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -192,7 +192,7 @@ function finish() {
 }
 
 .tour-next:hover {
-  background: #0f2480;
+  background: #0353e9;
 }
 
 .tour-overlay-enter-active,

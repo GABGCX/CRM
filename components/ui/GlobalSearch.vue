@@ -75,19 +75,19 @@ const loading  = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
 const STATUS_DOT_COLOR: Record<string, string> = {
-  'Novo':               '#64748b',
-  'Prospecção':         '#6366f1',
-  'Qualificação':       '#0ea5e9',
-  'Aguardando retorno': '#f59e0b',
-  'Follow-up':          '#3b82f6',
-  'De molho':           '#8b5cf6',
-  'Reunião agendada':   '#0d9488',
-  'Enviar proposta':    '#f97316',
-  'Proposta enviada':   '#06b6d4',
-  'Fechado':            '#16a34a',
-  'Recusado':           '#ef4444',
-  'Sem interesse':      '#6b7280',
-  'Não atende':         '#9ca3af',
+  'Novo':               '#8a857d',
+  'Prospecção':         '#5b6bb0',
+  'Qualificação':       '#4f7fa8',
+  'Aguardando retorno': '#a87b35',
+  'Follow-up':          '#46599a',
+  'De molho':           '#7a6f9c',
+  'Reunião agendada':   '#3f7a74',
+  'Enviar proposta':    '#a8693f',
+  'Proposta enviada':   '#4f7d8a',
+  'Fechado':            '#4e8c6a',
+  'Recusado':           '#b14a44',
+  'Sem interesse':      '#8a857d',
+  'Não atende':         '#a8a39b',
 }
 function statusDotColor(status: string): string {
   return STATUS_DOT_COLOR[status] || '#cbd5e1'

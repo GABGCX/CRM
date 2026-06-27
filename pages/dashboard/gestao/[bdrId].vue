@@ -184,25 +184,25 @@ const bottleneck = computed(() => {
     eyebrow: 'Sem atividade', title: 'Nenhum contato registrado este mes',
     body: 'Este BDR ainda nao registrou contatos efetivos no diario.',
     action: 'Verifique se o diario esta sendo preenchido.',
-    style: 'background:#f1f5f9;border-color:#e2e8f0;color:#475569',
+    style: 'background:var(--bg-subtle);border-color:var(--border);color:var(--text-2)',
   }
   if (rrFr.value < 20 && t.value.rr > 0) return {
     eyebrow: 'Gargalo identificado', title: 'Conversao reuniao → fechamento (RR→FR)',
     body: `Taxa atual ${rrFr.value.toFixed(0)}% contra benchmark de 40%.`,
     action: 'Foco em tecnica de negociacao e fechamento, nao em prospeccao.',
-    style: 'background:#fef2f2;border-color:#fecaca;color:#7f1d1d',
+    style: 'background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad)',
   }
   if (ceRm.value < 1.5 && t.value.ce > 20) return {
     eyebrow: 'Gargalo identificado', title: 'Conversao contato → reuniao (CE→RM)',
     body: `Taxa CE→RM ${ceRm.value.toFixed(1)}% contra benchmark de 2.7%.`,
     action: 'Foco em script de abertura e geracao de interesse.',
-    style: 'background:#fffbeb;border-color:#fde68a;color:#78350f',
+    style: 'background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn)',
   }
   return {
     eyebrow: 'No ritmo', title: 'Taxas dentro do benchmark',
     body: `CE→RM ${ceRm.value.toFixed(1)}% · RM→RR ${rmRr.value.toFixed(0)}%.`,
     action: 'Manter o volume diario de contatos.',
-    style: 'background:#f0fdf4;border-color:#bbf7d0;color:#14532d',
+    style: 'background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)',
   }
 })
 </script>
@@ -215,9 +215,9 @@ const bottleneck = computed(() => {
 
 .gd-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px }
 @media(max-width:640px){ .gd-stats{ grid-template-columns:repeat(2,1fr) } }
-.gd-stat { background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px }
-.gd-stat-label { font-size:11px;color:var(--text-2);margin-bottom:6px }
-.gd-stat-value { font-size:24px;font-weight:600;color:var(--text-1);letter-spacing:-.02em;font-variant-numeric:tabular-nums }
+.gd-stat { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm) }
+.gd-stat-label { font-size:11px;color:var(--text-2);margin-bottom:8px }
+.gd-stat-value { font-size:var(--num-lg);font-weight:600;color:var(--text-1);letter-spacing:-.01em;font-variant-numeric:tabular-nums;font-family:var(--font-mono) }
 .gd-stat-sub { font-size:11px;margin-top:4px;font-weight:500 }
 
 .gd-bottleneck { border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:14px }
@@ -238,7 +238,7 @@ const bottleneck = computed(() => {
 .gd-lead-link { flex:1;min-width:0;text-decoration:none }
 .gd-lead-name { font-size:13px;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .gd-lead-company { font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-.gd-lead-value { font-size:11px;font-weight:600;color:#16a34a;background:rgba(22,163,74,.10);border-radius:4px;padding:1px 6px;flex-shrink:0 }
+.gd-lead-value { font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:var(--radius-sm);padding:1px 6px;flex-shrink:0 }
 .gd-reassign { width:auto;flex-shrink:0;font-size:11px;padding:4px 6px }
 
 .gd-notes { display:flex;flex-direction:column;gap:7px;margin-top:14px }

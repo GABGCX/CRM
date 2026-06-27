@@ -27,7 +27,7 @@
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
           <span v-for="s in c.cadence_steps" :key="s.id"
-            style="font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:#0f2480;border:1px solid var(--accent-bd);display:inline-flex;align-items:center;gap:3px">
+            style="font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:#0353e9;border:1px solid var(--accent-bd);display:inline-flex;align-items:center;gap:3px">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0" v-html="channelIconHtml(s.channel)" />
             Dia {{ s.day_offset }}: {{ s.channel }}
           </span>
@@ -75,7 +75,7 @@
                     @click="s.channel = ch as CadenceChannel"
                     style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border-radius:7px;border:1px solid;cursor:pointer;font-family:inherit;font-size:9px;font-weight:500;transition:all .1s"
                     :style="s.channel === ch
-                      ? 'background:var(--accent-soft);border-color:#193497;color:#193497'
+                      ? 'background:var(--accent-soft);border-color:#0f62fe;color:#0f62fe'
                       : 'background:var(--bg-subtle);border-color:var(--border);color:var(--text-2)'">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="channelIconHtml(ch)" />
                     {{ CHANNEL_LABEL[ch] }}

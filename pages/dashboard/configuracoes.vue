@@ -25,7 +25,7 @@
       <!-- ── Metas ─────────────────────────────────────── -->
       <div class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
           </svg>
           Metas e financeiro
@@ -65,7 +65,7 @@
       <!-- ── Identidade visual ──────────────────────────── -->
       <div class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
           </svg>
           Personalização da marca
@@ -80,22 +80,6 @@
           </div>
 
           <div class="field">
-            <label class="label">Cor primária</label>
-            <div class="color-row">
-              <div class="color-swatch-wrap">
-                <input type="color" v-model="tf.primary_color" class="color-native" />
-              </div>
-              <input type="text" v-model="tf.primary_color" class="input mono"
-                style="width:96px;flex-shrink:0" maxlength="7" />
-              <div class="presets">
-                <button v-for="c in PRESETS" :key="c" type="button"
-                  class="preset" :class="{ 'preset-active': tf.primary_color === c }"
-                  :style="{ background: c }" @click="tf.primary_color = c" :title="c" />
-              </div>
-            </div>
-          </div>
-
-          <div class="field">
             <label class="label">URL do logo</label>
             <input v-model="tf.logo_url" type="url" placeholder="https://..." class="input" />
           </div>
@@ -107,16 +91,16 @@
           <div class="preview-block">
             <div class="preview-title">Preview</div>
             <div class="preview-card">
-              <div class="preview-logo" :style="{ background: tf.primary_color }">
+              <div class="preview-logo" style="background:var(--accent)">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
               </div>
               <div class="preview-info">
                 <div class="preview-name">{{ tf.product_name }}</div>
-                <div class="preview-url" :style="{ color: tf.primary_color }">{{ org?.slug }}.{{ appDomain }}</div>
+                <div class="preview-url" style="color:var(--accent)">{{ org?.slug }}.{{ appDomain }}</div>
               </div>
-              <button type="button" class="preview-cta" :style="{ background: tf.primary_color }">
+              <button type="button" class="preview-cta" style="background:var(--accent)">
                 Entrar
               </button>
             </div>
@@ -132,7 +116,7 @@
       <!-- ── Domínio ────────────────────────────────────── -->
       <div class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
           </svg>
           Domínio customizado
@@ -187,7 +171,7 @@
       <!-- ── Exportar dados ───────────────────────────── -->
       <div v-if="profile?.role === 'owner'" class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
           Exportar dados
@@ -203,7 +187,7 @@
       <!-- ── Etiquetas ───────────────────────────────────── -->
       <div class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
           </svg>
           Etiquetas
@@ -235,7 +219,7 @@
       <!-- ── Templates de mensagem ───────────────────────── -->
       <div class="card" style="grid-column:1/-1">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
             <line x1="16" y1="13" x2="8" y2="13"/>
@@ -327,7 +311,7 @@
       <!-- ── Equipe ─────────────────────────────────────── -->
       <div class="card">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
           </svg>
           Equipe
@@ -416,7 +400,7 @@
       <!-- ── Auditoria (owner only) ─────────────────────── -->
       <div v-if="profile?.role === 'owner'" class="card" style="grid-column:1/-1">
         <div class="card-header">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#193497;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#0f62fe;flex-shrink:0">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
           Log de auditoria
@@ -503,17 +487,15 @@ const showToast = (msg: string) => {
 
 // ── Constantes ────────────────────────────────────────────────────────
 const ROLE_LABELS: Record<string, string> = { owner:'Proprietário', admin:'Admin', bdr:'BDR' }
-const PRESETS = [
-  '#193497','#0f2480','#0a0a0a','#7c3aed',
-  '#db2777','#dc2626','#ea580c','#d97706','#16a34a','#0891b2',
-]
+// Marca travada em Carbon: a cor primaria nao e mais editavel; persiste o azul Carbon.
+const BRAND_COLOR = '#0f62fe'
 
 // ── Estado local ──────────────────────────────────────────────────────
 const localOrg = ref<typeof org.value>(null)
 
 // ── Forms ─────────────────────────────────────────────────────────────
 const sf = reactive({ name:'', meta_mensal:10000, ticket_medio:2000 })
-const tf = reactive({ product_name:'Outbound', primary_color:'#0a0a0a', logo_url:'', favicon_url:'' })
+const tf = reactive({ product_name:'Outbound', primary_color:BRAND_COLOR, logo_url:'', favicon_url:'' })
 const domainVal   = ref('')
 const inviteEmail = ref('')
 const inviteRole  = ref('bdr')
@@ -683,7 +665,7 @@ function syncFromOrg(o: NonNullable<typeof org.value>) {
   sf.meta_mensal   = o.settings?.meta_mensal  ?? 10000
   sf.ticket_medio  = o.settings?.ticket_medio ?? 2000
   tf.product_name  = o.theme?.product_name  || 'Outbound'
-  tf.primary_color = o.theme?.primary_color || '#0a0a0a'
+  tf.primary_color = BRAND_COLOR  // marca travada em Carbon; normaliza valor legado no proximo save
   tf.logo_url      = o.theme?.logo_url      || ''
   tf.favicon_url   = o.theme?.favicon_url   || ''
   domainVal.value  = o.custom_domain || ''
@@ -823,10 +805,10 @@ async function sendInvite() {
 .settings-page {
   --bg:var(--bg-subtle); --surface:#ffffff; --border:var(--border); --border-soft:var(--border-soft);
   --text-1:var(--text-1); --text-2:var(--text-2); --text-3:var(--text-3);
-  --accent:#16a34a; --danger:#dc2626; --danger-bg:var(--bad-bg); --danger-bdr:var(--bad-bd);
-  --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
+  --danger:var(--bad); --danger-bg:var(--bad-bg); --danger-bdr:var(--bad-bd);
+  --radius-sm:2px; --radius-md:2px; --radius-lg:2px;
   --transition:140ms cubic-bezier(0.16,1,0.3,1);
-  font-family:'Geist',-apple-system,sans-serif;
+  font-family:var(--font-sans),-apple-system,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 [data-theme="dark"] .settings-page {
@@ -835,7 +817,7 @@ async function sendInvite() {
   --danger-bg:rgba(224,149,149,.12); --danger-bdr:rgba(224,149,149,.25);
 }
 .page-header   { margin-bottom:16px }
-.page-title    { font-size:18px;font-weight:600;color:var(--text-1);letter-spacing:-.02em }
+.page-title    { font-size:22px;font-weight:600;color:var(--text-1);letter-spacing:-.025em }
 .page-sub      { font-size:13px;color:var(--text-3);margin-top:2px }
 .loading-state { padding:56px 0 }
 
@@ -855,7 +837,7 @@ async function sendInvite() {
 
 .input,.select { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-size:13px;padding:7px 10px;width:100%;outline:none;box-sizing:border-box;font-family:inherit;transition:border-color var(--transition),box-shadow var(--transition);-webkit-appearance:none;appearance:none }
 .input::placeholder { color:var(--text-3) }
-.input:focus,.select:focus { border-color:#193497;box-shadow:0 0 0 3px rgba(25,52,151,.12) }
+.input:focus,.select:focus { border-color:#0f62fe;box-shadow:0 0 0 3px rgba(15,98,254,.12) }
 .mono { font-family:"SF Mono","Fira Code",ui-monospace,monospace;font-size:12px;letter-spacing:.02em }
 .select { cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px }
 
@@ -867,7 +849,7 @@ async function sendInvite() {
 .projection-row { display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft) }
 .projection-row:last-child { border-bottom:none }
 .projection-label { font-size:12px;color:var(--text-2) }
-.projection-value { font-size:14px;font-weight:500;color:var(--text-1);font-variant-numeric:tabular-nums;letter-spacing:-.02em }
+.projection-value { font-size:14px;font-weight:600;color:var(--text-1);font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-family:var(--font-mono) }
 
 .color-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap }
 .color-swatch-wrap { width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden;flex-shrink:0;cursor:pointer }
@@ -905,7 +887,7 @@ async function sendInvite() {
 .member-email  { font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
 .members-empty { font-size:12px;color:var(--text-3);padding:6px 10px }
 .role-tag      { font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;letter-spacing:.03em;flex-shrink:0 }
-.role-owner    { background:var(--accent-soft);color:#193497;border:1px solid var(--accent-bd) }
+.role-owner    { background:var(--accent-soft);color:#0f62fe;border:1px solid var(--accent-bd) }
 .role-default  { background:var(--bg);color:var(--text-3);border:1px solid var(--border) }
 
 .invite-box   { border-top:1px solid var(--border-soft);padding-top:16px;display:flex;flex-direction:column;gap:10px }
@@ -915,8 +897,8 @@ async function sendInvite() {
 .btn:hover:not(:disabled) { background:var(--bg);border-color:var(--border) }
 .btn:active:not(:disabled) { transform:scale(.99) }
 .btn:disabled { opacity:.45;cursor:not-allowed }
-.btn-primary  { background:#193497;color:#fff;border-color:transparent }
-.btn-primary:hover:not(:disabled) { background:#0f2480;border-color:transparent }
+.btn-primary  { background:#0f62fe;color:#fff;border-color:transparent }
+.btn-primary:hover:not(:disabled) { background:#0353e9;border-color:transparent }
 
 @keyframes spin { to{transform:rotate(360deg)} }
 .spinner { width:12px;height:12px;border:1.5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0 }
