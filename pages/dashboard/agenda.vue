@@ -26,7 +26,7 @@
         </div>
         <NuxtLink
           v-for="l in g.leads" :key="l.id"
-          :to="`/dashboard/pipeline?highlight=${l.id}`"
+          :to="`/dashboard/leads/${l.id}`"
           class="agenda-row">
           <span class="agenda-name">{{ l.decisor || 'Sem nome' }}</span>
           <span class="agenda-company">{{ l.negocio || '' }}</span>
