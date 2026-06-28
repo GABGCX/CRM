@@ -166,6 +166,7 @@
             @close="confirmClose"
             @deleted="onLeadDeleted"
             @saved="showToast('Salvo!')"
+            @notify="showToast($event)"
             @unsaved="drawerUnsaved = $event" />
         </aside>
       </div>

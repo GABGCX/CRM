@@ -227,7 +227,7 @@ const props = withDefaults(defineProps<{
   showClose?: boolean
 }>(), { templates: () => [], customDefs: () => [], showClose: false })
 
-const emit = defineEmits<{ close: []; deleted: []; saved: []; unsaved: [v: boolean] }>()
+const emit = defineEmits<{ close: []; deleted: []; saved: []; unsaved: [v: boolean]; notify: [msg: string] }>()
 
 const { patchLead, toggleFU, deleteLead } = useLeads()
 
@@ -307,7 +307,7 @@ async function loadNotes() {
 async function onTagsChange(ids: string[]) {
   editForm.tag_ids = ids
   try { await patchLead(props.lead.id, { tag_ids: ids }) }
-  catch { /* noop */ }
+  catch { emit('notify', 'Erro ao salvar etiquetas.') }
 }
 
 function onStatusChange() {
@@ -345,6 +345,8 @@ async function saveLead() {
     await patchLead(props.lead.id, payload)
     hasUnsavedChanges.value = false
     emit('saved')
+  } catch {
+    emit('notify', 'Erro ao salvar. Verifique os campos.')
   } finally {
     detailSaving.value = false
   }
@@ -369,6 +371,8 @@ async function submitNote() {
     })
     leadNotes.value.unshift(note)
     newNote.value = ''
+  } catch {
+    emit('notify', 'Erro ao salvar nota.')
   } finally { noteSaving.value = false }
 }
 
@@ -376,7 +380,7 @@ async function deleteNote(noteId: string) {
   try {
     await $fetch(`/api/leads/${props.lead.id}/notes/${noteId}`, { method: 'DELETE' })
     leadNotes.value = leadNotes.value.filter(n => n.id !== noteId)
-  } catch { /* noop */ }
+  } catch { emit('notify', 'Erro ao remover nota.') }
 }
 
 const ACTIVITY_KINDS = [
@@ -398,6 +402,9 @@ async function logActivity(kind: string) {
       method: 'POST', body: { kind },
     })
     if (ev) leadEvents.value.unshift(ev)
+    emit('notify', 'Atividade registrada')
+  } catch {
+    emit('notify', 'Erro ao registrar atividade.')
   } finally { activitySaving.value = false }
 }
 

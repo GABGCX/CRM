@@ -26,7 +26,8 @@
         :templates="templates"
         :custom-defs="customDefs"
         @deleted="onDeleted"
-        @saved="showToast('Salvo!')" />
+        @saved="showToast('Salvo!')"
+        @notify="showToast($event)" />
     </div>
 
     <Transition name="toast"><div v-if="toast" class="toast">{{ toast }}</div></Transition>
