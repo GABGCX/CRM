@@ -506,9 +506,9 @@
       </div>
     </Transition>
 
-    <UiImportLeadsModal v-if="showImport" @close="showImport = false" @imported="onImported" />
+    <LazyUiImportLeadsModal v-if="showImport" @close="showImport = false" @imported="onImported" />
 
-    <UiLossReasonModal
+    <LazyUiLossReasonModal
       :show="showLossModal"
       :status="lossModalStatus"
       @confirm="onLossConfirm"

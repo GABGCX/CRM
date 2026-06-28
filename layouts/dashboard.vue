@@ -159,8 +159,8 @@
       </div>
     </main>
 
-    <UiGlobalSearch @select="onSearchSelect" />
-    <UiOnboardingTour />
+    <LazyUiGlobalSearch @select="onSearchSelect" />
+    <LazyUiOnboardingTour />
 
     <Transition name="toast">
       <div v-if="errorToast" class="layout-toast layout-toast-error">
