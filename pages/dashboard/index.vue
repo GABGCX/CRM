@@ -2,7 +2,7 @@
   <div class="dash">
     <header class="dash-head">
       <div>
-        <h1 class="dash-greet">Bom {{ greeting }}, {{ firstName }}</h1>
+        <h1 class="dash-greet">{{ greeting }}, {{ firstName }}</h1>
         <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
       </div>
       <div class="dash-head-right">
@@ -12,7 +12,7 @@
         </select>
         <div class="dash-days">
           <span class="dash-days-n tabular">{{ workdaysLeft }}</span>
-          <span class="dash-days-l">dias uteis restantes</span>
+          <span class="dash-days-l">dias úteis restantes</span>
         </div>
       </div>
     </header>
@@ -52,10 +52,10 @@
         </div>
       </section>
 
-      <!-- Funil do mes -->
+      <!-- Funil do mês -->
       <section class="tile t-funnel">
-        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.funnel" /><span>Funil do mes</span><span class="tile-cap">{{ MONTH_NAMES[currentMonth-1] }}</span></div>
-        <div v-if="!monthTotals.ld && !monthTotals.ce" class="empty-mini">Sem atividade registrada no mes.</div>
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.funnel" /><span>Funil do mês</span><span class="tile-cap">{{ MONTH_NAMES[currentMonth-1] }}</span></div>
+        <div v-if="!monthTotals.ld && !monthTotals.ce" class="empty-mini">Sem atividade registrada no mês.</div>
         <div v-else class="fn-bars">
           <template v-for="(row, i) in funnelRows" :key="row.key">
             <div v-if="i > 0" class="fn-gap">
@@ -87,7 +87,7 @@
         <div v-else class="empty-mini" style="text-align:left">Nenhuma oportunidade aberta com valor.</div>
       </component>
 
-      <!-- KPIs do mes com sparkline -->
+      <!-- KPIs do mês com sparkline -->
       <section class="tile t-kpis">
         <div class="kpi-row">
           <div v-for="k in kpiStrip" :key="k.key" class="kpi">
@@ -121,7 +121,7 @@
             <span class="reg-cell-meta">meta {{ f.meta }}</span>
           </label>
         </div>
-        <div class="reg-foot">CE&rarr;RM hoje <strong>{{ todayCERMRate }}%</strong> · mes <strong>{{ monthCERMRate }}%</strong> · <span class="hint">Ctrl+S salva</span></div>
+        <div class="reg-foot">CE&rarr;RM hoje <strong>{{ todayCERMRate }}%</strong> · mês <strong>{{ monthCERMRate }}%</strong> · <span class="hint">Ctrl+S salva</span></div>
       </section>
 
       <!-- Follow-ups hoje -->
@@ -138,7 +138,7 @@
 
       <!-- Ritmo -->
       <section class="tile t-ritmo">
-        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.activity" /><span>Ritmo do mes</span></div>
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.activity" /><span>Ritmo do mês</span></div>
         <div v-for="r in paceRows" :key="r.label" class="pace-row">
           <div class="pace-row-head">
             <span>{{ r.label }}</span>
@@ -150,7 +150,7 @@
 
       <!-- Evolucao CE -->
       <section class="tile t-spark">
-        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.trend" /><span>Evolucao CE no mes</span><span class="tile-cap">acumulado vs meta {{ ceNec }}</span></div>
+        <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.trend" /><span>Evolução CE no mês</span><span class="tile-cap">acumulado vs meta {{ ceNec }}</span></div>
         <div v-if="diaryPending" class="skel" style="height:100px" />
         <svg v-else viewBox="0 0 240 90" preserveAspectRatio="none" class="ce-chart">
           <defs>
@@ -204,7 +204,7 @@ const alreadySaved = ref(false)
 
 const showToast  = (m: string) => { toast.value = m; setTimeout(() => toast.value = null, 2500) }
 const hour       = now.getHours()
-const greeting   = hour < 12 ? 'dia' : hour < 18 ? 'tarde' : 'noite'
+const greeting   = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
 const firstName  = computed(() => (profile.value?.name || '').split(' ')[0] || 'BDR')
 const todayLabel = now.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' })
 const currentWeek = Math.ceil(now.getDate() / 7)
@@ -332,10 +332,10 @@ const paceColor = computed(() => ceDelta.value >= 5 ? 'var(--ok)' : ceDelta.valu
 const funnelRows = computed(() => {
   const t = monthTotals.value
   const stages = [
-    { key:'LD', label:'Ligacoes',        v: t.ld },
+    { key:'LD', label:'Ligações',        v: t.ld },
     { key:'CE', label:'Contato efetivo', v: t.ce },
-    { key:'RM', label:'Reuniao marcada', v: t.rm },
-    { key:'RR', label:'Reuniao realiz.', v: t.rr },
+    { key:'RM', label:'Reunião marcada', v: t.rm },
+    { key:'RR', label:'Reunião realiz.', v: t.rr },
     { key:'FR', label:'Fechamento',      v: t.fr },
   ]
   const maxV = Math.max(...stages.map(s => s.v), 1)
@@ -351,10 +351,10 @@ const focusAction = computed(() => {
   const ov = overdueLeads.value.length
   if (ov > 0) return { tone:'urgent', title:`${ov} retorno${ov>1?'s':''} vencido${ov>1?'s':''} para ligar agora`, sub:'Lead parado perde temperatura a cada dia. Comece pelos mais antigos.', cta:'Trabalhar fila de vencidos', to:'/dashboard/followup' }
   const dt = (urgentLeadsData.value || []).filter(l => l.data_retorno === todayStr).length
-  if (dt > 0) return { tone:'today', title:`${dt} retorno${dt>1?'s':''} agendado${dt>1?'s':''} para hoje`, sub:'Mantenha a cadencia em dia para nao acumular amanha.', cta:'Ver retornos de hoje', to:'/dashboard/followup' }
-  if (ceDelta.value < 0) return { tone:'pace', title:`Faltam ${Math.abs(ceDelta.value)} contatos para o ritmo de hoje`, sub:`Voce fez ${monthTotals.value.ce} CE no mes. O ritmo pede ${ceNeededByToday.value} ate agora.`, cta:'Registrar contatos', to:'/dashboard/diario' }
+  if (dt > 0) return { tone:'today', title:`${dt} retorno${dt>1?'s':''} agendado${dt>1?'s':''} para hoje`, sub:'Mantenha a cadência em dia para não acumular amanhã.', cta:'Ver retornos de hoje', to:'/dashboard/followup' }
+  if (ceDelta.value < 0) return { tone:'pace', title:`Faltam ${Math.abs(ceDelta.value)} contatos para o ritmo de hoje`, sub:`Você fez ${monthTotals.value.ce} CE no mês. O ritmo pede ${ceNeededByToday.value} até agora.`, cta:'Registrar contatos', to:'/dashboard/diario' }
   if (hottestLead.value) return { tone:'hot', title:`Avance ${hottestLead.value.decisor} no funil`, sub:`Maior oportunidade aberta: R$ ${(hottestLead.value.valor_estimado || 0).toLocaleString('pt-BR')} em ${hottestLead.value.resultado}.`, cta:'Abrir no pipeline', to:`/dashboard/pipeline?highlight=${hottestLead.value.id}` }
-  return { tone:'clear', title:'Tudo em dia. Hora de prospectar.', sub:'Sem pendencias urgentes. Gere novos contatos para alimentar o funil.', cta:'Adicionar leads', to:'/dashboard/pipeline' }
+  return { tone:'clear', title:'Tudo em dia. Hora de prospectar.', sub:'Sem pendências urgentes. Gere novos contatos para alimentar o funil.', cta:'Adicionar leads', to:'/dashboard/pipeline' }
 })
 
 // ── KPIs ────────────────────────────────────────────────────────────────
@@ -363,10 +363,10 @@ const kpiStrip = computed(() => {
   const need = Math.floor(ceNec.value * daysGone / totalWorkdays)
   const rmNeed = Math.floor(rmNec.value * daysGone / totalWorkdays)
   return [
-    { key:'ld', metric:'LD', label:'Ligacoes',        value:t.ld, icon:ICON.phone,  cls:'', spark:kpiSpark('ld') },
+    { key:'ld', metric:'LD', label:'Ligações',        value:t.ld, icon:ICON.phone,  cls:'', spark:kpiSpark('ld') },
     { key:'ce', metric:'CE', label:'Contato efetivo', value:t.ce, icon:ICON.msg,    cls: t.ce>=need ? 'is-ok' : 'is-bad', spark:kpiSpark('ce') },
-    { key:'rm', metric:'RM', label:'Reuniao marcada', value:t.rm, icon:ICON.cal,    cls: t.rm>=rmNeed ? 'is-ok' : 'is-warn', spark:kpiSpark('rm') },
-    { key:'rr', metric:'RR', label:'Reuniao realiz.', value:t.rr, icon:ICON.users,  cls:'', spark:kpiSpark('rr') },
+    { key:'rm', metric:'RM', label:'Reunião marcada', value:t.rm, icon:ICON.cal,    cls: t.rm>=rmNeed ? 'is-ok' : 'is-warn', spark:kpiSpark('rm') },
+    { key:'rr', metric:'RR', label:'Reunião realiz.', value:t.rr, icon:ICON.users,  cls:'', spark:kpiSpark('rr') },
     { key:'fr', metric:'FR', label:'Fechamento',      value:t.fr, icon:ICON.trophy, cls: t.fr>0 ? 'is-ok' : '', spark:kpiSpark('fr') },
   ]
 })
@@ -379,7 +379,7 @@ const paceRows = computed(() => {
   const rmN = Math.floor(rmNec.value * daysGone / totalWorkdays)
   return [
     { label:'Contatos efetivos', current:t.ce, target:ceNec.value,  pct:pct(t.ce,ceNec.value),  color:color(t.ce,ceN) },
-    { label:'Reunioes marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),  color:color(t.rm,rmN) },
+    { label:'Reuniões marcadas', current:t.rm, target:rmNec.value,  pct:pct(t.rm,rmNec.value),  color:color(t.rm,rmN) },
     { label:'Fechamentos',       current:t.fr, target:fechNec.value, pct:pct(t.fr,fechNec.value), color:t.fr>=fechNec.value?'var(--ok)':'var(--bad)' },
   ]
 })

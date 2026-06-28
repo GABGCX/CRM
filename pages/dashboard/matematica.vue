@@ -12,21 +12,21 @@
         <div class="mr-meta-input"><span>R$</span><input type="number" v-model.number="localMeta" min="0" step="500" @input="debounceSave" /></div>
       </div>
       <div class="mr-meta-field">
-        <label class="input-label">Ticket medio</label>
+        <label class="input-label">Ticket médio</label>
         <div class="mr-meta-input"><span>R$</span><input type="number" v-model.number="localTicket" min="0" step="100" @input="debounceSave" /></div>
       </div>
       <div class="mr-meta-note">Estes dois valores recalculam todos os numeros de ouro em tempo real.</div>
     </div>
 
-    <!-- Numeros de ouro: funil horizontal -->
+    <!-- Números de ouro: funil horizontal -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-label">Numeros de ouro · da meta ao contato diario</div>
+      <div class="card-label">Números de ouro · da meta ao contato diário</div>
       <div class="mr-chain">
         <template v-for="(row, i) in mathChain" :key="row.label">
           <div class="mr-chain-step">
             <div class="mr-chain-label">{{ row.label }}</div>
             <div class="mr-chain-value tabular">{{ row.value }}</div>
-            <div v-if="row.perDay" class="mr-chain-perday tabular">{{ row.perDay }}/dia util</div>
+            <div v-if="row.perDay" class="mr-chain-perday tabular">{{ row.perDay }}/dia útil</div>
             <div v-else-if="row.note" class="mr-chain-note">{{ row.note }}</div>
           </div>
           <div v-if="i < mathChain.length-1" class="mr-chain-arrow">
@@ -79,7 +79,7 @@
 
     <!-- Forecasting -->
     <div class="card" style="margin-top:12px">
-      <div class="card-label">Previsao de receita</div>
+      <div class="card-label">Previsão de receita</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden">
         <div style="padding:16px;border-right:1px solid var(--border)">
           <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">Pipeline total</div>
@@ -94,7 +94,7 @@
             :style="{ color: hotPipeline > 0 ? 'var(--ok)' : 'var(--text-1)' }">
             {{ hotPipeline > 0 ? 'R$ ' + hotPipeline.toLocaleString('pt-BR') : '--' }}
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Reuniao + Proposta enviada</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Reunião + Proposta enviada</div>
         </div>
         <div style="padding:16px">
           <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">vs. Meta mensal</div>
@@ -106,7 +106,7 @@
         </div>
       </div>
       <div v-if="leadsComValor === 0" style="margin-top:12px;font-size:12px;color:var(--text-2);text-align:center;padding:8px;background:var(--bg-subtle);border-radius:6px">
-        Adicione um valor estimado nos leads do pipeline para ver a previsao de receita.
+        Adicione um valor estimado nos leads do pipeline para ver a previsão de receita.
       </div>
     </div>
 

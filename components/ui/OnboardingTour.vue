@@ -35,8 +35,8 @@ const TOUR_KEY = 'prospecta_tour_done'
 const STEPS = [
   {
     title: 'Bem-vindo ao Prospecta!',
-    body: `O Prospecta organiza toda a sua prospecção B2B em um so lugar.<br><br>
-      Voce gerencia seu <strong>pipeline de leads</strong>, registra seus
+    body: `O Prospecta organiza toda a sua prospecção B2B em um só lugar.<br><br>
+      Você gerencia seu <strong>pipeline de leads</strong>, registra seus
       <strong>contatos diários</strong> e acompanha se está no ritmo certo para bater a meta.`,
   },
   {

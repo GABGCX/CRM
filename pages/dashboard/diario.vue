@@ -58,7 +58,7 @@
       </button>
     </div>
 
-    <!-- Resumo do mes -->
+    <!-- Resumo do mês -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0" class="md-totals">
       <UiMetricCard v-for="m in totalCards" :key="m.label" :value="m.value" :sub="m.sub" :sub-class="m.subClass">
         <template #label>
@@ -69,7 +69,7 @@
       </UiMetricCard>
     </div>
 
-    <!-- Historico -->
+    <!-- Histórico -->
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="card-label" style="margin-bottom:0">{{ entries.length }} dias registrados</div>
@@ -195,7 +195,7 @@ const cePerDay = computed(() => {
 })
 const rmPerDay = computed(() => Math.max(1, Math.ceil(cePerDay.value * 0.027)))
 
-// Paleta categorica Carbon, alinhada com Relatorios (LD cinza = volume bruto,
+// Paleta categorica Carbon, alinhada com Relatórios (LD cinza = volume bruto,
 // CE/RM/RR/FR = conversoes). Hex literal: vao em :style de cor/barra.
 const FIELDS = computed(() => [
   { key:'ld', label:'Ligações',          color:'#8d8d8d', meta: 'N/A' },

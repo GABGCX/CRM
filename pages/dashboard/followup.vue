@@ -15,7 +15,7 @@
       <span class="fu-stats-sep">·</span>
       <span><strong>{{ (leads||[]).filter(l=>l.reuniao_agendada).length }}</strong> reunioes</span>
       <span class="fu-stats-sep">·</span>
-      <span style="color:#16a34a"><strong>{{ closedThisMonth }}</strong> fechados/mes</span>
+      <span style="color:#16a34a"><strong>{{ closedThisMonth }}</strong> fechados/mês</span>
     </div>
 
     <!-- Log rapido do dia -->
@@ -122,7 +122,7 @@
               <span v-if="!selectedLead.telefone" class="fu-nophone">Sem telefone cadastrado</span>
             </div>
 
-            <!-- Cadencia: proximo passo -->
+            <!-- Cadência: próximo passo -->
             <div v-if="nextStep(selectedLead)" class="fu-cadence">
               <span class="fu-cadence-tag">Dia {{ nextStep(selectedLead)!.day_offset }} · {{ nextStep(selectedLead)!.channel }}</span>
               <span v-if="nextStep(selectedLead)!.instruction" class="fu-cadence-text">{{ nextStep(selectedLead)!.instruction }}</span>
@@ -140,7 +140,7 @@
             </div>
 
             <!-- Reagendar retorno -->
-            <div class="fu-block-label">Proximo retorno</div>
+            <div class="fu-block-label">Próximo retorno</div>
             <div class="fu-resched">
               <button v-for="opt in [2,4,7]" :key="opt" class="btn fu-resched-btn" @click="setRetorno(opt)">+{{ opt }}d</button>
               <input type="date" v-model="retornoDate" @change="setRetornoDate" class="fu-date" />
@@ -157,7 +157,7 @@
               <span>Notas</span>
               <span style="color:var(--text-3);font-weight:400">{{ notes.length }}</span>
             </div>
-            <textarea v-model="noteInput" rows="2" placeholder="Registrar contexto da ligacao..."
+            <textarea v-model="noteInput" rows="2" placeholder="Registrar contexto da ligação..."
               class="fu-note-input" @keydown.ctrl.enter="postNote" maxlength="2000" />
             <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" :disabled="postingNote || !noteInput.trim()" @click="postNote">
               {{ postingNote ? 'Salvando...' : 'Adicionar nota' }}
@@ -165,12 +165,12 @@
             <div v-if="notes.length" class="fu-notes">
               <div v-for="n in notes" :key="n.id" class="fu-note">
                 <div class="fu-note-body">{{ n.content }}</div>
-                <div class="fu-note-meta">{{ n.profiles?.name || 'Voce' }} · {{ fmtDate(n.created_at) }}</div>
+                <div class="fu-note-meta">{{ n.profiles?.name || 'Você' }} · {{ fmtDate(n.created_at) }}</div>
               </div>
             </div>
 
-            <!-- Proximo na fila -->
-            <button class="btn fu-next" @click="goNext" :disabled="!hasNext">Proximo na fila &rarr;</button>
+            <!-- Próximo na fila -->
+            <button class="btn fu-next" @click="goNext" :disabled="!hasNext">Próximo na fila &rarr;</button>
           </div>
         </div>
       </div>
@@ -186,7 +186,7 @@
     <!-- PREVISAO -->
     <div v-else-if="view === 'previsao'">
       <div class="card" style="margin-bottom:14px">
-        <div class="card-label">Carga de follow-ups nos proximos 7 dias</div>
+        <div class="card-label">Carga de follow-ups nos próximos 7 dias</div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
           <div v-for="d in weekForecast" :key="d.date"
             style="text-align:center;padding:10px 4px;border-radius:8px;border:1px solid"
@@ -267,7 +267,7 @@ const dueSoon  = computed(() => activeLeads.value.filter(l => leadUrgency(l) ===
 const queueGroups = computed(() => [
   { key: 'overdue', label: 'Vencidos',        color: URGENCY_COLOR.overdue, leads: overdue.value },
   { key: 'today',   label: 'Hoje',            color: URGENCY_COLOR.today,   leads: dueToday.value },
-  { key: 'soon',    label: 'Proximos 3 dias', color: URGENCY_COLOR.soon,    leads: dueSoon.value },
+  { key: 'soon',    label: 'Próximos 3 dias', color: URGENCY_COLOR.soon,    leads: dueSoon.value },
 ])
 const queueAll = computed(() => [...overdue.value, ...dueToday.value, ...dueSoon.value])
 
@@ -277,7 +277,7 @@ const closedThisMonth = computed(() => (leads.value || []).filter(l => l.resulta
 const views = [
   { id: 'fila' as const,     label: 'Fila' },
   { id: 'todos' as const,    label: 'Todos' },
-  { id: 'previsao' as const, label: 'Previsao' },
+  { id: 'previsao' as const, label: 'Previsão' },
 ]
 
 // ── Selecao + painel de trabalho ──────────────────────────────────────
@@ -323,7 +323,7 @@ function goNext() {
   if (i >= 0 && i < queueAll.value.length - 1) selectedId.value = queueAll.value[i + 1].id
 }
 
-// ── Cadencia: proximo passo ───────────────────────────────────────────
+// ── Cadência: próximo passo ───────────────────────────────────────────
 function nextStep(lead: LeadWithFU): CadenceStep | null {
   if (!lead.cadence_id) return null
   const cad = cadences.value.find(c => c.id === lead.cadence_id)
@@ -378,14 +378,14 @@ function retLabel(date: string | null): string {
   if (diff === null) return ''
   if (diff < 0)  return `${Math.abs(diff)}d atraso`
   if (diff === 0) return 'hoje'
-  if (diff === 1) return 'amanha'
+  if (diff === 1) return 'amanhã'
   return `+${diff}d`
 }
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-// ── Previsao ──────────────────────────────────────────────────────────
+// ── Previsão ──────────────────────────────────────────────────────────
 const weekForecast = computed(() =>
   Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() + i)

@@ -24,15 +24,15 @@
       </div>
       <div class="pipe-summary-divider"></div>
       <div class="pipe-summary-item">
-        <span class="pipe-summary-label">Previsao ponderada</span>
+        <span class="pipe-summary-label">Previsão ponderada</span>
         <span class="pipe-summary-value" style="color:var(--ok)">R$ {{ fmtMoney(Math.round(weightedForecast)) }}</span>
-        <span class="pipe-summary-hint">por probabilidade de estagio</span>
+        <span class="pipe-summary-hint">por probabilidade de estágio</span>
       </div>
       <div class="pipe-summary-divider"></div>
       <div class="pipe-summary-item">
-        <span class="pipe-summary-label">Ticket medio aberto</span>
+        <span class="pipe-summary-label">Ticket médio aberto</span>
         <span class="pipe-summary-value">R$ {{ fmtMoney(avgTicket) }}</span>
-        <span class="pipe-summary-hint">media dos leads ativos</span>
+        <span class="pipe-summary-hint">média dos leads ativos</span>
       </div>
     </div>
 
@@ -54,11 +54,11 @@
           <option value="">Todas etiquetas</option>
           <option v-for="t in tags" :key="t.id" :value="t.id">{{ t.name }}</option>
         </select>
-        <select v-model="filterCreated" class="pipe-filter-select" title="Filtrar por data de criacao">
-          <option value="">Qualquer criacao</option>
+        <select v-model="filterCreated" class="pipe-filter-select" title="Filtrar por data de criação">
+          <option value="">Qualquer criação</option>
           <option value="7">Criados: 7 dias</option>
           <option value="30">Criados: 30 dias</option>
-          <option value="month">Criados: este mes</option>
+          <option value="month">Criados: este mês</option>
         </select>
         <button class="pipe-toggle" :class="{ active: filterOverdue }"
           @click="filterOverdue = !filterOverdue" title="Apenas leads com retorno atrasado">
@@ -70,7 +70,7 @@
         </select>
         <select v-if="viewMode === 'list'" v-model="sortBy" class="pipe-filter-select" title="Ordenar">
           <option value="created_at">Mais recentes</option>
-          <option value="data_retorno">Retorno proximo</option>
+          <option value="data_retorno">Retorno próximo</option>
           <option value="fu_done">Menos follow-ups</option>
           <option value="score">Maior score</option>
         </select>
@@ -172,7 +172,7 @@
               </div>
             </div>
             <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-              <span v-if="hasUnsavedChanges" style="font-size:11px;color:#d97706;font-weight:500">Nao salvo</span>
+              <span v-if="hasUnsavedChanges" style="font-size:11px;color:#d97706;font-weight:500">Não salvo</span>
               <button class="btn btn-danger" @click="removeLead(selectedLead.id)" style="padding:5px 8px">
                 <i class="ti ti-trash" aria-hidden="true"></i>
               </button>
@@ -320,7 +320,7 @@
                 <div style="color:var(--text-1);line-height:1.6;white-space:pre-wrap">{{ note.content }}</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
                   <span style="font-size:11px;color:var(--text-3)">
-                    {{ note.profiles?.name || 'Usuario' }} &middot; {{ formatEventDate(note.created_at) }}
+                    {{ note.profiles?.name || 'Usuário' }} &middot; {{ formatEventDate(note.created_at) }}
                   </span>
                   <button @click="deleteNote(note.id)"
                     style="border:none;background:none;color:var(--text-3);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;transition:color .1s"
@@ -438,12 +438,12 @@
                   placeholder="Contexto relevante, dores mencionadas, próximo passo..." />
               </div>
               <div style="grid-column:span 2" class="form-field">
-                <label class="input-label">Cadencia de prospeccao</label>
+                <label class="input-label">Cadência de prospecção</label>
                 <select v-model="newForm.cadence_id">
                   <option value="">Nenhuma</option>
                   <option v-for="c in cadences" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
-                <div style="font-size:11px;color:var(--text-3)">Sequencia de passos que guia o follow-up</div>
+                <div style="font-size:11px;color:var(--text-3)">Sequência de passos que guia o follow-up</div>
               </div>
 
               <div style="grid-column:span 2">
@@ -565,7 +565,7 @@ function matchesCreated(l: LeadWithFU): boolean {
   return created >= localDateISO(d)
 }
 
-// Filtros que valem tanto na lista quanto no kanban: etiqueta, atrasados, data de criacao.
+// Filtros que valem tanto na lista quanto no kanban: etiqueta, atrasados, data de criação.
 function passesExtra(l: LeadWithFU): boolean {
   const mt = !filterTag.value || (l.tag_ids || []).includes(filterTag.value)
   const mo = !filterOverdue.value || (!!l.data_retorno && l.data_retorno < todayISO)
@@ -578,7 +578,7 @@ const { defs: customDefs, load: loadCustomFields } = useCustomFields()
 const route = useRoute()
 onMounted(() => {
   fetchTags(); initCardPrefs(); loadCustomFields()
-  // Drill-down vindo dos Relatorios (?status=...&view=list)
+  // Drill-down vindo dos Relatórios (?status=...&view=list)
   if (typeof route.query.status === 'string') {
     filterStatus.value = route.query.status
     if (route.query.view === 'list') viewMode.value = 'list'
@@ -729,15 +729,15 @@ async function deleteNote(noteId: string) {
 }
 
 const ACTIVITY_KINDS = [
-  { kind: 'ligacao',  label: 'Ligacao'  },
+  { kind: 'ligacao',  label: 'Ligação'  },
   { kind: 'whatsapp', label: 'WhatsApp' },
-  { kind: 'reuniao',  label: 'Reuniao'  },
+  { kind: 'reuniao',  label: 'Reunião'  },
   { kind: 'email',    label: 'Email'    },
 ] as const
 
 const ACTIVITY_LABELS: Record<string, string> = {
-  ligacao: 'Ligacao registrada', whatsapp: 'WhatsApp registrado',
-  reuniao: 'Reuniao registrada', email: 'Email registrado', outro: 'Atividade registrada',
+  ligacao: 'Ligação registrada', whatsapp: 'WhatsApp registrado',
+  reuniao: 'Reunião registrada', email: 'Email registrado', outro: 'Atividade registrada',
 }
 
 const activitySaving = ref(false)

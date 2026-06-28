@@ -2,14 +2,14 @@
   <div>
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div class="card-label" style="margin-bottom:0">Cadencias</div>
-      <button class="btn" style="font-size:11px" @click="openNew">+ Nova cadencia</button>
+      <div class="card-label" style="margin-bottom:0">Cadências</div>
+      <button class="btn" style="font-size:11px" @click="openNew">+ Nova cadência</button>
     </div>
 
-    <!-- Lista de cadencias -->
+    <!-- Lista de cadências -->
     <div v-if="loading" style="color:var(--text-3);font-size:12px;padding:16px 0">Carregando...</div>
     <div v-else-if="!cadences.length" style="color:var(--text-3);font-size:12px;padding:16px 0;text-align:center">
-      Nenhuma cadencia criada.<br>Crie uma para atribuir a seus leads.
+      Nenhuma cadência criada.<br>Crie uma para atribuir a seus leads.
     </div>
     <div v-else style="display:flex;flex-direction:column;gap:6px">
       <div v-for="c in cadences" :key="c.id"
@@ -35,14 +35,14 @@
       </div>
     </div>
 
-    <!-- Modal de criacao/edicao -->
+    <!-- Modal de criação/edicao -->
     <Teleport to="body">
       <div v-if="modalOpen"
         style="position:fixed;inset:0;background:rgba(40,40,40,.6);backdrop-filter:blur(2px);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px"
         @click.self="modalOpen = false">
         <div class="card" style="width:100%;max-width:520px;max-height:90vh;overflow-y:auto">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="font-size:15px;font-weight:600">{{ editing ? 'Editar cadencia' : 'Nova cadencia' }}</div>
+            <div style="font-size:15px;font-weight:600">{{ editing ? 'Editar cadência' : 'Nova cadência' }}</div>
             <button class="btn" @click="modalOpen = false" style="padding:4px 8px">X</button>
           </div>
 
@@ -52,13 +52,13 @@
               <input v-model="form.name" placeholder="Ex: Cold Call 10 tentativas" />
             </div>
             <div>
-              <div class="input-label" style="margin-bottom:4px">Descricao</div>
-              <input v-model="form.description" placeholder="Descricao opcional" />
+              <div class="input-label" style="margin-bottom:4px">Descrição</div>
+              <input v-model="form.description" placeholder="Descrição opcional" />
             </div>
           </div>
 
           <!-- Steps -->
-          <div style="font-size:12px;font-weight:600;margin-bottom:8px">Passos da cadencia</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px">Passos da cadência</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
             <div v-for="(s, i) in form.steps" :key="i"
               style="display:grid;grid-template-columns:70px 1fr 1fr auto;gap:6px;align-items:start">
@@ -83,7 +83,7 @@
                 </div>
               </div>
               <div>
-                <div style="font-size:10px;color:var(--text-3);margin-bottom:2px">Instrucao (opcional)</div>
+                <div style="font-size:10px;color:var(--text-3);margin-bottom:2px">Instrução (opcional)</div>
                 <input v-model="s.instruction" placeholder="O que fazer neste passo" style="font-size:12px" />
               </div>
               <button @click="removeStep(i)"
@@ -99,7 +99,7 @@
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn" @click="modalOpen = false">Cancelar</button>
             <button class="btn btn-primary" :disabled="saving" @click="save">
-              {{ saving ? 'Salvando...' : editing ? 'Salvar alteracoes' : 'Criar cadencia' }}
+              {{ saving ? 'Salvando...' : editing ? 'Salvar alterações' : 'Criar cadência' }}
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ const CHANNEL_ICON: Record<string, string> = {
 }
 function channelIconHtml(ch: string): string { return CHANNEL_ICON[ch] || '' }
 const CHANNEL_LABEL: Record<string, string> = {
-  'Ligacao': 'Ligacao', 'Email': 'Email', 'LinkedIn': 'LinkedIn', 'WhatsApp': 'WhatsApp', 'Outro': 'Outro',
+  'Ligacao': 'Ligação', 'Email': 'Email', 'LinkedIn': 'LinkedIn', 'WhatsApp': 'WhatsApp', 'Outro': 'Outro',
 }
 
 const cadences  = ref<Cadence[]>([])
@@ -182,7 +182,7 @@ function removeStep(i: number) {
 
 async function save() {
   formError.value = null
-  if (!form.name.trim()) { formError.value = 'Nome obrigatorio.'; return }
+  if (!form.name.trim()) { formError.value = 'Nome obrigatório.'; return }
   if (!form.steps.length) { formError.value = 'Adicione ao menos um passo.'; return }
 
   saving.value = true
@@ -208,7 +208,7 @@ async function save() {
 }
 
 async function remove(id: string) {
-  if (!confirm('Remover esta cadencia? Os leads associados perderao a referencia.')) return
+  if (!confirm('Remover esta cadência? Os leads associados perderão a referência.')) return
   try {
     await $fetch(`/api/cadences/${id}`, { method: 'DELETE' })
     cadences.value = cadences.value.filter(c => c.id !== id)

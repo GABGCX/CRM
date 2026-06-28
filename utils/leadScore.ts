@@ -14,7 +14,7 @@ export function calcLeadScore(lead: Lead): number {
   else if (lead.fonte === 'evento')   score += 15
   else if (lead.fonte === 'cold_call') score += 5
 
-  // Numero de vendedores (tamanho do time comercial) (0-20)
+  // Número de vendedores (tamanho do time comercial) (0-20)
   const nv = lead.num_vendedores ?? 0
   if (nv > 10)      score += 20
   else if (nv >= 5) score += 10

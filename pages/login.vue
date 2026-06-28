@@ -26,7 +26,7 @@
 
         <div class="form-field">
           <label class="input-label">E-mail</label>
-          <input v-model="email" type="email" autocomplete="email" required placeholder="voce@empresa.com" />
+          <input v-model="email" type="email" autocomplete="email" required placeholder="você@empresa.com" />
         </div>
 
         <div class="form-field">

@@ -7,7 +7,7 @@
 
         <div style="font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:4px">Qual foi o motivo da perda?</div>
         <div style="font-size:13px;color:var(--text-2);margin-bottom:20px">
-          {{ statusLabel }} — registrar o motivo ajuda a identificar padroes de objecao.
+          {{ statusLabel }} — registrar o motivo ajuda a identificar padrões de objeção.
         </div>
 
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
@@ -40,7 +40,7 @@
 const props = defineProps<{ show: boolean; status: string }>()
 const emit  = defineEmits<{ confirm: [reason: string]; cancel: [] }>()
 
-const REASONS = ['Preco alto', 'Ja tem solucao', 'Sem budget', 'Timing ruim', 'Nao precisa', 'Outro']
+const REASONS = ['Preço alto', 'Já tem solução', 'Sem budget', 'Timing ruim', 'Não precisa', 'Outro']
 
 const selected  = ref('')
 const outroText = ref('')

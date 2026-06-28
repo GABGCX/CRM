@@ -163,7 +163,7 @@
       </template>
 
       <template v-if="tab === 'prospeccao'">
-      <!-- ── Cadencias ─────────────────────────────────── -->
+      <!-- ── Cadências ─────────────────────────────────── -->
       <div v-if="profile?.role !== 'bdr'" class="card">
         <UiCadenceManager />
       </div>
@@ -475,7 +475,7 @@ const membersLoading = ref(false)
 const tab = ref<'conta' | 'prospeccao' | 'equipe'>('conta')
 const cfgTabs = [
   { id: 'conta' as const,      label: 'Conta & Marca' },
-  { id: 'prospeccao' as const, label: 'Prospeccao' },
+  { id: 'prospeccao' as const, label: 'Prospecção' },
   { id: 'equipe' as const,     label: 'Equipe' },
 ]
 const toast          = ref<string | null>(null)
@@ -487,7 +487,7 @@ const showToast = (msg: string) => {
 
 // ── Constantes ────────────────────────────────────────────────────────
 const ROLE_LABELS: Record<string, string> = { owner:'Proprietário', admin:'Admin', bdr:'BDR' }
-// Marca travada em Carbon: a cor primaria nao e mais editavel; persiste o azul Carbon.
+// Marca travada em Carbon: a cor primaria não e mais editavel; persiste o azul Carbon.
 const BRAND_COLOR = '#0f62fe'
 
 // ── Estado local ──────────────────────────────────────────────────────
@@ -542,7 +542,7 @@ async function delTag(t: { id: string; name: string }) {
 }
 
 // ── Templates de mensagem ──────────────────────────────────────────────
-const TPL_CHANNELS = ['WhatsApp', 'Email', 'Ligacao', 'LinkedIn', 'Outro'] as const
+const TPL_CHANNELS = ['WhatsApp', 'Email', 'Ligação', 'LinkedIn', 'Outro'] as const
 const templates       = ref<MessageTemplate[]>([])
 const templatesLoading = ref(false)
 const hoveredTpl      = ref<string | null>(null)
@@ -665,7 +665,7 @@ function syncFromOrg(o: NonNullable<typeof org.value>) {
   sf.meta_mensal   = o.settings?.meta_mensal  ?? 10000
   sf.ticket_medio  = o.settings?.ticket_medio ?? 2000
   tf.product_name  = o.theme?.product_name  || 'Outbound'
-  tf.primary_color = BRAND_COLOR  // marca travada em Carbon; normaliza valor legado no proximo save
+  tf.primary_color = BRAND_COLOR  // marca travada em Carbon; normaliza valor legado no próximo save
   tf.logo_url      = o.theme?.logo_url      || ''
   tf.favicon_url   = o.theme?.favicon_url   || ''
   domainVal.value  = o.custom_domain || ''
@@ -929,7 +929,7 @@ async function sendInvite() {
 .tpl-channel-tag { font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0;letter-spacing:.03em }
 .tpl-ch-whatsapp { background:var(--ok-bg);color:var(--ok) }
 .tpl-ch-email    { background:var(--info-bg);color:var(--info) }
-.tpl-ch-ligacao  { background:var(--warn-bg);color:var(--warn) }
+.tpl-ch-ligação  { background:var(--warn-bg);color:var(--warn) }
 .tpl-ch-linkedin { background:var(--info-bg);color:#3730a3 }
 .tpl-ch-outro    { background:var(--bg);color:var(--text-3);border:1px solid var(--border) }
 </style>

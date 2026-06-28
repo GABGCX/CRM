@@ -1,7 +1,7 @@
 <template>
   <div class="lqa" @click.stop>
     <button class="lqa-btn" :class="{ 'lqa-btn--flash': flash === 'ld' }"
-      title="Registrar 1 ligacao no dia" @click="doBump('ld')">
+      title="Registrar 1 ligação no dia" @click="doBump('ld')">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.07 9.81 2 2 0 0 1 5 7.91h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/></svg>
       Lig
     </button>
@@ -10,7 +10,7 @@
       CE
     </button>
     <button class="lqa-btn" :disabled="fuComplete"
-      :title="fuComplete ? 'Todos os follow-ups concluidos' : 'Marcar proximo follow-up'"
+      :title="fuComplete ? 'Todos os follow-ups concluídos' : 'Marcar próximo follow-up'"
       @click="$emit('fu')">
       FU
     </button>
