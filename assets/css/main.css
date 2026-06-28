@@ -320,4 +320,16 @@
     display: block; position: fixed; inset: 0; z-index: 70;
     background: rgba(15,15,15,.48); backdrop-filter: blur(1.5px);
   }
+
+  /* Toque/usabilidade: inputs em 16px evitam o zoom automatico do iOS ao focar;
+     alvos de toque maiores em botoes/campos. */
+  input[type="text"], input[type="number"], input[type="email"],
+  input[type="password"], input[type="date"], input[type="url"],
+  input[type="search"], input[type="tel"], input[type="time"],
+  input[type="datetime-local"], input[type="month"],
+  input:not([type]), textarea, select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .btn { min-height: 42px; }
 }

@@ -527,5 +527,7 @@ input.reg-input { text-align:center; font-size:var(--num-md); font-weight:600; p
   .kpi-row { grid-template-columns:repeat(2,1fr); gap:14px 0; }
   .kpi:nth-child(odd) { padding-left:0; border-left:none; }
   .kpi:nth-child(even) { padding-left:14px; }
+  .dash-head { flex-wrap:wrap; gap:12px; }
+  .dash-head-right { width:100%; justify-content:space-between; }
 }
 </style>

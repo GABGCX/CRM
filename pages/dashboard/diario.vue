@@ -91,7 +91,8 @@
           <div style="font-size:12px;color:var(--text-3)">Selecione uma data e preencha as métricas.</div>
         </div>
 
-        <table v-else style="width:100%;border-collapse:collapse;font-size:13px">
+        <div v-else style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="width:100%;min-width:460px;border-collapse:collapse;font-size:13px">
           <thead>
             <tr style="border-bottom:1px solid var(--border-soft)">
               <th style="text-align:left;font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">Dia</th>
@@ -142,6 +143,7 @@
             </tr>
           </tfoot>
         </table>
+        </div>
       </div>
 
     <Transition name="toast">

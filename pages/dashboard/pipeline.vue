@@ -1,12 +1,12 @@
 ﻿<template>
   <div>
     <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px">
       <div>
         <div class="page-title">Pipeline</div>
         <div class="page-sub">{{ totalLeads }} leads · {{ activeLeads.length }} ativos</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <button class="btn" @click="exportCSV">
           <i class="ti ti-download" aria-hidden="true"></i> CSV
         </button>

@@ -61,7 +61,7 @@
         <div class="fu-empty-sub">Nenhum retorno pendente. Hora de prospectar novos leads.</div>
       </div>
 
-      <div v-else class="fu-cockpit">
+      <div v-else class="fu-cockpit" :class="{ 'fu-show-detail': mobileDetail }">
         <!-- Fila -->
         <div class="fu-queue">
           <template v-for="group in queueGroups" :key="group.key">
@@ -98,6 +98,11 @@
           </div>
 
           <div v-else class="fu-work">
+            <!-- Voltar pra fila (so mobile) -->
+            <button class="fu-back" @click="backToQueue">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Fila
+            </button>
             <!-- Header -->
             <div class="fu-work-head">
               <div style="min-width:0">
@@ -278,6 +283,8 @@ const views = [
 // ── Selecao + painel de trabalho ──────────────────────────────────────
 const selectedId  = ref<string | null>(null)
 const selectedLead = computed(() => queueAll.value.find(l => l.id === selectedId.value) || null)
+// No mobile a fila e o painel viram master-detail: este flag controla qual mostrar.
+const mobileDetail = ref(false)
 const notes       = ref<LeadNote[]>([])
 const noteInput   = ref('')
 const postingNote = ref(false)
@@ -297,7 +304,15 @@ watch(selectedId, async (id) => {
   try { notes.value = await $fetch<LeadNote[]>(`/api/leads/${id}/notes`) } catch {}
 })
 
-function select(l: LeadWithFU) { selectedId.value = l.id }
+function select(l: LeadWithFU) {
+  selectedId.value = l.id
+  // No mobile, abre o painel de trabalho em tela cheia e sobe pro topo.
+  if (import.meta.client && window.innerWidth <= 820) {
+    mobileDetail.value = true
+    requestAnimationFrame(() => document.querySelector('.main-content')?.scrollTo({ top: 0 }))
+  }
+}
+function backToQueue() { mobileDetail.value = false }
 
 const hasNext = computed(() => {
   const i = queueAll.value.findIndex(l => l.id === selectedId.value)
@@ -421,7 +436,17 @@ const weekForecast = computed(() =>
 
 /* ── Cockpit (fila + painel) ─────────────────────────────── */
 .fu-cockpit { display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start }
-@media (max-width:820px){ .fu-cockpit{ grid-template-columns:1fr } }
+/* Botao "voltar pra fila": so aparece no mobile (regra no @media) */
+.fu-back { display:none;align-items:center;gap:5px;padding:6px 10px 6px 7px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--bg-card);color:var(--text-2);border-radius:8px;cursor:pointer;font-family:inherit;align-self:flex-start;margin-bottom:12px }
+.fu-back:hover { border-color:var(--accent);color:var(--accent) }
+@media (max-width:820px){
+  .fu-cockpit{ grid-template-columns:1fr }
+  /* master-detail: ou a fila, ou o painel — nunca os dois empilhados */
+  .fu-cockpit:not(.fu-show-detail) .fu-panel { display:none }
+  .fu-cockpit.fu-show-detail .fu-queue { display:none }
+  .fu-back { display:inline-flex }
+  .fu-queue { max-height:none }
+}
 
 .fu-queue { display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-card);max-height:calc(100vh - 300px);overflow-y:auto }
 .fu-group-head { display:flex;align-items:center;gap:6px;padding:9px 12px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3) }
