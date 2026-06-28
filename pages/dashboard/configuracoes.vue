@@ -163,10 +163,7 @@
       </template>
 
       <template v-if="tab === 'prospeccao'">
-      <!-- ── Cadências ─────────────────────────────────── -->
-      <div v-if="profile?.role !== 'bdr'" class="card">
-        <UiCadenceManager />
-      </div>
+      <!-- Cadências agora têm página própria (/dashboard/cadencias) -->
 
       <!-- ── Exportar dados ───────────────────────────── -->
       <div v-if="profile?.role === 'owner'" class="card">

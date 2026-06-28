@@ -73,6 +73,13 @@
           </button>
         </NuxtLink>
 
+        <NuxtLink to="/dashboard/agenda" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/agenda')" :title="collapsed ? 'Agenda' : undefined">
+            <i class="ti ti-calendar-event sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Agenda</span>
+          </button>
+        </NuxtLink>
+
         <div v-show="!collapsed" class="sb-section">Leads</div>
 
         <NuxtLink to="/dashboard/pipeline" custom v-slot="{ isActive }">
@@ -90,6 +97,13 @@
             <span v-show="!collapsed" class="sb-label">Follow-up</span>
             <span v-if="overdueCount > 0" class="nav-badge">{{ overdueCount }}</span>
             <span v-if="overdueCount > 0" class="nav-dot"></span>
+          </button>
+        </NuxtLink>
+
+        <NuxtLink v-if="isManager" to="/dashboard/cadencias" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/cadencias')" :title="collapsed ? 'Cadências' : undefined">
+            <i class="ti ti-route sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Cadências</span>
           </button>
         </NuxtLink>
 
