@@ -250,6 +250,8 @@ onMounted(() => {
     filterStatus.value = route.query.status
     if (route.query.view === 'list') viewMode.value = 'list'
   }
+  // Atalho "Novo lead" da command palette (?new=1)
+  if (route.query.new === '1') showModal.value = true
 })
 const leadTags = (l: LeadWithFU) => resolveTags(l.tag_ids)
 const selectedId    = ref<string | null>(null)
