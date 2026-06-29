@@ -334,11 +334,11 @@
   .btn { min-height: 42px; }
 }
 
-/* ── Configuracoes: primitivos de formulario compartilhados ──────────────
+/* Configuracoes: primitivos de formulario compartilhados.
    Globais porem ancorados em .settings-page para alcancar os componentes de
-   aba (UiSettingsAccount/Prospecting/Team), que renderizam dentro do wrapper.
-   Os tokens (--surface/--border/--text-*/--danger*) vem do bloco .settings-page
-   na propria pagina e sao herdados pelos filhos. */
+   aba (UiSettingsAccount, UiSettingsProspecting, UiSettingsTeam), que renderizam
+   dentro do wrapper. Os tokens de superficie/borda/texto/perigo vem do bloco
+   .settings-page na propria pagina e sao herdados pelos filhos. */
 @keyframes spin { to { transform:rotate(360deg) } }
 
 .settings-page .card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;flex-direction:column;gap:16px }
