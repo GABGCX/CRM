@@ -119,6 +119,32 @@ export function funnelStageColor(resultado: string, idx: number): string {
 }
 export const funnelStagePassed = (resultado: string, idx: number) => idx < funnelStageOf(resultado)
 
+// ── Eventos da timeline (atividade do lead) ─────────────────────────────
+export const ACTIVITY_LABELS: Record<string, string> = {
+  ligacao: 'Ligação registrada', whatsapp: 'WhatsApp registrado',
+  reuniao: 'Reunião registrada', email: 'Email registrado', outro: 'Atividade registrada',
+}
+const EVENT_ICONS: Record<string, string> = {
+  created: '+', status_change: '>', field_update: '~', followup: 'v', note: '@', activity: '*',
+}
+export function eventIcon(type: string) { return EVENT_ICONS[type] ?? '·' }
+export function eventLabel(ev: { type: string; payload?: Record<string, any> | null }): string {
+  const p = (ev.payload ?? {}) as Record<string, any>
+  switch (ev.type) {
+    case 'created':       return 'Lead criado'
+    case 'status_change': return `Status: ${p.from} → ${p.to}`
+    case 'field_update':  return `Campos atualizados: ${(p.fields ?? []).join(', ')}`
+    case 'followup':      return p.completed
+      ? `Follow-up ${p.attempt_index + 1} concluído`
+      : `Follow-up ${p.attempt_index + 1} reaberto`
+    case 'activity': {
+      const base = ACTIVITY_LABELS[p.kind] ?? 'Atividade registrada'
+      return p.note ? `${base}: ${p.note}` : base
+    }
+    default: return ev.type
+  }
+}
+
 // ── Cores e icones de status ────────────────────────────────────────────
 const STATUS_TAG: Record<string, string> = {
   'Novo': 'tag-gray', 'Prospecção': 'tag-indigo', 'Qualificação': 'tag-teal',

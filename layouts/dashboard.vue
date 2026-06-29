@@ -123,6 +123,13 @@
           </button>
         </NuxtLink>
 
+        <NuxtLink to="/dashboard/atividade" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/atividade')" :title="collapsed ? 'Atividade' : undefined">
+            <i class="ti ti-activity sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Atividade</span>
+          </button>
+        </NuxtLink>
+
         <NuxtLink v-if="isManager" to="/dashboard/gestao" custom v-slot="{ isActive }">
           <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/gestao')" :title="collapsed ? 'Gestão' : undefined">
             <i class="ti ti-users-group sb-icon" aria-hidden="true"></i>

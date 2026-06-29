@@ -216,6 +216,7 @@ import type { Lead, Followup, LeadStatus, MessageTemplate, LeadEvent, LeadNote }
 import {
   STATUSES, FU_DAYS, LOSS_STATUSES, FUNNEL_STAGES,
   funnelStageColor, funnelStagePassed, fuDone, sortedFU, daysIn, localDateISO,
+  eventIcon, eventLabel,
 } from '~/utils/leadDomain'
 
 type LeadWithFU = Lead & { followups: Followup[] }
@@ -390,11 +391,6 @@ const ACTIVITY_KINDS = [
   { kind: 'email',    label: 'Email'    },
 ] as const
 
-const ACTIVITY_LABELS: Record<string, string> = {
-  ligacao: 'Ligação registrada', whatsapp: 'WhatsApp registrado',
-  reuniao: 'Reunião registrada', email: 'Email registrado', outro: 'Atividade registrada',
-}
-
 async function logActivity(kind: string) {
   activitySaving.value = true
   try {
@@ -406,28 +402,6 @@ async function logActivity(kind: string) {
   } catch {
     emit('notify', 'Erro ao registrar atividade.')
   } finally { activitySaving.value = false }
-}
-
-const EVENT_ICONS: Record<string, string> = {
-  created: '+', status_change: '>', field_update: '~', followup: 'v', note: '@', activity: '*',
-}
-function eventIcon(type: string) { return EVENT_ICONS[type] ?? '·' }
-
-function eventLabel(ev: LeadEvent): string {
-  const p = (ev.payload ?? {}) as Record<string, any>
-  switch (ev.type) {
-    case 'created':       return 'Lead criado'
-    case 'status_change': return `Status: ${p.from} → ${p.to}`
-    case 'field_update':  return `Campos atualizados: ${(p.fields ?? []).join(', ')}`
-    case 'followup':      return p.completed
-      ? `Follow-up ${p.attempt_index + 1} concluído`
-      : `Follow-up ${p.attempt_index + 1} reaberto`
-    case 'activity': {
-      const base = ACTIVITY_LABELS[p.kind] ?? 'Atividade registrada'
-      return p.note ? `${base}: ${p.note}` : base
-    }
-    default: return ev.type
-  }
 }
 
 function formatEventDate(iso: string) {
