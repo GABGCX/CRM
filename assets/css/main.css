@@ -333,3 +333,39 @@
   }
   .btn { min-height: 42px; }
 }
+
+/* ── Configuracoes: primitivos de formulario compartilhados ──────────────
+   Globais porem ancorados em .settings-page para alcancar os componentes de
+   aba (UiSettingsAccount/Prospecting/Team), que renderizam dentro do wrapper.
+   Os tokens (--surface/--border/--text-*/--danger*) vem do bloco .settings-page
+   na propria pagina e sao herdados pelos filhos. */
+@keyframes spin { to { transform:rotate(360deg) } }
+
+.settings-page .card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;flex-direction:column;gap:16px }
+.settings-page .card-header { font-size:13px;font-weight:500;color:var(--text-1);letter-spacing:-.01em;display:flex;align-items:center;gap:8px }
+.settings-page .badge { font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);background:var(--bg);border:1px solid var(--border);padding:2px 6px;border-radius:4px }
+
+.settings-page .form  { display:flex;flex-direction:column;gap:12px }
+.settings-page .field { display:flex;flex-direction:column;gap:4px }
+.settings-page .label { font-size:11px;color:var(--text-3);letter-spacing:.01em }
+
+.settings-page .input,.settings-page .select { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-size:13px;padding:7px 10px;width:100%;outline:none;box-sizing:border-box;font-family:inherit;transition:border-color var(--transition),box-shadow var(--transition);-webkit-appearance:none;appearance:none }
+.settings-page .input::placeholder { color:var(--text-3) }
+.settings-page .input:focus,.settings-page .select:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,98,254,.12) }
+.settings-page .mono { font-family:"SF Mono","Fira Code",ui-monospace,monospace;font-size:12px;letter-spacing:.02em }
+.settings-page .select { cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px }
+
+.settings-page .alert { font-size:12px;padding:8px 11px;border-radius:var(--radius-sm);border:1px solid;line-height:1.5 }
+.settings-page .alert-error { background:var(--danger-bg);border-color:var(--danger-bdr);color:var(--danger) }
+
+.settings-page .invite-title { font-size:12px;font-weight:500;color:var(--text-1) }
+
+.settings-page .btn { display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border-radius:var(--radius-md);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-1);width:100%;font-family:inherit;letter-spacing:-.01em;transition:background var(--transition),border-color var(--transition),transform var(--transition) }
+.settings-page .btn:hover:not(:disabled) { background:var(--bg);border-color:var(--border) }
+.settings-page .btn:active:not(:disabled) { transform:scale(.99) }
+.settings-page .btn:disabled { opacity:.45;cursor:not-allowed }
+.settings-page .btn-primary  { background:var(--accent);color:#fff;border-color:transparent }
+.settings-page .btn-primary:hover:not(:disabled) { background:#0353e9;border-color:transparent }
+
+.settings-page .spinner { width:12px;height:12px;border:1.5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0 }
+.settings-page .spinner-dark { border-color:rgba(0,0,0,.1);border-top-color:var(--text-2) }
