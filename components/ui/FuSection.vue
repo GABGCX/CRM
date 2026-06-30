@@ -158,7 +158,11 @@ const daysIn   = (dt: string) => Math.floor((Date.now()-new Date(dt).getTime())/
 
 function daysUntil(d: string) {
   const t = new Date(); t.setHours(0,0,0,0)
-  return Math.floor((new Date(d).getTime()-t.getTime())/86400000)
+  // date-only ("YYYY-MM-DD") e UTC no parse padrão; forca local pra evitar
+  // off-by-one em fuso negativo (BRT). Ver utils/leadDomain.localDateISO.
+  const target = new Date(d.length === 10 ? `${d}T00:00:00` : d)
+  target.setHours(0,0,0,0)
+  return Math.round((target.getTime()-t.getTime())/86400000)
 }
 
 function urgencyColor(lead: LeadWithFU): string {

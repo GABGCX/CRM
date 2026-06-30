@@ -4,11 +4,12 @@
 // Follow-up e as acoes rapidas no hover das linhas de lead (Pipeline/Follow-up).
 
 import type { DiaryEntry } from '~/types'
+import { localDateISO } from '~/utils/leadDomain'
 
 type DiaryField = 'ld' | 'ce' | 'rm' | 'rr' | 'fr'
 
 export const useDiaryToday = () => {
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateISO()
   const day    = useState<Record<DiaryField, number>>('diary-today', () => ({ ld: 0, ce: 0, rm: 0, rr: 0, fr: 0 }))
   const loaded = useState<boolean>('diary-today-loaded', () => false)
   const saving = useState<boolean>('diary-today-saving', () => false)

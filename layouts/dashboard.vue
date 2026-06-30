@@ -60,9 +60,9 @@
         <div v-show="!collapsed" class="sb-section">Hoje</div>
 
         <NuxtLink to="/dashboard" custom v-slot="{ isExactActive }">
-          <button class="nav-item" :class="{ active: isExactActive }" @click="navigateTo('/dashboard')" :title="collapsed ? 'Inicio' : undefined">
+          <button class="nav-item" :class="{ active: isExactActive }" @click="navigateTo('/dashboard')" :title="collapsed ? 'Início' : undefined">
             <i class="ti ti-home sb-icon" aria-hidden="true"></i>
-            <span v-show="!collapsed" class="sb-label">Inicio</span>
+            <span v-show="!collapsed" class="sb-label">Início</span>
           </button>
         </NuxtLink>
 
@@ -70,6 +70,13 @@
           <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/diario')" :title="collapsed ? 'Meu Dia' : undefined">
             <i class="ti ti-calendar sb-icon" aria-hidden="true"></i>
             <span v-show="!collapsed" class="sb-label">Meu Dia</span>
+          </button>
+        </NuxtLink>
+
+        <NuxtLink to="/dashboard/agenda" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/agenda')" :title="collapsed ? 'Agenda' : undefined">
+            <i class="ti ti-calendar-event sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Agenda</span>
           </button>
         </NuxtLink>
 
@@ -93,7 +100,14 @@
           </button>
         </NuxtLink>
 
-        <div v-show="!collapsed" class="sb-section">Analise</div>
+        <NuxtLink v-if="isManager" to="/dashboard/cadencias" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/cadencias')" :title="collapsed ? 'Cadências' : undefined">
+            <i class="ti ti-route sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Cadências</span>
+          </button>
+        </NuxtLink>
+
+        <div v-show="!collapsed" class="sb-section">Análise</div>
 
         <NuxtLink to="/dashboard/matematica" custom v-slot="{ isActive }">
           <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/matematica')" :title="collapsed ? 'Metas e Ritmo' : undefined">
@@ -103,23 +117,30 @@
         </NuxtLink>
 
         <NuxtLink to="/dashboard/relatorios" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/relatorios')" :title="collapsed ? 'Relatorios' : undefined">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/relatorios')" :title="collapsed ? 'Relatórios' : undefined">
             <i class="ti ti-chart-bar sb-icon" aria-hidden="true"></i>
-            <span v-show="!collapsed" class="sb-label">Relatorios</span>
+            <span v-show="!collapsed" class="sb-label">Relatórios</span>
+          </button>
+        </NuxtLink>
+
+        <NuxtLink to="/dashboard/atividade" custom v-slot="{ isActive }">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/atividade')" :title="collapsed ? 'Atividade' : undefined">
+            <i class="ti ti-activity sb-icon" aria-hidden="true"></i>
+            <span v-show="!collapsed" class="sb-label">Atividade</span>
           </button>
         </NuxtLink>
 
         <NuxtLink v-if="isManager" to="/dashboard/gestao" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/gestao')" :title="collapsed ? 'Gestao' : undefined">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/gestao')" :title="collapsed ? 'Gestão' : undefined">
             <i class="ti ti-users-group sb-icon" aria-hidden="true"></i>
-            <span v-show="!collapsed" class="sb-label">Gestao</span>
+            <span v-show="!collapsed" class="sb-label">Gestão</span>
           </button>
         </NuxtLink>
 
         <NuxtLink to="/dashboard/configuracoes" custom v-slot="{ isActive }">
-          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/configuracoes')" :title="collapsed ? 'Configuracoes' : undefined">
+          <button class="nav-item" :class="{ active: isActive }" @click="navigateTo('/dashboard/configuracoes')" :title="collapsed ? 'Configurações' : undefined">
             <i class="ti ti-settings sb-icon" aria-hidden="true"></i>
-            <span v-show="!collapsed" class="sb-label">Configuracoes</span>
+            <span v-show="!collapsed" class="sb-label">Configurações</span>
           </button>
         </NuxtLink>
 
@@ -141,7 +162,7 @@
           <div class="sb-avatar">{{ (profile?.name || 'U')[0].toUpperCase() }}</div>
           <template v-if="!collapsed">
             <div class="sb-user-info">
-              <div class="sb-user-name">{{ profile?.name || 'Usuario' }}</div>
+              <div class="sb-user-name">{{ profile?.name || 'Usuário' }}</div>
               <div class="sb-user-role">{{ profile?.role }}</div>
             </div>
             <button class="sb-logout" @click="logout" title="Sair">
@@ -159,8 +180,8 @@
       </div>
     </main>
 
-    <UiGlobalSearch @select="onSearchSelect" />
-    <UiOnboardingTour />
+    <LazyUiGlobalSearch @select="onSearchSelect" />
+    <LazyUiOnboardingTour />
 
     <Transition name="toast">
       <div v-if="errorToast" class="layout-toast layout-toast-error">
@@ -182,7 +203,7 @@ const { isDark, init: initDark, toggle: toggleTheme } = useDarkMode()
 
 const isManager = computed(() => ['owner', 'admin'].includes(profile.value?.role || ''))
 
-// Carrega o perfil assim que o usuario de auth estiver disponivel (robusto a timing).
+// Carrega o perfil assim que o usuario de auth estiver disponível (robusto a timing).
 watch(user, (u) => { if (u && !profile.value) fetchProfile() }, { immediate: true })
 
 useHead(computed(() => ({

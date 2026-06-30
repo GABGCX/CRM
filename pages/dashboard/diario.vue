@@ -58,7 +58,7 @@
       </button>
     </div>
 
-    <!-- Resumo do mes -->
+    <!-- Resumo do mês -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0" class="md-totals">
       <UiMetricCard v-for="m in totalCards" :key="m.label" :value="m.value" :sub="m.sub" :sub-class="m.subClass">
         <template #label>
@@ -69,7 +69,7 @@
       </UiMetricCard>
     </div>
 
-    <!-- Historico -->
+    <!-- Histórico -->
     <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="card-label" style="margin-bottom:0">{{ entries.length }} dias registrados</div>
@@ -91,7 +91,8 @@
           <div style="font-size:12px;color:var(--text-3)">Selecione uma data e preencha as métricas.</div>
         </div>
 
-        <table v-else style="width:100%;border-collapse:collapse;font-size:13px">
+        <div v-else style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="width:100%;min-width:460px;border-collapse:collapse;font-size:13px">
           <thead>
             <tr style="border-bottom:1px solid var(--border-soft)">
               <th style="text-align:left;font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:0 8px 8px 0">Dia</th>
@@ -142,6 +143,7 @@
             </tr>
           </tfoot>
         </table>
+        </div>
       </div>
 
     <Transition name="toast">
@@ -152,6 +154,7 @@
 
 <script setup lang="ts">
 import type { DiaryEntry, MetricKey } from '~/types'
+import { localDateISO } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const supabase = useSupabaseClient()
@@ -159,7 +162,7 @@ const { org } = useProfile()
 
 const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 const now = new Date()
-const todayStr = now.toISOString().slice(0,10)
+const todayStr = localDateISO(now)
 
 const currentMonth = ref(now.getMonth() + 1)
 const currentYear  = ref(now.getFullYear())
@@ -192,7 +195,7 @@ const cePerDay = computed(() => {
 })
 const rmPerDay = computed(() => Math.max(1, Math.ceil(cePerDay.value * 0.027)))
 
-// Paleta categorica Carbon, alinhada com Relatorios (LD cinza = volume bruto,
+// Paleta categorica Carbon, alinhada com Relatórios (LD cinza = volume bruto,
 // CE/RM/RR/FR = conversoes). Hex literal: vao em :style de cor/barra.
 const FIELDS = computed(() => [
   { key:'ld', label:'Ligações',          color:'#8d8d8d', meta: 'N/A' },

@@ -7,7 +7,7 @@
       Campos personalizados
     </div>
     <p style="font-size:12px;color:var(--text-3);margin:-8px 0 4px">
-      Crie campos extras pra preencher no lead, alem dos campos padrao.
+      Crie campos extras para preencher no lead, além dos campos padrão.
     </p>
 
     <!-- Lista -->
@@ -30,9 +30,9 @@
         <input v-model="form.label" placeholder="Nome do campo (ex: Setor)" style="flex:1;min-width:150px" maxlength="40" />
         <select v-model="form.field_type" style="width:auto;flex-shrink:0">
           <option value="text">Texto</option>
-          <option value="number">Numero</option>
+          <option value="number">Número</option>
           <option value="date">Data</option>
-          <option value="select">Selecao</option>
+          <option value="select">Seleção</option>
         </select>
       </div>
       <input v-if="form.field_type === 'select'" v-model="optionsRaw"
@@ -49,7 +49,7 @@ import type { CustomFieldType, CustomFieldDef } from '~/types'
 
 const { defs, load, create, remove } = useCustomFields()
 
-const TYPE_LABEL: Record<string, string> = { text: 'Texto', number: 'Numero', date: 'Data', select: 'Selecao' }
+const TYPE_LABEL: Record<string, string> = { text: 'Texto', number: 'Número', date: 'Data', select: 'Seleção' }
 
 const form = reactive<{ label: string; field_type: CustomFieldType }>({ label: '', field_type: 'text' })
 const optionsRaw = ref('')

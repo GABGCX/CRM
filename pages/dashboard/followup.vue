@@ -15,7 +15,7 @@
       <span class="fu-stats-sep">·</span>
       <span><strong>{{ (leads||[]).filter(l=>l.reuniao_agendada).length }}</strong> reunioes</span>
       <span class="fu-stats-sep">·</span>
-      <span style="color:#16a34a"><strong>{{ closedThisMonth }}</strong> fechados/mes</span>
+      <span style="color:#16a34a"><strong>{{ closedThisMonth }}</strong> fechados/mês</span>
     </div>
 
     <!-- Log rapido do dia -->
@@ -61,7 +61,7 @@
         <div class="fu-empty-sub">Nenhum retorno pendente. Hora de prospectar novos leads.</div>
       </div>
 
-      <div v-else class="fu-cockpit">
+      <div v-else class="fu-cockpit" :class="{ 'fu-show-detail': mobileDetail }">
         <!-- Fila -->
         <div class="fu-queue">
           <template v-for="group in queueGroups" :key="group.key">
@@ -98,6 +98,11 @@
           </div>
 
           <div v-else class="fu-work">
+            <!-- Voltar pra fila (so mobile) -->
+            <button class="fu-back" @click="backToQueue">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Fila
+            </button>
             <!-- Header -->
             <div class="fu-work-head">
               <div style="min-width:0">
@@ -117,7 +122,7 @@
               <span v-if="!selectedLead.telefone" class="fu-nophone">Sem telefone cadastrado</span>
             </div>
 
-            <!-- Cadencia: proximo passo -->
+            <!-- Cadência: próximo passo -->
             <div v-if="nextStep(selectedLead)" class="fu-cadence">
               <span class="fu-cadence-tag">Dia {{ nextStep(selectedLead)!.day_offset }} · {{ nextStep(selectedLead)!.channel }}</span>
               <span v-if="nextStep(selectedLead)!.instruction" class="fu-cadence-text">{{ nextStep(selectedLead)!.instruction }}</span>
@@ -135,7 +140,7 @@
             </div>
 
             <!-- Reagendar retorno -->
-            <div class="fu-block-label">Proximo retorno</div>
+            <div class="fu-block-label">Próximo retorno</div>
             <div class="fu-resched">
               <button v-for="opt in [2,4,7]" :key="opt" class="btn fu-resched-btn" @click="setRetorno(opt)">+{{ opt }}d</button>
               <input type="date" v-model="retornoDate" @change="setRetornoDate" class="fu-date" />
@@ -152,7 +157,7 @@
               <span>Notas</span>
               <span style="color:var(--text-3);font-weight:400">{{ notes.length }}</span>
             </div>
-            <textarea v-model="noteInput" rows="2" placeholder="Registrar contexto da ligacao..."
+            <textarea v-model="noteInput" rows="2" placeholder="Registrar contexto da ligação..."
               class="fu-note-input" @keydown.ctrl.enter="postNote" maxlength="2000" />
             <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" :disabled="postingNote || !noteInput.trim()" @click="postNote">
               {{ postingNote ? 'Salvando...' : 'Adicionar nota' }}
@@ -160,12 +165,12 @@
             <div v-if="notes.length" class="fu-notes">
               <div v-for="n in notes" :key="n.id" class="fu-note">
                 <div class="fu-note-body">{{ n.content }}</div>
-                <div class="fu-note-meta">{{ n.profiles?.name || 'Voce' }} · {{ fmtDate(n.created_at) }}</div>
+                <div class="fu-note-meta">{{ n.profiles?.name || 'Você' }} · {{ fmtDate(n.created_at) }}</div>
               </div>
             </div>
 
-            <!-- Proximo na fila -->
-            <button class="btn fu-next" @click="goNext" :disabled="!hasNext">Proximo na fila &rarr;</button>
+            <!-- Próximo na fila -->
+            <button class="btn fu-next" @click="goNext" :disabled="!hasNext">Próximo na fila &rarr;</button>
           </div>
         </div>
       </div>
@@ -181,7 +186,7 @@
     <!-- PREVISAO -->
     <div v-else-if="view === 'previsao'">
       <div class="card" style="margin-bottom:14px">
-        <div class="card-label">Carga de follow-ups nos proximos 7 dias</div>
+        <div class="card-label">Carga de follow-ups nos próximos 7 dias</div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
           <div v-for="d in weekForecast" :key="d.date"
             style="text-align:center;padding:10px 4px;border-radius:8px;border:1px solid"
@@ -226,14 +231,14 @@
 import type { Lead, Followup, LeadStatus, Cadence, CadenceStep, LeadNote } from '~/types'
 import {
   FU_DAYS, STATUSES, leadUrgency, URGENCY_COLOR, URGENCY_AVATAR,
-  fuDone, sortedFU, daysIn, telHref, waHref,
+  fuDone, sortedFU, daysIn, telHref, waHref, daysUntil, localDateISO,
 } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 type LeadWithFU = Lead & { followups: Followup[] }
 type ViewId = 'fila' | 'todos' | 'previsao'
 
-const todayStr  = new Date().toISOString().slice(0, 10)
+const todayStr  = localDateISO()
 const view      = ref<ViewId>('fila')
 const toastMsg  = ref<string | null>(null)
 const showToast = (m: string) => { toastMsg.value = m; setTimeout(() => toastMsg.value = null, 2500) }
@@ -262,7 +267,7 @@ const dueSoon  = computed(() => activeLeads.value.filter(l => leadUrgency(l) ===
 const queueGroups = computed(() => [
   { key: 'overdue', label: 'Vencidos',        color: URGENCY_COLOR.overdue, leads: overdue.value },
   { key: 'today',   label: 'Hoje',            color: URGENCY_COLOR.today,   leads: dueToday.value },
-  { key: 'soon',    label: 'Proximos 3 dias', color: URGENCY_COLOR.soon,    leads: dueSoon.value },
+  { key: 'soon',    label: 'Próximos 3 dias', color: URGENCY_COLOR.soon,    leads: dueSoon.value },
 ])
 const queueAll = computed(() => [...overdue.value, ...dueToday.value, ...dueSoon.value])
 
@@ -272,12 +277,14 @@ const closedThisMonth = computed(() => (leads.value || []).filter(l => l.resulta
 const views = [
   { id: 'fila' as const,     label: 'Fila' },
   { id: 'todos' as const,    label: 'Todos' },
-  { id: 'previsao' as const, label: 'Previsao' },
+  { id: 'previsao' as const, label: 'Previsão' },
 ]
 
 // ── Selecao + painel de trabalho ──────────────────────────────────────
 const selectedId  = ref<string | null>(null)
 const selectedLead = computed(() => queueAll.value.find(l => l.id === selectedId.value) || null)
+// No mobile a fila e o painel viram master-detail: este flag controla qual mostrar.
+const mobileDetail = ref(false)
 const notes       = ref<LeadNote[]>([])
 const noteInput   = ref('')
 const postingNote = ref(false)
@@ -297,7 +304,15 @@ watch(selectedId, async (id) => {
   try { notes.value = await $fetch<LeadNote[]>(`/api/leads/${id}/notes`) } catch {}
 })
 
-function select(l: LeadWithFU) { selectedId.value = l.id }
+function select(l: LeadWithFU) {
+  selectedId.value = l.id
+  // No mobile, abre o painel de trabalho em tela cheia e sobe pro topo.
+  if (import.meta.client && window.innerWidth <= 820) {
+    mobileDetail.value = true
+    requestAnimationFrame(() => document.querySelector('.main-content')?.scrollTo({ top: 0 }))
+  }
+}
+function backToQueue() { mobileDetail.value = false }
 
 const hasNext = computed(() => {
   const i = queueAll.value.findIndex(l => l.id === selectedId.value)
@@ -308,7 +323,7 @@ function goNext() {
   if (i >= 0 && i < queueAll.value.length - 1) selectedId.value = queueAll.value[i + 1].id
 }
 
-// ── Cadencia: proximo passo ───────────────────────────────────────────
+// ── Cadência: próximo passo ───────────────────────────────────────────
 function nextStep(lead: LeadWithFU): CadenceStep | null {
   if (!lead.cadence_id) return null
   const cad = cadences.value.find(c => c.id === lead.cadence_id)
@@ -331,7 +346,7 @@ async function onStatus(lead: LeadWithFU, resultado: LeadStatus) {
 async function setRetorno(days: number) {
   if (!selectedLead.value) return
   const d = new Date(); d.setDate(d.getDate() + days)
-  const iso = d.toISOString().slice(0, 10)
+  const iso = localDateISO(d)
   try { await patchLead(selectedLead.value.id, { data_retorno: iso }); showToast(`Retorno em +${days}d`) }
   catch { showToast('Erro ao reagendar.') }
 }
@@ -359,22 +374,22 @@ const avatarBg = (l: LeadWithFU) => URGENCY_AVATAR[leadUrgency(l)].bg
 const avatarFg = (l: LeadWithFU) => URGENCY_AVATAR[leadUrgency(l)].fg
 
 function retLabel(date: string | null): string {
-  if (!date) return ''
-  const diff = Math.floor((new Date(date).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86_400_000)
+  const diff = daysUntil(date)
+  if (diff === null) return ''
   if (diff < 0)  return `${Math.abs(diff)}d atraso`
   if (diff === 0) return 'hoje'
-  if (diff === 1) return 'amanha'
+  if (diff === 1) return 'amanhã'
   return `+${diff}d`
 }
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-// ── Previsao ──────────────────────────────────────────────────────────
+// ── Previsão ──────────────────────────────────────────────────────────
 const weekForecast = computed(() =>
   Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() + i)
-    const date = d.toISOString().slice(0, 10)
+    const date = localDateISO(d)
     const label = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' })
     const dayLeads = activeLeads.value.filter(l => l.data_retorno === date)
     const count = dayLeads.length
@@ -421,7 +436,17 @@ const weekForecast = computed(() =>
 
 /* ── Cockpit (fila + painel) ─────────────────────────────── */
 .fu-cockpit { display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start }
-@media (max-width:820px){ .fu-cockpit{ grid-template-columns:1fr } }
+/* Botao "voltar pra fila": so aparece no mobile (regra no @media) */
+.fu-back { display:none;align-items:center;gap:5px;padding:6px 10px 6px 7px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--bg-card);color:var(--text-2);border-radius:8px;cursor:pointer;font-family:inherit;align-self:flex-start;margin-bottom:12px }
+.fu-back:hover { border-color:var(--accent);color:var(--accent) }
+@media (max-width:820px){
+  .fu-cockpit{ grid-template-columns:1fr }
+  /* master-detail: ou a fila, ou o painel — nunca os dois empilhados */
+  .fu-cockpit:not(.fu-show-detail) .fu-panel { display:none }
+  .fu-cockpit.fu-show-detail .fu-queue { display:none }
+  .fu-back { display:inline-flex }
+  .fu-queue { max-height:none }
+}
 
 .fu-queue { display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-card);max-height:calc(100vh - 300px);overflow-y:auto }
 .fu-group-head { display:flex;align-items:center;gap:6px;padding:9px 12px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3) }

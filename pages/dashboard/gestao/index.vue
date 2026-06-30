@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-bottom:16px">
-      <div class="page-title">Gestao da equipe</div>
+      <div class="page-title">Gestão da equipe</div>
       <div class="page-sub">{{ MONTH_NAMES[(data?.month || 1) - 1] }} {{ data?.year }} · desempenho por BDR</div>
     </div>
 
@@ -19,7 +19,7 @@
         </div>
         <div class="gm-sum-div" />
         <div class="gm-sum-item">
-          <span class="gm-sum-label">CE no mes</span>
+          <span class="gm-sum-label">CE no mês</span>
           <span class="gm-sum-value">{{ team.ce }}</span>
           <span class="gm-sum-hint">contatos efetivos</span>
         </div>
@@ -31,7 +31,7 @@
         </div>
         <div class="gm-sum-div" />
         <div class="gm-sum-item">
-          <span class="gm-sum-label">Previsao ponderada</span>
+          <span class="gm-sum-label">Previsão ponderada</span>
           <span class="gm-sum-value" style="color:#16a34a">R$ {{ team.forecast.toLocaleString('pt-BR') }}</span>
           <span class="gm-sum-hint">pipeline R$ {{ fmtK(team.pipeline) }} · {{ team.activeLeads }} ativos</span>
         </div>
@@ -105,7 +105,7 @@ import { fmtK } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
-const ROLE_LABEL: Record<string, string> = { owner: 'Proprietario', admin: 'Admin', bdr: 'BDR' }
+const ROLE_LABEL: Record<string, string> = { owner: 'Proprietário', admin: 'Admin', bdr: 'BDR' }
 const B = OUTBOUND_BENCHMARKS
 
 interface TeamMember {
@@ -165,7 +165,7 @@ function pace(b: TeamMember) {
 const alerts = computed(() => {
   const out: { kind: string; text: string }[] = []
   const noLog = bdrs.value.filter(b => b.daysLogged === 0)
-  if (noLog.length) out.push({ kind: 'log', text: `${noLog.length} BDR(s) sem nenhum registro no diario este mes: ${noLog.map(b => b.name).join(', ')}` })
+  if (noLog.length) out.push({ kind: 'log', text: `${noLog.length} BDR(s) sem nenhum registro no diário este mês: ${noLog.map(b => b.name).join(', ')}` })
   const gargalo = bdrs.value.filter(b => b.ce > 20 && (b.rm / b.ce) < 0.015)
   if (gargalo.length) out.push({ kind: 'gargalo', text: `${gargalo.length} BDR(s) com CE→RM abaixo de 1.5%: ${gargalo.map(b => b.name).join(', ')}` })
   const atrasados = bdrs.value.filter(b => pace(b).label === 'atrasado')
@@ -173,7 +173,7 @@ const alerts = computed(() => {
   return out
 })
 
-// Taxa de conversao colorida vs benchmark
+// Taxa de conversão colorida vs benchmark
 function rate(from: number, to: number, benchmark: number) {
   if (from === 0) return { label: '--', color: 'var(--text-3)' }
   const v = to / from

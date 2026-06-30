@@ -13,7 +13,7 @@
         <div class="page-sub">{{ ROLE_LABEL[data.profile.role] || data.profile.role }} · {{ MONTH_NAMES[(data.month||1)-1] }} {{ data.year }}</div>
       </div>
 
-      <!-- Totais do mes -->
+      <!-- Totais do mês -->
       <div class="gd-stats">
         <div v-for="s in stats" :key="s.label" class="gd-stat">
           <div class="gd-stat-label">{{ s.label }}</div>
@@ -32,14 +32,14 @@
 
       <!-- Meta individual -->
       <div class="card" style="margin-bottom:14px">
-        <div class="card-label">Meta individual {{ data.hasGoal ? '' : '· usando meta da organizacao' }}</div>
+        <div class="card-label">Meta individual {{ data.hasGoal ? '' : '· usando meta da organização' }}</div>
         <div class="gd-goal">
           <div class="gd-goal-field">
             <label>Meta mensal (R$)</label>
             <input type="number" v-model.number="goalMeta" min="0" step="500" />
           </div>
           <div class="gd-goal-field">
-            <label>Ticket medio (R$)</label>
+            <label>Ticket médio (R$)</label>
             <input type="number" v-model.number="goalTicket" min="0" step="100" />
           </div>
           <button class="btn btn-primary" :disabled="savingGoal" @click="saveGoal" style="flex-shrink:0">
@@ -94,7 +94,7 @@ import { fmtK } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
-const ROLE_LABEL: Record<string, string> = { owner: 'Proprietario', admin: 'Admin', bdr: 'BDR' }
+const ROLE_LABEL: Record<string, string> = { owner: 'Proprietário', admin: 'Admin', bdr: 'BDR' }
 
 const route = useRoute()
 interface Drill {
@@ -172,36 +172,36 @@ const rmRr = computed(() => t.value.rm > 0 ? (t.value.rr / t.value.rm) * 100 : 0
 const rrFr = computed(() => t.value.rr > 0 ? (t.value.fr / t.value.rr) * 100 : 0)
 
 const stats = computed(() => [
-  { label: 'Contatos efetivos', value: t.value.ce, sub: 'no mes', color: 'var(--text-3)' },
-  { label: 'Reunioes marcadas', value: t.value.rm, sub: `CE→RM ${ceRm.value.toFixed(1)}%`, color: ceRm.value >= OUTBOUND_BENCHMARKS.TX_CE_RM*100 ? '#16a34a' : '#d97706' },
-  { label: 'Reunioes realizadas', value: t.value.rr, sub: `RM→RR ${rmRr.value.toFixed(0)}%`, color: rmRr.value >= 35 ? '#16a34a' : '#d97706' },
+  { label: 'Contatos efetivos', value: t.value.ce, sub: 'no mês', color: 'var(--text-3)' },
+  { label: 'Reuniões marcadas', value: t.value.rm, sub: `CE→RM ${ceRm.value.toFixed(1)}%`, color: ceRm.value >= OUTBOUND_BENCHMARKS.TX_CE_RM*100 ? '#16a34a' : '#d97706' },
+  { label: 'Reuniões realizadas', value: t.value.rr, sub: `RM→RR ${rmRr.value.toFixed(0)}%`, color: rmRr.value >= 35 ? '#16a34a' : '#d97706' },
   { label: 'Fechamentos', value: t.value.fr, sub: `RR→FR ${rrFr.value.toFixed(0)}%`, color: t.value.fr > 0 ? '#16a34a' : 'var(--text-3)' },
 ])
 
 // Gargalo (mesma logica do matematica.vue)
 const bottleneck = computed(() => {
   if (t.value.ce === 0) return {
-    eyebrow: 'Sem atividade', title: 'Nenhum contato registrado este mes',
-    body: 'Este BDR ainda nao registrou contatos efetivos no diario.',
-    action: 'Verifique se o diario esta sendo preenchido.',
+    eyebrow: 'Sem atividade', title: 'Nenhum contato registrado este mês',
+    body: 'Este BDR ainda não registrou contatos efetivos no diário.',
+    action: 'Verifique se o diário está sendo preenchido.',
     style: 'background:var(--bg-subtle);border-color:var(--border);color:var(--text-2)',
   }
   if (rrFr.value < 20 && t.value.rr > 0) return {
-    eyebrow: 'Gargalo identificado', title: 'Conversao reuniao → fechamento (RR→FR)',
+    eyebrow: 'Gargalo identificado', title: 'Conversão reunião → fechamento (RR→FR)',
     body: `Taxa atual ${rrFr.value.toFixed(0)}% contra benchmark de 40%.`,
-    action: 'Foco em tecnica de negociacao e fechamento, nao em prospeccao.',
+    action: 'Foco em técnica de negociação e fechamento, não em prospecção.',
     style: 'background:var(--bad-bg);border-color:var(--bad-bd);color:var(--bad)',
   }
   if (ceRm.value < 1.5 && t.value.ce > 20) return {
-    eyebrow: 'Gargalo identificado', title: 'Conversao contato → reuniao (CE→RM)',
+    eyebrow: 'Gargalo identificado', title: 'Conversão contato → reunião (CE→RM)',
     body: `Taxa CE→RM ${ceRm.value.toFixed(1)}% contra benchmark de 2.7%.`,
-    action: 'Foco em script de abertura e geracao de interesse.',
+    action: 'Foco em script de abertura e geração de interesse.',
     style: 'background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn)',
   }
   return {
     eyebrow: 'No ritmo', title: 'Taxas dentro do benchmark',
     body: `CE→RM ${ceRm.value.toFixed(1)}% · RM→RR ${rmRr.value.toFixed(0)}%.`,
-    action: 'Manter o volume diario de contatos.',
+    action: 'Manter o volume diário de contatos.',
     style: 'background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok)',
   }
 })

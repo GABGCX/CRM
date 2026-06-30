@@ -16,7 +16,7 @@
       </div>
       <div v-if="mode === 'custom'" style="display:flex;align-items:center;gap:6px">
         <input type="date" v-model="customFrom" :max="customTo || todayStr" style="width:auto" />
-        <span style="font-size:12px;color:var(--text-3)">ate</span>
+        <span style="font-size:12px;color:var(--text-3)">até</span>
         <input type="date" v-model="customTo" :min="customFrom" :max="todayStr" style="width:auto" />
       </div>
       <select v-if="profile?.role !== 'bdr'" v-model="selectedUser" style="width:auto">
@@ -29,7 +29,7 @@
       </button>
     </div>
 
-    <!-- KPIs com delta vs periodo anterior -->
+    <!-- KPIs com delta vs período anterior -->
     <div class="kpi-grid">
       <div v-for="k in kpiCards" :key="k.key" class="kpi-card">
         <div class="kpi-label">
@@ -50,8 +50,8 @@
     <!-- Funil agregado + Receita -->
     <div class="r-grid-2">
       <div class="card">
-        <div class="card-label">Funil do periodo (LD &rarr; FR)</div>
-        <div v-if="!periodTotals.ld && !periodTotals.ce" class="r-empty">Sem atividade registrada no periodo.</div>
+        <div class="card-label">Funil do período (LD &rarr; FR)</div>
+        <div v-if="!periodTotals.ld && !periodTotals.ce" class="r-empty">Sem atividade registrada no período.</div>
         <div v-else style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
           <div v-for="st in funnelStages" :key="st.key">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
@@ -72,10 +72,10 @@
 
       <div class="card">
         <div class="card-label">Receita</div>
-        <div v-if="!metaMensal" class="r-empty">Defina a meta mensal em Configuracoes.</div>
+        <div v-if="!metaMensal" class="r-empty">Defina a meta mensal em Configurações.</div>
         <template v-else>
           <div class="rev-row">
-            <span class="rev-k">Fechado no periodo</span>
+            <span class="rev-k">Fechado no período</span>
             <span class="rev-v" style="color:var(--ok)">R$ {{ fmtMoney(revenue.closedValue) }}</span>
           </div>
           <div class="gauge-track">
@@ -84,25 +84,25 @@
           <div class="rev-hint">{{ (revenue.closedValue / metaMensal * 100).toFixed(0) }}% da meta (R$ {{ fmtMoney(metaMensal) }}) · {{ revenue.closedCount }} fechados</div>
 
           <div class="rev-row" style="margin-top:14px">
-            <span class="rev-k">Previsao ponderada (pipeline)</span>
+            <span class="rev-k">Previsão ponderada (pipeline)</span>
             <span class="rev-v">R$ {{ fmtMoney(Math.round(revenue.weightedForecast)) }}</span>
           </div>
           <div class="gauge-track">
             <div class="gauge-fill" :style="{ width: pctClamp((revenue.closedValue + revenue.weightedForecast) / metaMensal) + '%', background: 'var(--accent)' }" />
           </div>
-          <div class="rev-hint">fechado + previsao = {{ ((revenue.closedValue + revenue.weightedForecast) / metaMensal * 100).toFixed(0) }}% da meta · pipeline R$ {{ fmtMoney(revenue.pipelineValue) }}</div>
+          <div class="rev-hint">fechado + previsão = {{ ((revenue.closedValue + revenue.weightedForecast) / metaMensal * 100).toFixed(0) }}% da meta · pipeline R$ {{ fmtMoney(revenue.pipelineValue) }}</div>
         </template>
       </div>
     </div>
 
-    <!-- Atividade: ligacoes/dia + CE/LD -->
+    <!-- Atividade: ligações/dia + CE/LD -->
     <div class="card" style="margin-top:12px">
-      <div class="card-label">Atividade diaria (ligacoes e contato efetivo)</div>
+      <div class="card-label">Atividade diária (ligações e contato efetivo)</div>
       <div class="r-grid-3" style="margin-bottom:14px">
         <div class="vol-item">
-          <div class="vol-label">Ligacoes / dia (media)</div>
+          <div class="vol-label">Ligações / dia (média)</div>
           <div class="vol-value" :style="{ color: ldPerDayActual >= ldPerDay ? 'var(--ok)' : 'var(--text-1)' }">{{ ldPerDayActual }}</div>
-          <div class="vol-hint">meta {{ ldPerDay }}/dia util · {{ activeDays }} dias com registro</div>
+          <div class="vol-hint">meta {{ ldPerDay }}/dia útil · {{ activeDays }} dias com registro</div>
         </div>
         <div class="vol-item">
           <div class="vol-label">Taxa de contato (CE/LD)</div>
@@ -112,13 +112,13 @@
         <div class="vol-item">
           <div class="vol-label">CE / agendamento</div>
           <div class="vol-value" :style="{ color: actualCePerRM !== '--' && Number(actualCePerRM) <= cePerRM ? 'var(--ok)' : 'var(--text-1)' }">{{ actualCePerRM }}</div>
-          <div class="vol-hint">meta ~{{ cePerRM }} · ligacoes/RM meta ~{{ ldPerRM }}</div>
+          <div class="vol-hint">meta ~{{ cePerRM }} · ligações/RM meta ~{{ ldPerRM }}</div>
         </div>
       </div>
-      <!-- Barras de ligacoes por bucket com linha de meta -->
+      <!-- Barras de ligações por bucket com linha de meta -->
       <div v-if="trendBuckets.length" style="overflow-x:auto">
         <div class="bars-row" :style="{ minWidth: trendBuckets.length * 34 + 'px' }">
-          <div v-for="b in trendBuckets" :key="b.key" class="bar-col" :title="`${bucketLabel(b.key)}: ${b.ld} ligacoes`">
+          <div v-for="b in trendBuckets" :key="b.key" class="bar-col" :title="`${bucketLabel(b.key)}: ${b.ld} ligações`">
             <div class="bar-wrap">
               <div class="bar" :style="{ height: pctClamp(b.ld / trendLdMax) + '%', background: C.ld }" />
             </div>
@@ -131,7 +131,7 @@
     <!-- Tendencia multi-serie do funil -->
     <div class="card" style="margin-top:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div class="card-label" style="margin-bottom:0">Tendencia do funil ({{ granLabel }})</div>
+        <div class="card-label" style="margin-bottom:0">Tendência do funil ({{ granLabel }})</div>
         <div class="seg seg-sm">
           <button v-for="g in (['auto','day','week','month'] as const)" :key="g"
             class="seg-btn" :class="{ active: granularity === g }" @click="granularity = g">{{ GRAN_LABEL[g] }}</button>
@@ -153,11 +153,11 @@
       </div>
     </div>
 
-    <!-- Comparativo por BDR + Conversao por fonte -->
+    <!-- Comparativo por BDR + Conversão por fonte -->
     <div class="r-grid-2" style="margin-top:12px">
       <div v-if="profile?.role !== 'bdr'" class="card">
-        <div class="card-label">Comparativo por BDR (CE no periodo)</div>
-        <div v-if="!bdrRows.length" class="r-empty">Sem registros de equipe no periodo.</div>
+        <div class="card-label">Comparativo por BDR (CE no período)</div>
+        <div v-if="!bdrRows.length" class="r-empty">Sem registros de equipe no período.</div>
         <div v-else style="display:flex;flex-direction:column;gap:8px">
           <div v-for="b in bdrRows" :key="b.user_id">
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
@@ -172,9 +172,9 @@
       </div>
 
       <div class="card">
-        <div class="card-label">Conversao por fonte (avanco para reuniao+)</div>
-        <div class="r-sublabel">Leads criados no periodo, por canal (snapshot do estagio atual).</div>
-        <div v-if="!sourceRows.length" class="r-empty">Sem leads com fonte no periodo.</div>
+        <div class="card-label">Conversão por fonte (avanço para reunião+)</div>
+        <div class="r-sublabel">Leads criados no período, por canal (snapshot do estágio atual).</div>
+        <div v-if="!sourceRows.length" class="r-empty">Sem leads com fonte no período.</div>
         <div v-else style="display:flex;flex-direction:column;gap:8px">
           <div v-for="s in sourceRows" :key="s.fonte">
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
@@ -204,7 +204,7 @@
               <div class="bar-x">{{ i + 1 }}</div>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:6px">{{ fuDrop.totalLeads }} leads · referencia: 80% das vendas fecham com 8+ contatos.</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:6px">{{ fuDrop.totalLeads }} leads · referência: 80% das vendas fecham com 8+ contatos.</div>
         </div>
       </div>
 
@@ -224,8 +224,8 @@
     <!-- Status + Motivos de perda -->
     <div class="r-grid-2" style="margin-top:12px">
       <div class="card">
-        <div class="card-label">Leads por status (criados no periodo)</div>
-        <div v-if="!statusData.length" class="r-empty">Sem leads criados no periodo.</div>
+        <div class="card-label">Leads por status (criados no período)</div>
+        <div v-if="!statusData.length" class="r-empty">Sem leads criados no período.</div>
         <div v-else style="display:flex;gap:12px;align-items:flex-start">
           <svg width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
             <circle cx="50" cy="50" r="38" fill="none" :stroke="C.donutBg" stroke-width="16"/>
@@ -246,8 +246,8 @@
       </div>
 
       <div class="card">
-        <div class="card-label">Motivos de perda (criados no periodo)</div>
-        <div v-if="!lossData.length" class="r-empty">Nenhum lead perdido com motivo no periodo.</div>
+        <div class="card-label">Motivos de perda (criados no período)</div>
+        <div v-if="!lossData.length" class="r-empty">Nenhum lead perdido com motivo no período.</div>
         <div v-else>
           <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">Total: {{ lossTotal }} leads perdidos com motivo</div>
           <div style="display:flex;flex-direction:column;gap:7px">
@@ -268,7 +268,7 @@
     <!-- Aging -->
     <div class="card" style="margin-top:12px">
       <div class="card-label">Envelhecimento dos leads ativos</div>
-      <div class="r-sublabel">Dias desde a ultima atualizacao. Leads parados ha muito tempo sao receita travada.</div>
+      <div class="r-sublabel">Dias desde a última atualização. Leads parados há muito tempo são receita travada.</div>
       <div v-if="!agingTotal" class="r-empty">Sem leads ativos.</div>
       <div v-else class="r-grid-4">
         <div v-for="a in agingData" :key="a.label" class="vol-item">
@@ -279,18 +279,18 @@
       </div>
     </div>
 
-    <!-- ════ Analise estrutural ════ -->
+    <!-- ════ Análise estrutural ════ -->
     <div style="margin:20px 0 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)">
-      Analise estrutural
+      Análise estrutural
     </div>
 
     <!-- Waterfall + Velocidade -->
     <div class="r-grid-2">
       <div class="card">
-        <div class="card-label">Movimentacao do pipeline no periodo</div>
-        <div class="r-sublabel">A partir do historico de transicoes (lead_events).</div>
+        <div class="card-label">Movimentação do pipeline no período</div>
+        <div class="r-sublabel">A partir do historico de transições (lead_events).</div>
         <div v-if="!waterfall.created && !waterfall.advanced && !waterfall.won && !waterfall.lost" class="r-empty">
-          Sem movimentacoes registradas no periodo.
+          Sem movimentações registradas no período.
         </div>
         <div v-else style="display:flex;flex-direction:column;gap:9px">
           <div v-for="b in waterfallBars" :key="b.label">
@@ -305,14 +305,14 @@
 
       <div class="card">
         <div class="card-label">Velocidade do funil</div>
-        <div class="r-sublabel">Tempo medio em cada etapa e ciclo ate o fechamento.</div>
+        <div class="r-sublabel">Tempo médio em cada etapa e ciclo até o fechamento.</div>
         <div class="rev-row" style="margin-bottom:10px">
-          <span class="rev-k">Ciclo medio (criacao &rarr; fechamento)</span>
+          <span class="rev-k">Ciclo médio (criação &rarr; fechamento)</span>
           <span class="rev-v">{{ velocity.cycleDays }}d</span>
         </div>
-        <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">{{ velocity.cycleCount }} fechamentos no periodo</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">{{ velocity.cycleCount }} fechamentos no período</div>
         <div v-if="!velocity.stages.length" style="font-size:12px;color:var(--text-3)">
-          Sem transicoes suficientes no periodo para medir tempo por etapa.
+          Sem transições suficientes no período para medir tempo por etapa.
         </div>
         <div v-else style="display:flex;flex-direction:column;gap:7px">
           <div v-for="st in velocity.stages.slice(0,6)" :key="st.stage" style="display:flex;align-items:center;gap:8px">
@@ -320,23 +320,23 @@
             <div class="funbar-track"><div class="funbar-fill" :style="{ width: velStagePct(st.avgDays) + '%', background: C.rr }" /></div>
             <span style="width:42px;text-align:right;font-size:12px;font-weight:600;color:var(--text-1)">{{ st.avgDays }}d</span>
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:2px">baseado em {{ velocity.transitions }} transicoes</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px">baseado em {{ velocity.transitions }} transições</div>
         </div>
       </div>
     </div>
 
     <!-- Coorte -->
     <div class="card" style="margin-top:12px">
-      <div class="card-label">Coorte por mes de criacao (posicao atual no funil)</div>
-      <div class="r-sublabel">Dos leads criados em cada mes, quantos % chegaram a cada etapa.</div>
-      <div v-if="!cohortRows.length" class="r-empty">Sem leads criados no periodo.</div>
+      <div class="card-label">Coorte por mês de criação (posição atual no funil)</div>
+      <div class="r-sublabel">Dos leads criados em cada mês, quantos % chegaram a cada etapa.</div>
+      <div v-if="!cohortRows.length" class="r-empty">Sem leads criados no período.</div>
       <div v-else style="overflow-x:auto">
         <table class="cohort-table">
           <thead>
             <tr>
               <th style="text-align:left">Coorte</th>
               <th>Leads</th>
-              <th>Reuniao+</th>
+              <th>Reunião+</th>
               <th>Proposta+</th>
               <th>Fechou</th>
             </tr>
@@ -358,7 +358,7 @@
     <div class="card" style="margin-top:12px">
       <div class="card-label">Pipeline ao longo do tempo (valor ativo)</div>
       <div v-if="!pipeHistory.length" class="r-empty">
-        Sem historico ainda. Aplique a migracao de snapshots; o grafico passa a acumular a partir dai.
+        Sem histórico ainda. Aplique a migração de snapshots; o gráfico passa a acumular a partir daí.
       </div>
       <div v-else style="overflow-x:auto">
         <svg :width="pipeW" height="100" style="display:block">
@@ -374,15 +374,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Profile } from '~/types'
+import type { FunnelRow, DayRow } from '~/composables/useReports'
 import { OUTBOUND_BENCHMARKS, useOutboundMath } from '~/composables/useOutboundMath'
-import { fmtMoney } from '~/utils/leadDomain'
+import { fmtMoney, localDateISO } from '~/utils/leadDomain'
 definePageMeta({ layout: 'dashboard' })
 
 const { profile, org } = useProfile()
 
 // Cores de serie/grafico — paleta categorica Carbon (hex literal: vao em
-// atributos SVG fill/stroke, onde var(--...) nao resolve). Consts, nao
+// atributos SVG fill/stroke, onde var(--...) não resolve). Consts, não
 // literais em style="" para a trava de cores.
 const C = {
   ld: '#8d8d8d', ce: '#0f62fe', rm: '#8a3ffc', rr: '#009d9a', fr: '#24a148',
@@ -395,7 +395,7 @@ const TREND_SERIES = [
   { key: 'fr' as const, label: 'FR', color: C.fr },
 ]
 const PRESETS = [{ value: 3, label: '3 meses' }, { value: 6, label: '6 meses' }, { value: 12, label: '1 ano' }]
-const GRAN_LABEL = { auto: 'Auto', day: 'Dia', week: 'Semana', month: 'Mes' }
+const GRAN_LABEL = { auto: 'Auto', day: 'Dia', week: 'Semana', month: 'Mês' }
 const DOW = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado']
 const DOW_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
 
@@ -409,105 +409,13 @@ const { ldPerDay, cePerDay } = useOutboundMath(
   computed(() => metaMensal.value || 10000), ticketMedio,
 )
 
-// ── Periodo ─────────────────────────────────────────────────────────────
-const months       = ref(6)
-const mode         = ref<'preset' | 'custom'>('preset')
-const _now         = new Date()
-const todayStr     = _now.toISOString().slice(0, 10)
-const monthStartStr = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-01`
-const customFrom   = ref(monthStartStr)
-const customTo     = ref(todayStr)
-const selectedUser = ref('')
-const granularity  = ref<'auto' | 'day' | 'week' | 'month'>('auto')
-
-function setPreset(v: number) { months.value = v; mode.value = 'preset' }
-
-const fmtDay = (s: string) => s
-  ? new Date(s + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })
-  : ''
-const periodLabel = computed(() =>
-  mode.value === 'custom' && customFrom.value && customTo.value
-    ? `${fmtDay(customFrom.value)} a ${fmtDay(customTo.value)}`
-    : months.value === 12 ? '1 ano' : `${months.value} meses`
-)
-
-function resolveRange(): { from: string; to: string } {
-  if (mode.value === 'custom' && customFrom.value && customTo.value) {
-    return { from: customFrom.value, to: customTo.value }
-  }
-  const c = new Date(); c.setMonth(c.getMonth() - months.value + 1); c.setDate(1)
-  return { from: c.toISOString().slice(0, 10), to: todayStr }
-}
-function prevRange(r: { from: string; to: string }) {
-  const fromD = new Date(r.from + 'T00:00:00'); const toD = new Date(r.to + 'T00:00:00')
-  const lenDays = Math.round((toD.getTime() - fromD.getTime()) / 86_400_000) + 1
-  const prevTo = new Date(fromD); prevTo.setDate(prevTo.getDate() - 1)
-  const prevFrom = new Date(prevTo); prevFrom.setDate(prevFrom.getDate() - (lenDays - 1))
-  return { from: prevFrom.toISOString().slice(0, 10), to: prevTo.toISOString().slice(0, 10) }
-}
-function paramsFor(r: { from: string; to: string }) {
-  const p = new URLSearchParams({ from: r.from, to: r.to })
-  if (selectedUser.value) p.set('user_id', selectedUser.value)
-  return p
-}
-
-// ── Dados ───────────────────────────────────────────────────────────────
-interface FunnelRow { month: string; ld: number; ce: number; rm: number; rr: number; fr: number }
-interface DayRow { date: string; ld: number; ce: number; rm: number; rr: number; fr: number }
-const funnelData = ref<FunnelRow[]>([])
-const funnelPrev = ref<FunnelRow[]>([])
-const activityData = ref<DayRow[]>([])
-const statusData = ref<{ status: string; count: number }[]>([])
-const lossData = ref<{ reason: string; count: number }[]>([])
-const sourceData = ref<{ fonte: string; total: number; advanced: number; won: number }[]>([])
-const bdrData = ref<{ user_id: string; ld: number; ce: number; rm: number; rr: number; fr: number }[]>([])
-const revenue = ref({ closedValue: 0, closedCount: 0, pipelineValue: 0, weightedForecast: 0, activeWithValue: 0 })
-const fuDrop = ref<{ totalLeads: number; completedByAttempt: number[] }>({ totalLeads: 0, completedByAttempt: [] })
-const agingData = ref<{ label: string; count: number }[]>([])
-const velocity = ref<{ cycleDays: number; cycleCount: number; transitions: number; stages: { stage: string; avgDays: number; count: number }[] }>({ cycleDays: 0, cycleCount: 0, transitions: 0, stages: [] })
-const cohortData = ref<{ month: string; total: number; reuniao: number; proposta: number; won: number }[]>([])
-const waterfall = ref({ created: 0, advanced: 0, won: 0, lost: 0 })
-const pipeHistory = ref<{ date: string; count: number; value: number }[]>([])
-const loading = ref(false)
-
-const membersList = ref<(Profile & { email: string })[]>([])
-
-async function loadAll() {
-  loading.value = true
-  const r = resolveRange()
-  const p = paramsFor(r); const pp = paramsFor(prevRange(r))
-  try {
-    const tasks: Promise<any>[] = [
-      $fetch<FunnelRow[]>(`/api/reports/funnel?${p}`).then(d => funnelData.value = d),
-      $fetch<FunnelRow[]>(`/api/reports/funnel?${pp}`).then(d => funnelPrev.value = d),
-      $fetch<DayRow[]>(`/api/reports/activity?${p}`).then(d => activityData.value = d),
-      $fetch<any[]>(`/api/reports/leads-by-status?${p}`).then(d => statusData.value = d.sort((a, b) => b.count - a.count)),
-      $fetch<any[]>(`/api/reports/loss-reasons?${p}`).then(d => lossData.value = d),
-      $fetch<any[]>(`/api/reports/by-source?${p}`).then(d => sourceData.value = d),
-      $fetch<any>(`/api/reports/revenue?${p}`).then(d => revenue.value = d),
-      $fetch<any>(`/api/reports/velocity?${p}`).then(d => velocity.value = d),
-      $fetch<any[]>(`/api/reports/cohort?${p}`).then(d => cohortData.value = d),
-      $fetch<any>(`/api/reports/waterfall?${p}`).then(d => waterfall.value = d),
-      $fetch<any[]>(`/api/reports/pipeline-history?${p}`).then(d => pipeHistory.value = d),
-    ]
-    if (profile.value?.role !== 'bdr' && !selectedUser.value) {
-      tasks.push($fetch<any[]>(`/api/reports/by-bdr?${p}`).then(d => bdrData.value = d))
-    } else { bdrData.value = [] }
-    await Promise.all(tasks)
-  } catch { /* silencioso */ }
-  finally { loading.value = false }
-}
-
-onMounted(async () => {
-  if (profile.value?.role !== 'bdr') {
-    try { membersList.value = await $fetch<(Profile & { email: string })[]>('/api/settings/members') } catch {}
-  }
-  const url = (s: string) => s // evita a inferencia de rota tipada (excessive stack depth)
-  try { fuDrop.value = await $fetch<{ totalLeads: number; completedByAttempt: number[] }>(url('/api/reports/followups')) } catch {}
-  try { agingData.value = await $fetch<{ label: string; count: number }[]>(url('/api/reports/aging')) } catch {}
-})
-
-watch([months, selectedUser, mode, customFrom, customTo], () => loadAll(), { immediate: true })
+// ── Camada de dados dos relatorios (composable useReports) ──────────────
+const {
+  months, mode, todayStr, customFrom, customTo, selectedUser, granularity,
+  setPreset, fmtDay, periodLabel, resolveRange,
+  funnelData, funnelPrev, activityData, statusData, lossData, sourceData, bdrData,
+  revenue, fuDrop, agingData, velocity, cohortData, waterfall, pipeHistory, loading, membersList,
+} = useReports()
 
 // ── Totais e deltas ─────────────────────────────────────────────────────
 const sumRows = (rows: FunnelRow[]) => rows.reduce((a, r) => ({
@@ -530,10 +438,10 @@ const kpiCards = computed(() => {
   const txCeRm = t.ce ? ((t.rm / t.ce) * 100).toFixed(1) : '0'
   const txRrFr = t.rr ? ((t.fr / t.rr) * 100).toFixed(0) : '0'
   return [
-    { key: 'LD', label: 'Ligacoes', metric: 'LD' as const, value: t.ld, delta: delta(t.ld, p.ld), sub: 'vs periodo anterior' },
+    { key: 'LD', label: 'Ligações', metric: 'LD' as const, value: t.ld, delta: delta(t.ld, p.ld), sub: 'vs período anterior' },
     { key: 'CE', label: 'Contatos efetivos', metric: 'CE' as const, value: t.ce, delta: delta(t.ce, p.ce), sub: `LD->CE ${t.ld ? (t.ce / t.ld * 100).toFixed(0) : 0}%` },
-    { key: 'RM', label: 'Reunioes marcadas', metric: 'RM' as const, value: t.rm, delta: delta(t.rm, p.rm), sub: `CE->RM ${txCeRm}%` },
-    { key: 'RR', label: 'Reunioes realizadas', metric: 'RR' as const, value: t.rr, delta: delta(t.rr, p.rr), sub: 'vs periodo anterior' },
+    { key: 'RM', label: 'Reuniões marcadas', metric: 'RM' as const, value: t.rm, delta: delta(t.rm, p.rm), sub: `CE->RM ${txCeRm}%` },
+    { key: 'RR', label: 'Reuniões realizadas', metric: 'RR' as const, value: t.rr, delta: delta(t.rr, p.rr), sub: 'vs período anterior' },
     { key: 'FR', label: 'Fechamentos', metric: 'FR' as const, value: t.fr, delta: delta(t.fr, p.fr), sub: `RR->FR ${txRrFr}%` },
   ]
 })
@@ -576,11 +484,11 @@ const effGran = computed<'day' | 'week' | 'month'>(() =>
   granularity.value !== 'auto' ? granularity.value
     : rangeDays.value <= 45 ? 'day' : rangeDays.value <= 180 ? 'week' : 'month'
 )
-const granLabel = computed(() => ({ day: 'diario', week: 'semanal', month: 'mensal' }[effGran.value]))
+const granLabel = computed(() => ({ day: 'diário', week: 'semanal', month: 'mensal' }[effGran.value]))
 
 function mondayOf(ds: string) {
   const d = new Date(ds + 'T00:00:00'); const off = (d.getDay() + 6) % 7
-  d.setDate(d.getDate() - off); return d.toISOString().slice(0, 10)
+  d.setDate(d.getDate() - off); return localDateISO(d)
 }
 const trendBuckets = computed(() => {
   const map = new Map<string, DayRow>()
@@ -717,7 +625,7 @@ function exportCSV() {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
   const href = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = href; a.download = `relatorio-atividade-${todayStr}.csv`; a.click()
+  a.href = href; a.download = `relatório-atividade-${todayStr}.csv`; a.click()
   URL.revokeObjectURL(href)
 }
 

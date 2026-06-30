@@ -10,7 +10,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div>
             <div style="font-size:15px;font-weight:600">Importar leads via CSV</div>
-            <div style="font-size:12px;color:var(--text-2);margin-top:2px">Maximo 500 leads por importacao</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:2px">Máximo 500 leads por importação</div>
           </div>
           <button class="btn" @click="$emit('close')" style="padding:4px 8px">X</button>
         </div>
@@ -133,7 +133,7 @@ const FIELDS = [
   { key: 'telefone',       label: 'Telefone',          required: false },
   { key: 'negocio',        label: 'Empresa',           required: false },
   { key: 'instagram',      label: 'Instagram',         required: false },
-  { key: 'nome_ponte',     label: 'Indicacao / Ponte', required: false },
+  { key: 'nome_ponte',     label: 'Indicação / Ponte', required: false },
   { key: 'segmento',       label: 'Segmento',          required: false },
   { key: 'cidade',         label: 'Cidade',            required: false },
   { key: 'porte',          label: 'Porte',             required: false },

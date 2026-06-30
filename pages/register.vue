@@ -55,7 +55,7 @@
             <input
               v-model="form.slug"
               type="text" required
-              placeholder="agencia-xyz"
+              placeholder="agência-xyz"
               style="border-radius:8px 0 0 8px;border-right:none"
               @input="form.slug = form.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')"
             />
