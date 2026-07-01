@@ -36,6 +36,9 @@
       </div>
     </div>
 
+    <!-- Visoes salvas -->
+    <UiPipelineViews :current="currentFilters" :defaults="defaultFilters" @apply="applyView" />
+
     <!-- Visualizacao (primaria) + filtros (secundarios) -->
     <div class="pipe-bar">
       <div class="pipe-views">
@@ -101,12 +104,23 @@
         Nenhum lead encontrado.
       </div>
 
-      <div v-else class="lead-list">
+      <div v-else class="lead-list" :class="{ 'has-selection': selectedIds.length }">
+        <div class="lead-list-head">
+          <label class="ll-selall">
+            <input type="checkbox" :checked="allVisibleSelected" @change="toggleSelectAll" />
+            <span>{{ selectedIds.length ? `${selectedIds.length} selecionado(s)` : 'Selecionar todos' }}</span>
+          </label>
+          <span class="ll-count">{{ filtered.length }} {{ filtered.length === 1 ? 'lead' : 'leads' }}</span>
+        </div>
+
         <div
           v-for="l in filtered" :key="l.id"
-          @click="selectLead(l)"
           class="lead-row"
-          :class="{ 'lead-row--selected': selectedId === l.id }">
+          :class="{ 'lead-row--selected': selectedId === l.id, 'lead-row--checked': isSelected(l.id) }">
+          <label class="lead-check" @click.stop>
+            <input type="checkbox" :checked="isSelected(l.id)" @change="toggleSelect(l.id)" />
+          </label>
+          <div class="lead-row-main" @click="selectLead(l)">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px">
             <div style="min-width:0;flex:1">
               <div style="font-size:13px;font-weight:500;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
@@ -143,6 +157,7 @@
               <span v-if="cardPrefs.fu">{{ fuDone(l) }}/10</span>
               <span>{{ daysIn(l.created_at) }}d</span>
             </div>
+          </div>
           </div>
         </div>
 
@@ -183,6 +198,15 @@
 
     <LazyUiImportLeadsModal v-if="showImport" @close="showImport = false" @imported="onImported" />
 
+    <UiBulkBar
+      :count="selectedIds.length"
+      :statuses="STATUSES"
+      :tags="tags"
+      @set-status="bulkStatus"
+      @add-tag="bulkAddTag"
+      @delete="bulkDelete"
+      @clear="clearSelection" />
+
     <Transition name="toast">
       <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
     </Transition>
@@ -205,11 +229,14 @@ onMounted(() => {
   const saved = localStorage.getItem('pipeline-view')
   if (saved === 'kanban' || saved === 'list') viewMode.value = saved
 })
-watch(viewMode, v => localStorage.setItem('pipeline-view', v))
+watch(viewMode, (v) => {
+  localStorage.setItem('pipeline-view', v)
+  if (v === 'kanban') clearSelection() // selecao em massa so existe na lista
+})
 
 const {
   leads, pending, hasMore, loadingMore, loadMore, leadsTotal,
-  activeLeads, toggleFU, patchStatus,
+  activeLeads, toggleFU, patchStatus, patchLead, deleteLead,
   exportCSV, refresh: refreshLeads,
 } = useLeads()
 
@@ -219,6 +246,47 @@ const filterCreated      = ref<''|'7'|'30'|'month'>('')
 const filterOverdue      = ref(false)
 const searchQ            = ref('')
 const sortBy             = ref<'created_at'|'data_retorno'|'fu_done'|'score'>('created_at')
+
+// ── Visoes salvas (snapshot dos filtros) ────────────────────────────────
+const currentFilters = computed(() => ({
+  viewMode:      viewMode.value,
+  filterStatus:  filterStatus.value,
+  filterTag:     filterTag.value,
+  filterCreated: filterCreated.value,
+  filterOverdue: filterOverdue.value,
+  searchQ:       searchQ.value,
+  sortBy:        sortBy.value,
+}))
+// A visualizacao (kanban/lista) acompanha o estado atual, entao trocar de view
+// nao conta como "filtro ativo"; so os filtros de verdade contam pro Limpar/Salvar.
+const defaultFilters = computed(() => ({
+  viewMode:      viewMode.value,
+  filterStatus:  'Todos',
+  filterTag:     '',
+  filterCreated: '',
+  filterOverdue: false,
+  searchQ:       '',
+  sortBy:        'created_at',
+}))
+function applyView(f: Record<string, any>) {
+  if (f.viewMode === 'list' || f.viewMode === 'kanban') viewMode.value = f.viewMode
+  filterStatus.value  = f.filterStatus ?? 'Todos'
+  filterTag.value     = f.filterTag ?? ''
+  filterCreated.value = f.filterCreated ?? ''
+  filterOverdue.value = !!f.filterOverdue
+  searchQ.value       = f.searchQ ?? ''
+  sortBy.value        = f.sortBy ?? 'created_at'
+}
+
+// ── Selecao em massa (lista) ────────────────────────────────────────────
+const selectedIds = ref<string[]>([])
+const isSelected  = (id: string) => selectedIds.value.includes(id)
+function toggleSelect(id: string) {
+  selectedIds.value = isSelected(id)
+    ? selectedIds.value.filter(x => x !== id)
+    : [...selectedIds.value, id]
+}
+function clearSelection() { selectedIds.value = [] }
 
 const todayISO = localDateISO()
 const monthStartISO = localDateISO(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
@@ -311,6 +379,45 @@ const filtered = computed(() => {
   }
   return list
 })
+
+// ── Acoes em massa ──────────────────────────────────────────────────────
+const allVisibleSelected = computed(() =>
+  filtered.value.length > 0 && filtered.value.every(l => isSelected(l.id))
+)
+function toggleSelectAll() {
+  if (allVisibleSelected.value) clearSelection()
+  else selectedIds.value = filtered.value.map(l => l.id)
+}
+
+async function bulkStatus(status: string) {
+  const ids = [...selectedIds.value]
+  let ok = 0
+  for (const id of ids) { try { await patchStatus(id, status as LeadStatus); ok++ } catch { /* segue */ } }
+  showToast(`${ok} lead(s) movidos para ${status}.`)
+  clearSelection()
+}
+async function bulkAddTag(tagId: string) {
+  const ids = [...selectedIds.value]
+  let ok = 0
+  for (const id of ids) {
+    const l = (leads.value || []).find(x => x.id === id)
+    if (!l) continue
+    const cur = l.tag_ids || []
+    if (cur.includes(tagId)) { ok++; continue }
+    try { await patchLead(id, { tag_ids: [...cur, tagId] } as Partial<Lead>); ok++ } catch { /* segue */ }
+  }
+  const t = tags.value.find(x => x.id === tagId)
+  showToast(`Etiqueta "${t?.name || ''}" aplicada a ${ok} lead(s).`)
+  clearSelection()
+}
+async function bulkDelete() {
+  const ids = [...selectedIds.value]
+  if (!confirm(`Excluir ${ids.length} lead(s)? Esta ação é irreversível.`)) return
+  let ok = 0
+  for (const id of ids) { try { await deleteLead(id); ok++ } catch { /* segue */ } }
+  showToast(`${ok} lead(s) excluídos.`)
+  clearSelection()
+}
 
 // No Kanban as colunas ja representam os status, entao so busca e etiqueta filtram.
 const filteredForKanban = computed(() =>
@@ -576,18 +683,54 @@ async function onImported() {
 }
 
 .lead-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
   border: 1px solid var(--border-soft);
   border-radius: 10px;
   padding: 11px 14px;
-  cursor: pointer;
   background: var(--bg-card);
   transition: all .12s;
 }
 .lead-row:hover       { border-color: var(--border); }
 .lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.12); }
+.lead-row--checked    { border-color: var(--accent-bd); background: var(--accent-soft); }
+.lead-row-main        { flex: 1; min-width: 0; cursor: pointer; }
 .lead-row-qa          { opacity: 0; transition: opacity .12s; }
 .lead-row:hover .lead-row-qa,
 .lead-row:focus-within .lead-row-qa { opacity: 1; }
+
+/* Checkbox de selecao em massa (revela no hover / quando ha selecao) */
+.lead-check {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity .12s;
+}
+.lead-row:hover .lead-check,
+.lead-row--checked .lead-check,
+.lead-list.has-selection .lead-check { opacity: 1; }
+.lead-check input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); margin: 0; }
+
+/* Cabecalho da lista (selecionar todos) */
+.lead-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 14px 6px;
+}
+.ll-selall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  user-select: none;
+}
+.ll-selall input { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); margin: 0; }
+.ll-count { font-size: 11px; color: var(--text-3); }
 
 .detail-tabs {
   display: flex;
