@@ -3,6 +3,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: { title: 'Prospecta' },
+    // Transicao de pagina global (fade + rise suave), classes em main.css
+    pageTransition: { name: 'page', mode: 'out-in' },
   },
 
   modules: [

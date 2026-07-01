@@ -268,7 +268,7 @@
   .page-title { font-size:30px; font-weight:700; color:var(--text-1); letter-spacing:-0.03em; line-height:1.08; font-family:var(--font-sans); }
   .page-sub   { font-size:13.5px; color:var(--text-2); margin-top:5px; }
   /* Texto com preenchimento em gradiente da marca (numeros/heros de destaque) */
-  .text-gradient { background:var(--grad-brand); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .text-gradient { background:var(--grad-brand); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
 
   /* ── Cards (vidro sobre a aurora) ────────────────────── */
   .card       { background:var(--glass-bg); -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border:1px solid var(--glass-brd); border-radius:var(--radius-lg); padding:22px; box-shadow:var(--shadow-md); }
@@ -350,6 +350,39 @@
 /* ── Toast animation ─────────────────────────────────── */
 .toast-enter-active, .toast-leave-active { transition: all .18s ease; }
 .toast-enter-from, .toast-leave-to { opacity:0; transform:translateY(6px); }
+
+/* ── Transicao de pagina (fade + rise) ───────────────── */
+.page-enter-active, .page-leave-active { transition: opacity .28s var(--ease-out), transform .3s var(--ease-out); }
+.page-enter-from { opacity: 0; transform: translateY(10px) scale(.995); }
+.page-leave-to  { opacity: 0; transform: translateY(-6px) scale(.996); }
+
+/* ── Borda com gradiente animado (assinatura, @property) ── */
+@property --aura-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.aura-border { position: relative; isolation: isolate; }
+.aura-border::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: conic-gradient(from var(--aura-angle), #0f62fe, #6d5cff, #00c2ff, #6d5cff, #0f62fe);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: aura-spin 6s linear infinite; pointer-events: none; z-index: 1;
+}
+@keyframes aura-spin { to { --aura-angle: 360deg; } }
+
+/* ── Shimmer no botao primario ───────────────────────── */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(120deg, transparent 28%, rgba(255,255,255,.28) 50%, transparent 72%);
+  transform: translateX(-130%);
+}
+.btn-primary:hover::after { transform: translateX(130%); transition: transform .7s var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-border::before { animation: none; }
+  .page-enter-active, .page-leave-active { transition: opacity .18s ease; }
+  .page-enter-from, .page-leave-to { transform: none; }
+}
 
 /* ── Pace banner variants ────────────────────────────── */
 .pace-ok   { background:var(--ok-bg);   border-color:var(--ok-bd); }
