@@ -2,7 +2,22 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
   app: {
-    head: { title: 'Prospecta' },
+    head: {
+      title: 'Prospecta',
+      meta: [
+        // viewport-fit=cover habilita as safe-area-inset (notch/home indicator)
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+        { name: 'theme-color', content: '#0b63ff' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'Prospecta' },
+      ],
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icon.svg' },
+      ],
+    },
     // Transicao de pagina global (fade + rise suave), classes em main.css
     pageTransition: { name: 'page', mode: 'out-in' },
   },

@@ -652,9 +652,26 @@ async function onImported() {
 .drawer-body { flex: 1; overflow-y: auto; padding: 18px 20px; }
 
 .drawer-enter-active, .drawer-leave-active { transition: opacity .2s ease; }
-.drawer-enter-active .drawer, .drawer-leave-active .drawer { transition: transform .24s cubic-bezier(.16, 1, .3, 1); }
+.drawer-enter-active .drawer, .drawer-leave-active .drawer { transition: transform .28s cubic-bezier(.16, 1, .3, 1); }
 .drawer-enter-from, .drawer-leave-to { opacity: 0; }
 .drawer-enter-from .drawer, .drawer-leave-to .drawer { transform: translateX(100%); }
+
+/* Mobile: o drawer vira BOTTOM-SHEET (estilo app) */
+@media (max-width: 768px) {
+  .drawer-backdrop { justify-content: center; align-items: flex-end; }
+  .drawer {
+    width: 100%; max-width: 100%;
+    height: 92vh; max-height: 92vh;
+    border-left: none; border-top: 1px solid var(--glass-brd);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(0,0,0,.28);
+  }
+  .drawer::before {
+    content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 42px; height: 4px; border-radius: 999px; background: var(--border); z-index: 5;
+  }
+  .drawer-enter-from .drawer, .drawer-leave-to .drawer { transform: translateY(100%); }
+}
 
 .view-toggle {
   display: flex;
