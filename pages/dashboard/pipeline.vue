@@ -687,13 +687,14 @@ async function onImported() {
   align-items: stretch;
   gap: 10px;
   border: 1px solid var(--border-soft);
-  border-radius: 10px;
-  padding: 11px 14px;
+  border-radius: 12px;
+  padding: 12px 15px;
   background: var(--bg-card);
-  transition: all .12s;
+  box-shadow: var(--shadow-sm);
+  transition: all .14s ease;
 }
-.lead-row:hover       { border-color: var(--border); }
-.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.12); }
+.lead-row:hover       { border-color: var(--border); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.14); }
 .lead-row--checked    { border-color: var(--accent-bd); background: var(--accent-soft); }
 .lead-row-main        { flex: 1; min-width: 0; cursor: pointer; }
 .lead-row-qa          { opacity: 0; transition: opacity .12s; }

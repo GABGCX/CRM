@@ -71,7 +71,7 @@ onMounted(async () => {
   --bg:var(--bg-subtle); --surface:#ffffff; --border:var(--border); --border-soft:var(--border-soft);
   --text-1:var(--text-1); --text-2:var(--text-2); --text-3:var(--text-3);
   --danger:var(--bad); --danger-bg:var(--bad-bg); --danger-bdr:var(--bad-bd);
-  --radius-sm:2px; --radius-md:2px; --radius-lg:2px;
+  --radius-sm:7px; --radius-md:10px; --radius-lg:14px;
   --transition:140ms cubic-bezier(0.16,1,0.3,1);
   font-family:var(--font-sans),-apple-system,sans-serif;
   -webkit-font-smoothing:antialiased;
