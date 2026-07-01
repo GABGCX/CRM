@@ -172,7 +172,7 @@
     <!-- Detail drawer (slide-over) -->
     <Transition name="drawer">
       <div v-if="selectedLead" class="drawer-backdrop" @click.self="confirmClose">
-        <aside class="drawer">
+        <aside class="drawer" v-swipe-dismiss="confirmClose">
           <UiLeadDetail
             :lead="selectedLead"
             :templates="templates"

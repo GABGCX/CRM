@@ -183,14 +183,14 @@
       <button
         v-for="t in mobileTabs" :key="t.key"
         class="mtab" :class="{ active: t.match(route.path) }"
-        @click="navigateTo(t.to)">
+        @click="haptic(); navigateTo(t.to)">
         <span class="mtab-ic-wrap">
           <i class="ti" :class="t.icon" aria-hidden="true"></i>
           <span v-if="t.badge" class="mtab-badge">{{ t.badge > 9 ? '9+' : t.badge }}</span>
         </span>
         <span class="mtab-lbl">{{ t.label }}</span>
       </button>
-      <button class="mtab" :class="{ active: mobileOpen }" @click="mobileOpen = true">
+      <button class="mtab" :class="{ active: mobileOpen }" @click="haptic(); mobileOpen = true">
         <span class="mtab-ic-wrap"><i class="ti ti-dots" aria-hidden="true"></i></span>
         <span class="mtab-lbl">Mais</span>
       </button>
@@ -553,19 +553,11 @@ function openGlobalSearch() {
     color: var(--text-3); font-family: inherit; font-size: 10px; font-weight: 600;
     position: relative; -webkit-tap-highlight-color: transparent; transition: color .15s;
   }
-  .mtab .ti { font-size: 22px; line-height: 1; transition: transform .2s var(--spring); }
-  .mtab:active .ti { transform: scale(.82); }
+  .mtab .ti { font-size: 24px; line-height: 1; transition: transform .18s var(--spring); }
+  .mtab:active .ti { transform: scale(.8); }
+  /* iOS: item ativo apenas na cor de tint (sem gradiente/indicador) */
   .mtab.active { color: var(--accent); }
-  .mtab.active .ti,
-  .mtab.active .mtab-lbl {
-    background: var(--grad-brand);
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent; -webkit-text-fill-color: transparent;
-  }
-  .mtab.active::before {
-    content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-    width: 28px; height: 3px; border-radius: 999px; background: var(--grad-brand);
-  }
+  .mtab.active .ti, .mtab.active .mtab-lbl { color: var(--accent); }
   .mtab-ic-wrap { position: relative; display: flex; }
   .mtab-badge {
     position: absolute; top: -5px; right: -10px;

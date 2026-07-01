@@ -26,11 +26,25 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
     '@formkit/auto-animate/nuxt',
+    '@vite-pwa/nuxt',
   ],
 
   // Morph nativo entre rotas onde suportado (degrada pro pageTransition)
   experimental: {
     viewTransition: true,
+  },
+
+  // PWA: instalavel + auto-update + cache de assets. App SSR, entao SEM
+  // navigateFallback (navegacao continua indo pro servidor). SW so em producao.
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: false, // usa o public/manifest.webmanifest ja existente
+    workbox: {
+      globPatterns: ['**/*.{js,css,svg,woff,woff2,png,ico}'],
+      navigateFallback: null,
+      cleanupOutdatedCaches: true,
+    },
+    devOptions: { enabled: false },
   },
 
   // @nuxtjs/supabase config
