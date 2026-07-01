@@ -10,7 +10,13 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss',
+    '@formkit/auto-animate/nuxt',
   ],
+
+  // Morph nativo entre rotas onde suportado (degrada pro pageTransition)
+  experimental: {
+    viewTransition: true,
+  },
 
   // @nuxtjs/supabase config
   // Rotas que NÃO precisam de autenticação

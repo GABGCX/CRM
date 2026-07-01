@@ -20,7 +20,7 @@
           <div class="kb-col-accent" :style="{ background: col.color }" />
 
           <!-- Cards -->
-          <div class="kb-cards">
+          <div v-auto-animate class="kb-cards">
             <div
               v-for="lead in col.leads"
               :key="lead.id"

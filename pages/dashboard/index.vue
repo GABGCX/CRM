@@ -2,7 +2,7 @@
   <div class="dash">
     <header class="dash-head">
       <div>
-        <h1 class="dash-greet">{{ greeting }}, {{ firstName }}</h1>
+        <h1 class="dash-greet">{{ greeting }}, <span class="text-gradient">{{ firstName }}</span></h1>
         <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
       </div>
       <div class="dash-head-right">
@@ -11,7 +11,7 @@
           <option v-for="m in orgMembers" :key="m.id" :value="m.id">{{ m.name || m.id.slice(0,8) }}</option>
         </select>
         <div class="dash-days">
-          <span class="dash-days-n tabular">{{ workdaysLeft }}</span>
+          <span class="dash-days-n"><UiCountUp :value="workdaysLeft" /></span>
           <span class="dash-days-l">dias úteis restantes</span>
         </div>
       </div>
@@ -19,7 +19,7 @@
 
     <div class="grid">
       <!-- Foco agora -->
-      <section class="tile t-focus">
+      <section class="tile t-focus" v-tilt="4">
         <div class="tile-head">
           <svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.target" />
           <span>Foco agora</span>
@@ -34,7 +34,7 @@
       </section>
 
       <!-- Gauge: meta de CE -->
-      <section class="tile t-gauge">
+      <section class="tile t-gauge" v-tilt="6">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.gauge" /><span>Meta de CE</span></div>
         <div class="gauge-wrap">
           <svg viewBox="0 0 120 120" class="gauge-svg">
@@ -75,13 +75,13 @@
 
       <!-- Lead quente -->
       <component :is="hottestLead ? 'NuxtLink' : 'section'"
-        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined" class="tile t-hot">
+        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined" class="tile t-hot" v-tilt="6">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.flame" /><span>Lead mais quente</span></div>
         <template v-if="hottestLead">
           <div class="hot-name">{{ hottestLead.decisor }}</div>
           <div class="hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
           <div class="hot-spacer" />
-          <div class="hot-value tabular">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</div>
+          <div class="hot-value tabular">R$ <UiCountUp :value="hottestLead.valor_estimado || 0" /></div>
           <div class="hot-status"><span class="dot" /> {{ hottestLead.resultado }}</div>
         </template>
         <div v-else class="empty-mini" style="text-align:left">Nenhuma oportunidade aberta com valor.</div>
@@ -95,7 +95,7 @@
               <svg class="kpi-ic" viewBox="0 0 24 24" v-html="k.icon" />
               <span class="kpi-name">{{ k.metric }}</span>
             </div>
-            <div class="kpi-num tabular" :class="k.cls">{{ k.value.toLocaleString('pt-BR') }}</div>
+            <div class="kpi-num tabular" :class="k.cls"><UiCountUp :value="k.value" /></div>
             <svg v-if="k.spark" class="kpi-spark" viewBox="0 0 64 20" preserveAspectRatio="none">
               <path :d="k.spark" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -404,7 +404,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .dash { max-width: 1200px; }
 
 .dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:20px; }
-.dash-greet { font-size:22px; font-weight:600; letter-spacing:-.02em; color:var(--text-1); line-height:1.1; }
+.dash-greet { font-size:28px; font-weight:700; letter-spacing:-.03em; color:var(--text-1); line-height:1.05; }
 .dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
 .dash-select { font-size:13px; padding:7px 11px; max-width:170px; width:auto; }
@@ -424,7 +424,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-ritmo  { grid-column:span 6; }
 .t-spark  { grid-column:span 6; }
 
-.tile { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; display:flex; flex-direction:column; }
+.tile { background:var(--glass-bg); -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border:1px solid var(--glass-brd); border-radius:var(--radius-lg); padding:20px 22px; display:flex; flex-direction:column; box-shadow:var(--shadow-sm); }
 .tile-head { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-2); }
 .tile-ic { width:15px; height:15px; flex-shrink:0; fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .tile-cap { margin-left:auto; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-3); }
@@ -451,8 +451,8 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .fn-bars { display:flex; flex-direction:column; flex:1; justify-content:center; padding:4px 0; }
 .fn-row { display:flex; align-items:center; gap:10px; }
 .fn-lbl { font-size:11px; color:var(--text-2); width:114px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:1px; overflow:hidden; }
-.fn-fill { height:100%; background:var(--accent); border-radius:1px; opacity:.88; transition:width .5s ease; }
+.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:999px; overflow:hidden; }
+.fn-fill { height:100%; background:var(--grad-brand); border-radius:999px; opacity:.95; transition:width .5s var(--ease-out); }
 .fn-val { font-size:12px; font-weight:600; color:var(--text-1); width:42px; text-align:right; flex-shrink:0; }
 .fn-gap { display:flex; align-items:center; gap:5px; padding:3px 0 3px 124px; }
 .fn-chevron { color:var(--text-3); flex-shrink:0; }
@@ -478,7 +478,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .kpi-name { font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--text-2); }
 .kpi-num { font-size:var(--num-hero); font-weight:600; color:var(--text-1); letter-spacing:-.02em; line-height:1; margin-top:10px; }
 .kpi-num.is-ok { color:var(--ok); } .kpi-num.is-warn { color:var(--warn); } .kpi-num.is-bad { color:var(--bad); }
-.kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.7; }
+.kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.85; filter:drop-shadow(0 1px 4px rgba(15,98,254,.35)); }
 .kpi-spark-empty { height:20px; margin-top:8px; }
 .kpi-sub { font-size:11px; color:var(--text-3); margin-top:7px; }
 
@@ -511,7 +511,7 @@ input.reg-input { text-align:center; font-size:var(--num-md); font-weight:600; p
 .track-fill { height:100%; transition:width .4s; }
 
 /* ── Spark ───────────────────────────────────────────────── */
-.ce-chart { width:100%; height:100px; }
+.ce-chart { width:100%; height:100px; filter:drop-shadow(0 2px 6px rgba(15,98,254,.26)); }
 .spark-foot { font-size:12px; color:var(--text-2); margin-top:10px; }
 
 @media (max-width: 1000px) {

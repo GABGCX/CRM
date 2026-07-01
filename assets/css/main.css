@@ -356,6 +356,9 @@
 .page-enter-from { opacity: 0; transform: translateY(10px) scale(.995); }
 .page-leave-to  { opacity: 0; transform: translateY(-6px) scale(.996); }
 
+/* View Transitions API (morph nativo entre rotas onde suportado) */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .32s; }
+
 /* ── Borda com gradiente animado (assinatura, @property) ── */
 @property --aura-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 .aura-border { position: relative; isolation: isolate; }

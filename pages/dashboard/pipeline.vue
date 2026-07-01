@@ -104,7 +104,7 @@
         Nenhum lead encontrado.
       </div>
 
-      <div v-else class="lead-list" :class="{ 'has-selection': selectedIds.length }">
+      <div v-else v-auto-animate class="lead-list" :class="{ 'has-selection': selectedIds.length }">
         <div class="lead-list-head">
           <label class="ll-selall">
             <input type="checkbox" :checked="allVisibleSelected" @change="toggleSelectAll" />
@@ -499,13 +499,15 @@ async function onImported() {
   display: flex;
   align-items: stretch;
   gap: 0;
-  background: var(--bg-card, #fff);
-  border: 1px solid var(--border, var(--border-soft));
-  border-radius: var(--radius);
-  padding: 16px 6px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-brd);
+  border-radius: var(--radius-lg);
+  padding: 18px 8px;
   margin-bottom: 14px;
   flex-wrap: wrap;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 .pipe-summary-item {
   display: flex;
@@ -627,11 +629,13 @@ async function onImported() {
   width: 100%;
   max-width: 480px;
   height: 100%;
-  background: var(--bg-card, #fff);
-  border-left: 1px solid var(--border, var(--border));
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  border-radius: 22px 0 0 22px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, .14);
+  box-shadow: var(--shadow-lg);
 }
 .drawer-head {
   display: flex;
