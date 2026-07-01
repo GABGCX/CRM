@@ -296,10 +296,11 @@ function openGlobalSearch() {
 }
 
 .sb-logo-icon {
-  width: 27px;
-  height: 27px;
-  border-radius: 7px;
-  background: var(--accent);
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: var(--grad-brand);
+  box-shadow: 0 3px 12px rgba(15,98,254,.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -503,7 +504,8 @@ function openGlobalSearch() {
 .mobile-burger:hover, .mobile-theme:hover { background: var(--bg-subtle); color: var(--text-1); }
 .mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--text-1); letter-spacing: -.01em; }
 .mobile-brand-icon {
-  width: 24px; height: 24px; border-radius: 6px; background: var(--accent);
+  width: 26px; height: 26px; border-radius: 8px; background: var(--grad-brand);
+  box-shadow: 0 2px 10px rgba(15,98,254,.4);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .mb-fade-enter-active, .mb-fade-leave-active { transition: opacity .2s ease; }
