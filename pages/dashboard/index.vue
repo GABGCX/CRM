@@ -413,7 +413,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
 /* ── Grid 12 col ─────────────────────────────────────────── */
-.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:14px; }
 .t-focus  { grid-column:span 8; }
 .t-gauge  { grid-column:span 4; }
 .t-funnel { grid-column:span 8; }
@@ -424,7 +424,8 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-ritmo  { grid-column:span 6; }
 .t-spark  { grid-column:span 6; }
 
-.tile { background:var(--glass-bg); -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border:1px solid var(--glass-brd); border-radius:var(--radius-lg); padding:20px 22px; display:flex; flex-direction:column; box-shadow:var(--shadow-sm); }
+.tile { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:var(--radius-lg); padding:20px 22px; display:flex; flex-direction:column; box-shadow:var(--shadow-xs); transition:box-shadow .2s var(--ease-out), border-color .2s; }
+.tile:hover { box-shadow:var(--shadow-sm); }
 .tile-head { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-2); }
 .tile-ic { width:15px; height:15px; flex-shrink:0; fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .tile-cap { margin-left:auto; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-3); }

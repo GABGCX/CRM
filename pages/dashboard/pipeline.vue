@@ -499,15 +499,13 @@ async function onImported() {
   display: flex;
   align-items: stretch;
   gap: 0;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-brd);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
   padding: 18px 8px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-xs);
 }
 .pipe-summary-item {
   display: flex;
