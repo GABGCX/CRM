@@ -52,6 +52,7 @@
           <table class="gm-table">
             <thead>
               <tr>
+                <th class="gm-th-rank">#</th>
                 <th class="gm-th-left">BDR</th>
                 <th v-for="c in ['CE','RM','RR','FR']" :key="c">{{ c }}</th>
                 <th>CE&rarr;RM</th>
@@ -63,7 +64,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="b in rankedBdrs" :key="b.id" class="gm-row" @click="goBdr(b.id)">
+              <tr v-for="(b, i) in rankedBdrs" :key="b.id" class="gm-row" :class="{ 'gm-row--top': i === 0 }" @click="goBdr(b.id)">
+                <td class="gm-td-rank">
+                  <span class="gm-medal" :class="i < 3 ? `gm-medal--${i + 1}` : ''">{{ i + 1 }}</span>
+                </td>
                 <td class="gm-td-left">
                   <div class="gm-bdr">
                     <span class="gm-avatar">{{ (b.name || 'B')[0].toUpperCase() }}</span>
@@ -87,7 +91,7 @@
                 </td>
               </tr>
               <tr v-if="!bdrs.length">
-                <td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">Nenhum BDR na equipe ainda.</td>
+                <td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">Nenhum BDR na equipe ainda.</td>
               </tr>
             </tbody>
           </table>
@@ -202,9 +206,16 @@ function goBdr(id: string) { navigateTo(`/dashboard/gestao/${id}`) }
 .gm-table { width:100%;border-collapse:collapse;font-size:13px }
 .gm-table th { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:11px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border-soft);background:var(--bg-subtle) }
 .gm-th-left { text-align:left !important }
+.gm-th-rank { text-align:center !important;width:44px }
 .gm-table td { padding:10px;text-align:right;border-bottom:1px solid var(--border-soft);color:var(--text-1);white-space:nowrap }
 .gm-td-left { text-align:left !important }
+.gm-td-rank { text-align:center !important }
+.gm-medal { display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;color:var(--text-3);background:var(--bg-subtle);border:1px solid var(--border-soft);font-variant-numeric:tabular-nums }
+.gm-medal--1 { background:linear-gradient(135deg, rgba(250,204,21,1), rgba(202,138,4,1));   color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(202,138,4,.4) }
+.gm-medal--2 { background:linear-gradient(135deg, rgba(226,232,240,1), rgba(148,163,184,1)); color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(148,163,184,.35) }
+.gm-medal--3 { background:linear-gradient(135deg, rgba(240,178,128,1), rgba(176,108,58,1));   color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(176,108,58,.35) }
 .gm-row { cursor:pointer;transition:background .1s }
+.gm-row--top td { background:rgba(250,204,21,.06) }
 .gm-row:hover td { background:var(--bg-subtle) }
 .gm-row:last-child td { border-bottom:none }
 .gm-bdr { display:flex;align-items:center;gap:9px }
