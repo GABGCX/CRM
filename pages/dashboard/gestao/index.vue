@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:18px">
+      <div class="eyebrow" style="margin-bottom:6px">Performance do time</div>
       <div class="page-title">Gestão da equipe</div>
       <div class="page-sub">{{ MONTH_NAMES[(data?.month || 1) - 1] }} {{ data?.year }} · desempenho por BDR</div>
     </div>

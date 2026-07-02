@@ -1,6 +1,7 @@
 ﻿<template>
   <div>
     <div style="margin-bottom:20px">
+      <div class="eyebrow" style="margin-bottom:6px">Planejamento reverso</div>
       <div class="page-title">Metas e Ritmo</div>
       <div class="page-sub">Matemática reversa · da meta ao contato diário</div>
     </div>

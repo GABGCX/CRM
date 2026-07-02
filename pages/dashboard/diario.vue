@@ -2,6 +2,7 @@
   <div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
+        <div class="eyebrow" style="margin-bottom:6px">Registro diário</div>
         <div class="page-title">Meu Dia</div>
         <div class="page-sub">{{ MONTH_NAMES[currentMonth-1] }} {{ currentYear }}</div>
       </div>
