@@ -3,6 +3,7 @@
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px">
       <div>
+        <div class="eyebrow" style="margin-bottom:6px">Funil de vendas</div>
         <div class="page-title">Pipeline</div>
         <div class="page-sub">{{ totalLeads }} leads · {{ activeLeads.length }} ativos</div>
       </div>
@@ -104,7 +105,7 @@
         Nenhum lead encontrado.
       </div>
 
-      <div v-else class="lead-list" :class="{ 'has-selection': selectedIds.length }">
+      <div v-else v-auto-animate class="lead-list" :class="{ 'has-selection': selectedIds.length }">
         <div class="lead-list-head">
           <label class="ll-selall">
             <input type="checkbox" :checked="allVisibleSelected" @change="toggleSelectAll" />
@@ -172,7 +173,7 @@
     <!-- Detail drawer (slide-over) -->
     <Transition name="drawer">
       <div v-if="selectedLead" class="drawer-backdrop" @click.self="confirmClose">
-        <aside class="drawer">
+        <aside class="drawer" v-swipe-dismiss="confirmClose">
           <UiLeadDetail
             :lead="selectedLead"
             :templates="templates"
@@ -499,13 +500,13 @@ async function onImported() {
   display: flex;
   align-items: stretch;
   gap: 0;
-  background: var(--bg-card, #fff);
-  border: 1px solid var(--border, var(--border-soft));
-  border-radius: var(--radius);
-  padding: 16px 6px;
-  margin-bottom: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 18px 8px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
 .pipe-summary-item {
   display: flex;
@@ -555,7 +556,8 @@ async function onImported() {
   display: flex;
   gap: 3px;
   background: var(--bg-subtle, var(--border-soft));
-  border-radius: 9px;
+  border: 1px solid var(--border-soft);
+  border-radius: 11px;
   padding: 3px;
   flex-shrink: 0;
 }
@@ -564,7 +566,7 @@ async function onImported() {
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  border-radius: 7px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--text-2);
@@ -578,8 +580,9 @@ async function onImported() {
 .pipe-view.active {
   background: var(--bg-card, #fff);
   color: var(--text-1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
+.pipe-view.active svg { color: var(--accent); }
 .pipe-filters {
   display: flex;
   align-items: center;
@@ -627,11 +630,13 @@ async function onImported() {
   width: 100%;
   max-width: 480px;
   height: 100%;
-  background: var(--bg-card, #fff);
-  border-left: 1px solid var(--border, var(--border));
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  border-radius: 22px 0 0 22px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, .14);
+  box-shadow: var(--shadow-lg);
 }
 .drawer-head {
   display: flex;
@@ -648,9 +653,26 @@ async function onImported() {
 .drawer-body { flex: 1; overflow-y: auto; padding: 18px 20px; }
 
 .drawer-enter-active, .drawer-leave-active { transition: opacity .2s ease; }
-.drawer-enter-active .drawer, .drawer-leave-active .drawer { transition: transform .24s cubic-bezier(.16, 1, .3, 1); }
+.drawer-enter-active .drawer, .drawer-leave-active .drawer { transition: transform .28s cubic-bezier(.16, 1, .3, 1); }
 .drawer-enter-from, .drawer-leave-to { opacity: 0; }
 .drawer-enter-from .drawer, .drawer-leave-to .drawer { transform: translateX(100%); }
+
+/* Mobile: o drawer vira BOTTOM-SHEET (estilo app) */
+@media (max-width: 768px) {
+  .drawer-backdrop { justify-content: center; align-items: flex-end; }
+  .drawer {
+    width: 100%; max-width: 100%;
+    height: 92vh; max-height: 92vh;
+    border-left: none; border-top: 1px solid var(--glass-brd);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(0,0,0,.28);
+  }
+  .drawer::before {
+    content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 42px; height: 4px; border-radius: 999px; background: var(--border); z-index: 5;
+  }
+  .drawer-enter-from .drawer, .drawer-leave-to .drawer { transform: translateY(100%); }
+}
 
 .view-toggle {
   display: flex;
@@ -687,13 +709,14 @@ async function onImported() {
   align-items: stretch;
   gap: 10px;
   border: 1px solid var(--border-soft);
-  border-radius: 10px;
-  padding: 11px 14px;
+  border-radius: 12px;
+  padding: 12px 15px;
   background: var(--bg-card);
-  transition: all .12s;
+  box-shadow: var(--shadow-sm);
+  transition: all .14s ease;
 }
-.lead-row:hover       { border-color: var(--border); }
-.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.12); }
+.lead-row:hover       { border-color: var(--border); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.lead-row--selected   { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(15,98,254,.14); }
 .lead-row--checked    { border-color: var(--accent-bd); background: var(--accent-soft); }
 .lead-row-main        { flex: 1; min-width: 0; cursor: pointer; }
 .lead-row-qa          { opacity: 0; transition: opacity .12s; }

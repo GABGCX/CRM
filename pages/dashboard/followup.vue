@@ -1,21 +1,33 @@
 <template>
   <div>
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:18px">
+      <div class="eyebrow" style="margin-bottom:6px">Cadência de retornos</div>
       <div class="page-title">Follow-up</div>
       <div class="page-sub">Protocolo 10 tentativas · trabalhe a fila de cima para baixo</div>
     </div>
 
-    <!-- Stats strip -->
-    <div class="fu-stats">
-      <span><strong>{{ activeLeads.length }}</strong> ativos</span>
-      <span class="fu-stats-sep">·</span>
-      <span :style="{ color: overdue.length ? '#dc2626' : 'var(--text-3)' }"><strong>{{ overdue.length }}</strong> vencidos</span>
-      <span class="fu-stats-sep">·</span>
-      <span><strong>{{ dueToday.length }}</strong> hoje</span>
-      <span class="fu-stats-sep">·</span>
-      <span><strong>{{ (leads||[]).filter(l=>l.reuniao_agendada).length }}</strong> reunioes</span>
-      <span class="fu-stats-sep">·</span>
-      <span style="color:#16a34a"><strong>{{ closedThisMonth }}</strong> fechados/mês</span>
+    <!-- KPIs -->
+    <div class="fu-kpis">
+      <div class="fu-kpi">
+        <span class="fu-kpi-n tabular">{{ activeLeads.length }}</span>
+        <span class="fu-kpi-l">Ativos</span>
+      </div>
+      <div class="fu-kpi" :class="{ 'is-bad': overdue.length }">
+        <span class="fu-kpi-n tabular">{{ overdue.length }}</span>
+        <span class="fu-kpi-l">Vencidos</span>
+      </div>
+      <div class="fu-kpi" :class="{ 'is-warn': dueToday.length }">
+        <span class="fu-kpi-n tabular">{{ dueToday.length }}</span>
+        <span class="fu-kpi-l">Hoje</span>
+      </div>
+      <div class="fu-kpi">
+        <span class="fu-kpi-n tabular">{{ (leads||[]).filter(l=>l.reuniao_agendada).length }}</span>
+        <span class="fu-kpi-l">Reuniões</span>
+      </div>
+      <div class="fu-kpi is-ok">
+        <span class="fu-kpi-n tabular">{{ closedThisMonth }}</span>
+        <span class="fu-kpi-l">Fechados/mês</span>
+      </div>
     </div>
 
     <!-- Log rapido do dia -->
@@ -42,9 +54,14 @@
     </div>
 
     <!-- View switch -->
-    <div class="seg">
-      <button v-for="v in views" :key="v.id" @click="view = v.id"
-        class="seg-btn" :class="{ active: view === v.id }">{{ v.label }}</button>
+    <div class="fu-controls">
+      <div class="seg">
+        <button v-for="v in views" :key="v.id" @click="view = v.id"
+          class="seg-btn" :class="{ active: view === v.id }">{{ v.label }}</button>
+      </div>
+      <span v-if="view === 'fila' && queueAll.length" class="fu-hint">
+        <kbd>J</kbd><kbd>K</kbd> navegam · <kbd>Enter</kbd> abre no mobile
+      </span>
     </div>
 
     <!-- FILA: cockpit de trabalho (fila + painel) -->
@@ -322,6 +339,20 @@ function goNext() {
   const i = queueAll.value.findIndex(l => l.id === selectedId.value)
   if (i >= 0 && i < queueAll.value.length - 1) selectedId.value = queueAll.value[i + 1].id
 }
+function goPrev() {
+  const i = queueAll.value.findIndex(l => l.id === selectedId.value)
+  if (i > 0) selectedId.value = queueAll.value[i - 1].id
+}
+// Atalhos de teclado na fila (power-user): J/K ou setas navegam
+function onQueueKey(e: KeyboardEvent) {
+  if (view.value !== 'fila' || !queueAll.value.length) return
+  const tag = (e.target as HTMLElement | null)?.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); goNext() }
+  else if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); goPrev() }
+}
+onMounted(() => window.addEventListener('keydown', onQueueKey))
+onUnmounted(() => window.removeEventListener('keydown', onQueueKey))
 
 // ── Cadência: próximo passo ───────────────────────────────────────────
 function nextStep(lead: LeadWithFU): CadenceStep | null {
@@ -404,13 +435,23 @@ const weekForecast = computed(() =>
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
 /* ── Stats strip ─────────────────────────────────────────── */
-.fu-stats { display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:14px;border-bottom:1px solid var(--border-soft);flex-wrap:wrap;font-size:13px;color:var(--text-1) }
-.fu-stats strong { font-weight:600 }
-.fu-stats span:not(.fu-stats-sep) { color:var(--text-2) }
-.fu-stats-sep { color:var(--border) }
+.fu-kpis { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px }
+.fu-kpi { display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;box-shadow:var(--shadow-xs);transition:transform .18s var(--spring),box-shadow .18s var(--ease-out) }
+.fu-kpi:hover { transform:translateY(-2px);box-shadow:var(--shadow-sm) }
+.fu-kpi-n { font-size:var(--num-lg);font-weight:700;color:var(--text-1);font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1 }
+.fu-kpi-l { font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em }
+.fu-kpi.is-bad .fu-kpi-n { color:var(--bad) }
+.fu-kpi.is-warn .fu-kpi-n { color:var(--warn) }
+.fu-kpi.is-ok .fu-kpi-n { color:var(--ok) }
+@media (max-width:700px){ .fu-kpis{ grid-template-columns:repeat(3,1fr) } }
+
+.fu-controls { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px }
+.fu-hint { font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:4px }
+.fu-hint kbd { font-family:var(--font-mono);font-size:10px;background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:5px;padding:1px 5px;color:var(--text-2) }
+@media (max-width:820px){ .fu-hint { display:none } }
 
 /* ── Log rapido ──────────────────────────────────────────── */
-.ql-bar { display:flex;align-items:center;gap:16px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap }
+.ql-bar { display:flex;align-items:center;gap:16px;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;box-shadow:var(--shadow-xs);margin-bottom:14px;flex-wrap:wrap }
 .ql-bar-head { display:flex;flex-direction:column;min-width:0;margin-right:4px }
 .ql-bar-title { font-size:12px;font-weight:600;color:var(--text-1) }
 .ql-bar-hint { font-size:11px;color:var(--text-3) }
@@ -430,9 +471,9 @@ const weekForecast = computed(() =>
 .ql-state--saving::before { background:var(--text-3);animation:pulse 1s infinite }
 
 /* ── Segmented switch ────────────────────────────────────── */
-.seg { display:flex;gap:3px;background:var(--bg-subtle);border-radius:10px;padding:3px;width:fit-content;margin-bottom:16px }
+.seg { display:flex;gap:3px;background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:11px;padding:3px;width:fit-content }
 .seg-btn { padding:6px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:transparent;color:var(--text-2);transition:all .12s }
-.seg-btn.active { background:var(--bg-card);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08) }
+.seg-btn.active { background:var(--bg-card);color:var(--text-1);box-shadow:var(--shadow-xs) }
 
 /* ── Cockpit (fila + painel) ─────────────────────────────── */
 .fu-cockpit { display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start }
@@ -448,7 +489,7 @@ const weekForecast = computed(() =>
   .fu-queue { max-height:none }
 }
 
-.fu-queue { display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-card);max-height:calc(100vh - 300px);overflow-y:auto }
+.fu-queue { display:flex;flex-direction:column;border:1px solid var(--border-soft);border-radius:16px;overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-xs);max-height:calc(100vh - 300px);overflow-y:auto }
 .fu-group-head { display:flex;align-items:center;gap:6px;padding:9px 12px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3) }
 .fu-group-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0 }
 .fu-group-count { margin-left:auto;font-size:10px;color:var(--text-3);background:var(--bg-subtle);border-radius:10px;padding:0 6px }
@@ -465,7 +506,7 @@ const weekForecast = computed(() =>
 .fu-qfu { font-size:10px;color:var(--text-3) }
 
 /* ── Painel de trabalho ──────────────────────────────────── */
-.fu-panel { border:1px solid var(--border);border-radius:12px;background:var(--bg-card);min-height:300px }
+.fu-panel { border:1px solid var(--border-soft);border-radius:16px;background:var(--bg-card);box-shadow:var(--shadow-xs);min-height:300px }
 .fu-panel-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:300px;color:var(--text-3);font-size:13px;text-align:center }
 .fu-work { padding:18px 20px }
 .fu-work-head { display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px }

@@ -20,7 +20,7 @@
           <div class="kb-col-accent" :style="{ background: col.color }" />
 
           <!-- Cards -->
-          <div class="kb-cards">
+          <div v-auto-animate class="kb-cards">
             <div
               v-for="lead in col.leads"
               :key="lead.id"
@@ -178,7 +178,7 @@ function retColor(iso: string) {
   flex-shrink: 0;
   background: var(--bg-subtle);
   border: 1px solid var(--border-soft);
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   transition: border-color .15s, background .15s;
 }
@@ -228,15 +228,16 @@ function retColor(iso: string) {
 /* ── Card ────────────────────────────────────────────────── */
 .kb-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 11px 12px;
   cursor: grab;
   user-select: none;
-  transition: border-color .12s, background .12s;
+  box-shadow: var(--shadow-sm);
+  transition: border-color .12s, background .12s, box-shadow .12s, transform .12s;
   position: relative;
 }
-.kb-card:hover { border-color: var(--text-3); }
+.kb-card:hover { border-color: var(--border); box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .kb-card:active { cursor: grabbing; }
 .kb-card--dragging { opacity: .4; }
 .kb-card--overdue::before {

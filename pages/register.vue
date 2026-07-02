@@ -1,29 +1,20 @@
-﻿<template>
-  <div style="min-height:100vh;background:var(--bg-subtle);display:flex;align-items:center;justify-content:center;padding:16px">
-    <div style="width:100%;max-width:420px">
+<template>
+  <div class="auth-wrap">
+    <div class="auth-aurora" aria-hidden="true"></div>
 
+    <div class="auth-inner">
       <!-- Brand -->
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#0f62fe;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 14px rgba(15,98,254,.18)">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="4" fill="white"/>
-            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h1 style="font-size:23px;font-weight:600;color:var(--text-1);letter-spacing:-.03em;margin:0 0 7px">Criar conta no Prospecta</h1>
-        <p style="font-size:14px;color:var(--text-2);margin:0">Configure sua prospecção em minutos</p>
+      <div class="auth-brand">
+        <UiBrandMark :size="58" radius="17px" glow />
+        <h1 class="auth-title text-gradient">Prospecta</h1>
+        <p class="auth-sub">Configure sua prospecção em minutos.</p>
       </div>
 
-      <form @submit.prevent="handleRegister"
-        style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:14px">
+      <form @submit.prevent="handleRegister" class="auth-card aura-border">
 
-        <div v-if="error"
-          style="background:var(--bad-bg);border:1px solid var(--bad-bd);color:#dc2626;font-size:13px;border-radius:8px;padding:10px 14px">
-          {{ error }}
-        </div>
+        <div v-if="error" class="auth-error">{{ error }}</div>
 
-        <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em">Sua conta</div>
+        <div class="auth-section">Sua conta</div>
 
         <div class="form-field">
           <label class="input-label">Seu nome</label>
@@ -39,7 +30,7 @@
         </div>
 
         <div class="divider" style="margin:2px 0"></div>
-        <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em">Sua organização</div>
+        <div class="auth-section">Sua organização</div>
 
         <div class="form-field">
           <label class="input-label">Nome da empresa</label>
@@ -49,39 +40,35 @@
         <div class="form-field">
           <label class="input-label">
             Subdomínio
-            <span style="font-size:11px;color:var(--text-3);font-weight:400;margin-left:4px">(seu endereço único)</span>
+            <span class="auth-hint">(seu endereço único)</span>
           </label>
           <div style="display:flex">
             <input
               v-model="form.slug"
               type="text" required
               placeholder="agência-xyz"
-              style="border-radius:8px 0 0 8px;border-right:none"
+              style="border-radius:10px 0 0 10px;border-right:none"
               @input="form.slug = form.slug.toLowerCase().replace(/[^a-z0-9-]/g, '')"
             />
-            <span
-              style="display:flex;align-items:center;padding:0 12px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:0 8px 8px 0;font-size:13px;color:var(--text-2);white-space:nowrap;height:auto">
-              .{{ appDomain }}
-            </span>
+            <span class="auth-suffix">.{{ appDomain }}</span>
           </div>
-          <p v-if="form.slug" style="font-size:12px;color:#0f62fe;margin:4px 0 0;font-weight:500">
+          <p v-if="form.slug" class="auth-slug-preview">
             Acesso em: <strong>{{ form.slug }}.{{ appDomain }}</strong>
           </p>
         </div>
 
-        <button type="submit" :disabled="loading" class="btn btn-primary"
-          style="justify-content:center;width:100%;padding:10px 14px;font-size:14px;margin-top:4px">
-          <span v-if="loading" style="display:flex;align-items:center;gap:8px">
-            <span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .6s linear infinite" />
+        <button type="submit" :disabled="loading" class="btn btn-primary auth-submit">
+          <span v-if="loading" class="auth-loading">
+            <span class="auth-spinner"></span>
             Criando organização...
           </span>
           <span v-else>Criar e entrar</span>
         </button>
       </form>
 
-      <p style="text-align:center;font-size:13px;color:var(--text-2);margin-top:20px">
+      <p class="auth-alt">
         Já tem conta?
-        <NuxtLink to="/login" style="color:#0f62fe;font-weight:500;text-decoration:none;margin-left:3px">Entrar</NuxtLink>
+        <NuxtLink to="/login" class="auth-alt-link">Entrar</NuxtLink>
       </p>
     </div>
   </div>
@@ -137,4 +124,63 @@ async function handleRegister() {
 
 <style scoped>
 @keyframes spin { to { transform: rotate(360deg) } }
+
+.auth-wrap {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.auth-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 40% at 18% 15%, var(--aurora-1), transparent 72%),
+    radial-gradient(42% 44% at 82% 22%, var(--aurora-2), transparent 72%),
+    radial-gradient(46% 50% at 72% 88%, var(--aurora-3), transparent 72%),
+    radial-gradient(40% 42% at 26% 84%, var(--aurora-2), transparent 72%);
+  filter: blur(46px);
+  animation: aurora-drift 26s var(--ease-out) infinite alternate;
+}
+.auth-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  animation: auth-rise .5s var(--ease-out) both;
+}
+@keyframes auth-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.auth-brand { text-align: center; margin-bottom: 26px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.auth-title { font-size: 34px; font-weight: 700; letter-spacing: -.04em; margin: 4px 0 0; line-height: 1; }
+.auth-sub   { font-size: 14px; color: var(--text-2); margin: 0; }
+
+.auth-card {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-brd);
+  border-radius: var(--radius-xl);
+  padding: 26px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.auth-error { background: var(--bad-bg); border: 1px solid var(--bad-bd); color: #dc2626; font-size: 13px; border-radius: 10px; padding: 10px 14px; }
+.auth-section { font-size: 12px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em; }
+.auth-hint { font-size: 11px; color: var(--text-3); font-weight: 400; margin-left: 4px; }
+.auth-suffix { display: flex; align-items: center; padding: 0 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 0 10px 10px 0; font-size: 13px; color: var(--text-2); white-space: nowrap; }
+.auth-slug-preview { font-size: 12px; color: var(--accent); margin: 4px 0 0; font-weight: 500; }
+.auth-submit { justify-content: center; width: 100%; padding: 11px 14px; font-size: 14px; margin-top: 4px; }
+.auth-loading { display: flex; align-items: center; gap: 8px; }
+.auth-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin .6s linear infinite; }
+.auth-alt { text-align: center; font-size: 13px; color: var(--text-2); margin-top: 20px; }
+.auth-alt-link { color: var(--accent); font-weight: 600; text-decoration: none; margin-left: 3px; }
 </style>

@@ -1,9 +1,19 @@
 <template>
   <div class="dash">
     <header class="dash-head">
-      <div>
-        <h1 class="dash-greet">{{ greeting }}, {{ firstName }}</h1>
-        <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
+      <div class="dash-head-l">
+        <div class="eyebrow dash-eyebrow">{{ todayLabel }} · Semana {{ currentWeek }} de 4</div>
+        <h1 class="dash-greet">{{ greeting }}, <span class="text-gradient">{{ firstName }}</span></h1>
+        <div class="dash-chips">
+          <span class="dash-chip" :class="streak > 0 ? 'is-streak' : ''">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2.5-1-4 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-10z"/></svg>
+            {{ streak }} dia{{ streak === 1 ? '' : 's' }} de ofensiva
+          </span>
+          <span class="dash-chip" :class="paceChip.cls">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            {{ paceChip.label }}
+          </span>
+        </div>
       </div>
       <div class="dash-head-right">
         <select v-if="canFilterUsers && orgMembers?.length" v-model="selectedUserId" class="dash-select">
@@ -11,7 +21,7 @@
           <option v-for="m in orgMembers" :key="m.id" :value="m.id">{{ m.name || m.id.slice(0,8) }}</option>
         </select>
         <div class="dash-days">
-          <span class="dash-days-n tabular">{{ workdaysLeft }}</span>
+          <span class="dash-days-n"><UiCountUp :value="workdaysLeft" /></span>
           <span class="dash-days-l">dias úteis restantes</span>
         </div>
       </div>
@@ -19,7 +29,7 @@
 
     <div class="grid">
       <!-- Foco agora -->
-      <section class="tile t-focus">
+      <section class="tile t-focus" v-tilt="4">
         <div class="tile-head">
           <svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.target" />
           <span>Foco agora</span>
@@ -34,16 +44,16 @@
       </section>
 
       <!-- Gauge: meta de CE -->
-      <section class="tile t-gauge">
+      <section class="tile t-gauge" :class="{ 'is-goal': goalHit }" v-tilt="6">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.gauge" /><span>Meta de CE</span></div>
         <div class="gauge-wrap">
           <svg viewBox="0 0 120 120" class="gauge-svg">
             <circle cx="60" cy="60" r="50" fill="none" style="stroke:var(--bg-subtle)" stroke-width="10" />
             <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"
-              :stroke-dasharray="GAUGE_C" :stroke-dashoffset="gaugeOffset" transform="rotate(-90 60 60)"
-              :style="{ stroke: paceColor, transition:'stroke-dashoffset .5s' }" />
-            <text x="60" y="58" text-anchor="middle" class="gauge-pct">{{ gaugePct }}%</text>
-            <text x="60" y="76" text-anchor="middle" class="gauge-cap">da meta</text>
+              :stroke-dasharray="GAUGE_C" :stroke-dashoffset="ringOffset" transform="rotate(-90 60 60)"
+              :style="{ stroke: goalHit ? 'var(--ok)' : paceColor }" class="gauge-ring" />
+            <text x="60" y="58" text-anchor="middle" class="gauge-pct">{{ Math.round(ringPct) }}%</text>
+            <text x="60" y="76" text-anchor="middle" class="gauge-cap">{{ goalHit ? 'meta batida' : 'da meta' }}</text>
           </svg>
         </div>
         <div class="gauge-foot">
@@ -75,13 +85,13 @@
 
       <!-- Lead quente -->
       <component :is="hottestLead ? 'NuxtLink' : 'section'"
-        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined" class="tile t-hot">
+        :to="hottestLead ? `/dashboard/pipeline?highlight=${hottestLead.id}` : undefined" class="tile t-hot" v-tilt="6">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.flame" /><span>Lead mais quente</span></div>
         <template v-if="hottestLead">
           <div class="hot-name">{{ hottestLead.decisor }}</div>
           <div class="hot-company">{{ hottestLead.negocio || 'Sem empresa' }}</div>
           <div class="hot-spacer" />
-          <div class="hot-value tabular">R$ {{ (hottestLead.valor_estimado || 0).toLocaleString('pt-BR') }}</div>
+          <div class="hot-value tabular">R$ <UiCountUp :value="hottestLead.valor_estimado || 0" /></div>
           <div class="hot-status"><span class="dot" /> {{ hottestLead.resultado }}</div>
         </template>
         <div v-else class="empty-mini" style="text-align:left">Nenhuma oportunidade aberta com valor.</div>
@@ -95,7 +105,7 @@
               <svg class="kpi-ic" viewBox="0 0 24 24" v-html="k.icon" />
               <span class="kpi-name">{{ k.metric }}</span>
             </div>
-            <div class="kpi-num tabular" :class="k.cls">{{ k.value.toLocaleString('pt-BR') }}</div>
+            <div class="kpi-num tabular" :class="k.cls"><UiCountUp :value="k.value" /></div>
             <svg v-if="k.spark" class="kpi-spark" viewBox="0 0 64 20" preserveAspectRatio="none">
               <path :d="k.spark" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -168,6 +178,7 @@
       </section>
     </div>
 
+    <UiConfetti :run="confettiKey" />
     <Transition name="toast"><div v-if="toast" class="toast">{{ toast }}</div></Transition>
   </div>
 </template>
@@ -319,14 +330,59 @@ function kpiSpark(key: 'ld'|'ce'|'rm'|'rr'|'fr') {
 // ── Pace ────────────────────────────────────────────────────────────────
 const ceNeededByToday = computed(() => cePerDay.value * daysGone)
 const ceDelta         = computed(() => monthTotals.value.ce - ceNeededByToday.value)
+
+// ── Gamificacao: ofensiva (streak de dias uteis produtivos) + ritmo ─────
+const streak = computed(() => {
+  const byDate = new Map((diaryRows.value || []).map(r => [r.date, r]))
+  const d = new Date(); let s = 0; let first = true
+  for (let guard = 0; guard < 60; guard++) {
+    const dow = d.getDay()
+    if (dow === 0 || dow === 6) { d.setDate(d.getDate() - 1); continue } // pula fim de semana
+    const e = byDate.get(localDateISO(d))
+    const active = !!e && (((e.ce || 0) > 0) || (((e as any).ld || 0) > 0))
+    if (active) { s++; first = false; d.setDate(d.getDate() - 1) }
+    else if (first) { first = false; d.setDate(d.getDate() - 1) } // hoje ainda pendente nao quebra
+    else break
+  }
+  return s
+})
+const paceChip = computed(() => {
+  const dv = ceDelta.value
+  if (dv >= 5) return { label: `${dv} CE acima do ritmo`, cls: 'is-ok' }
+  if (dv >= 0) return { label: 'No ritmo do mês', cls: 'is-warn' }
+  return { label: `${Math.abs(dv)} CE atrás do ritmo`, cls: 'is-bad' }
+})
 const focusTone       = computed(() => focusAction.value.tone)
 const focusToneLabel  = computed(() => ({ urgent:'urgente', today:'hoje', pace:'ritmo', hot:'oportunidade', clear:'em dia' }[focusAction.value.tone] || ''))
 
 // ── Gauge ───────────────────────────────────────────────────────────────
 const GAUGE_C = 2 * Math.PI * 50
 const gaugePct = computed(() => Math.min(100, Math.round(monthTotals.value.ce / Math.max(ceNec.value, 1) * 100)))
-const gaugeOffset = computed(() => GAUGE_C * (1 - gaugePct.value / 100))
 const paceColor = computed(() => ceDelta.value >= 5 ? 'var(--ok)' : ceDelta.value >= 0 ? 'var(--warn)' : 'var(--bad)')
+
+// Anel animado (ease de 0 ao alvo) + celebracao ao bater a meta
+const ringPct = ref(0)
+let ringRaf = 0
+function animateRing(to: number) {
+  if (typeof window === 'undefined' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { ringPct.value = to; return }
+  cancelAnimationFrame(ringRaf)
+  const from = ringPct.value, t0 = performance.now(), dur = 900
+  const step = (t: number) => {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3)
+    ringPct.value = from + (to - from) * e
+    if (p < 1) ringRaf = requestAnimationFrame(step); else ringPct.value = to
+  }
+  ringRaf = requestAnimationFrame(step)
+}
+const ringOffset = computed(() => GAUGE_C * (1 - ringPct.value / 100))
+const goalHit = computed(() => gaugePct.value >= 100)
+const confettiKey = ref(0)
+watch(gaugePct, (v, old) => {
+  animateRing(v)
+  if (v >= 100 && (old ?? 0) < 100) confettiKey.value++
+})
+onMounted(() => { animateRing(gaugePct.value); if (goalHit.value) confettiKey.value++ })
+onUnmounted(() => cancelAnimationFrame(ringRaf))
 
 // ── Funil ────────────────────────────────────────────────────────────────
 const funnelRows = computed(() => {
@@ -403,9 +459,18 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .skel { background:var(--bg-subtle); animation:pulse 1.5s infinite; }
 .dash { max-width: 1200px; }
 
-.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:20px; }
-.dash-greet { font-size:22px; font-weight:600; letter-spacing:-.02em; color:var(--text-1); line-height:1.1; }
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:22px; }
+.dash-head-l { min-width:0; }
+.dash-eyebrow { text-transform:capitalize; margin-bottom:9px; }
+.dash-greet { font-size:30px; font-weight:700; letter-spacing:-.025em; color:var(--text-1); line-height:1.04; }
 .dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
+.dash-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:13px; }
+.dash-chip { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft); color:var(--text-2); box-shadow:var(--shadow-xs); }
+.dash-chip svg { opacity:.9; }
+.dash-chip.is-streak { color:#d97706; background:rgba(217,119,6,.09); border-color:rgba(217,119,6,.22); }
+.dash-chip.is-ok   { color:var(--ok);   background:var(--ok-bg);   border-color:var(--ok-bd); }
+.dash-chip.is-warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-bd); }
+.dash-chip.is-bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-bd); }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
 .dash-select { font-size:13px; padding:7px 11px; max-width:170px; width:auto; }
 .dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.1; }
@@ -413,7 +478,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .dash-days-l { font-size:11px; color:var(--text-3); margin-top:2px; }
 
 /* ── Grid 12 col ─────────────────────────────────────────── */
-.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:14px; }
 .t-focus  { grid-column:span 8; }
 .t-gauge  { grid-column:span 4; }
 .t-funnel { grid-column:span 8; }
@@ -424,7 +489,8 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-ritmo  { grid-column:span 6; }
 .t-spark  { grid-column:span 6; }
 
-.tile { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; display:flex; flex-direction:column; }
+.tile { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:var(--radius-lg); padding:20px 22px; display:flex; flex-direction:column; box-shadow:var(--shadow-xs); transition:box-shadow .2s var(--ease-out), border-color .2s; }
+.tile:hover { box-shadow:var(--shadow-sm); }
 .tile-head { display:flex; align-items:center; gap:8px; margin-bottom:16px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--text-2); }
 .tile-ic { width:15px; height:15px; flex-shrink:0; fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .tile-cap { margin-left:auto; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-3); }
@@ -443,6 +509,14 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-gauge { align-items:center; }
 .gauge-wrap { display:flex; justify-content:center; padding:4px 0; }
 .gauge-svg { width:120px; height:120px; }
+.gauge-ring { filter:drop-shadow(0 0 5px rgba(15,98,254,.30)); transition:stroke .3s; }
+.t-gauge.is-goal { border-color:var(--ok-bd); animation:goal-pulse 2.4s ease-in-out infinite; }
+.t-gauge.is-goal .gauge-ring { filter:drop-shadow(0 0 9px rgba(36,161,72,.55)); }
+@keyframes goal-pulse {
+  0%,100% { box-shadow:0 0 0 1px var(--ok-bd), var(--shadow-xs); }
+  50%     { box-shadow:0 0 0 3px var(--ok-bg), 0 8px 22px rgba(36,161,72,.18); }
+}
+@media (prefers-reduced-motion: reduce) { .t-gauge.is-goal { animation:none; } }
 .gauge-pct { font-family:var(--font-mono); font-size:var(--num-hero); font-weight:600; fill:var(--text-1); }
 .gauge-cap { font-size:9px; fill:var(--text-3); text-transform:uppercase; letter-spacing:.08em; }
 .gauge-foot { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center; }
@@ -451,8 +525,8 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .fn-bars { display:flex; flex-direction:column; flex:1; justify-content:center; padding:4px 0; }
 .fn-row { display:flex; align-items:center; gap:10px; }
 .fn-lbl { font-size:11px; color:var(--text-2); width:114px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:1px; overflow:hidden; }
-.fn-fill { height:100%; background:var(--accent); border-radius:1px; opacity:.88; transition:width .5s ease; }
+.fn-track { flex:1; height:12px; background:var(--bg-subtle); border-radius:999px; overflow:hidden; }
+.fn-fill { height:100%; background:var(--grad-brand); border-radius:999px; opacity:.95; transition:width .5s var(--ease-out); }
 .fn-val { font-size:12px; font-weight:600; color:var(--text-1); width:42px; text-align:right; flex-shrink:0; }
 .fn-gap { display:flex; align-items:center; gap:5px; padding:3px 0 3px 124px; }
 .fn-chevron { color:var(--text-3); flex-shrink:0; }
@@ -478,7 +552,7 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .kpi-name { font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--text-2); }
 .kpi-num { font-size:var(--num-hero); font-weight:600; color:var(--text-1); letter-spacing:-.02em; line-height:1; margin-top:10px; }
 .kpi-num.is-ok { color:var(--ok); } .kpi-num.is-warn { color:var(--warn); } .kpi-num.is-bad { color:var(--bad); }
-.kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.7; }
+.kpi-spark { width:100%; height:20px; margin-top:8px; color:var(--accent); opacity:.85; filter:drop-shadow(0 1px 4px rgba(15,98,254,.35)); }
 .kpi-spark-empty { height:20px; margin-top:8px; }
 .kpi-sub { font-size:11px; color:var(--text-3); margin-top:7px; }
 
@@ -511,7 +585,7 @@ input.reg-input { text-align:center; font-size:var(--num-md); font-weight:600; p
 .track-fill { height:100%; transition:width .4s; }
 
 /* ── Spark ───────────────────────────────────────────────── */
-.ce-chart { width:100%; height:100px; }
+.ce-chart { width:100%; height:100px; filter:drop-shadow(0 2px 6px rgba(15,98,254,.26)); }
 .spark-foot { font-size:12px; color:var(--text-2); margin-top:10px; }
 
 @media (max-width: 1000px) {

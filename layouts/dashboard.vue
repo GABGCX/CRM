@@ -6,9 +6,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="mobile-brand">
-        <div class="mobile-brand-icon">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="white"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
+        <UiBrandMark :size="26" radius="8px" glow />
         <span>Prospecta</span>
       </div>
       <button class="mobile-theme" @click="toggleTheme" :aria-label="isDark ? 'Tema claro' : 'Tema escuro'">
@@ -180,6 +178,24 @@
       </div>
     </main>
 
+    <!-- Tab bar mobile (app-like, so <=768px) -->
+    <nav class="mobile-tabbar">
+      <button
+        v-for="t in mobileTabs" :key="t.key"
+        class="mtab" :class="{ active: t.match(route.path) }"
+        @click="haptic(); navigateTo(t.to)">
+        <span class="mtab-ic-wrap">
+          <i class="ti" :class="t.icon" aria-hidden="true"></i>
+          <span v-if="t.badge" class="mtab-badge">{{ t.badge > 9 ? '9+' : t.badge }}</span>
+        </span>
+        <span class="mtab-lbl">{{ t.label }}</span>
+      </button>
+      <button class="mtab" :class="{ active: mobileOpen }" @click="haptic(); mobileOpen = true">
+        <span class="mtab-ic-wrap"><i class="ti ti-dots" aria-hidden="true"></i></span>
+        <span class="mtab-lbl">Mais</span>
+      </button>
+    </nav>
+
     <LazyUiGlobalSearch @select="onSearchSelect" />
     <LazyUiOnboardingTour />
 
@@ -218,6 +234,15 @@ const mobileOpen      = ref(false)
 // Fecha o drawer ao navegar
 const route = useRoute()
 watch(() => route.fullPath, () => { mobileOpen.value = false })
+
+// ── Tab bar mobile (navegacao estilo app) ───────────────────────────────
+interface MobileTab { key: string; label: string; icon: string; to: string; match: (p: string) => boolean; badge?: number }
+const mobileTabs = computed<MobileTab[]>(() => [
+  { key: 'home',   label: 'Início',    icon: 'ti-home',     to: '/dashboard',           match: (p: string) => p === '/dashboard' },
+  { key: 'pipe',   label: 'Pipeline',  icon: 'ti-users',    to: '/dashboard/pipeline',  match: (p: string) => p.startsWith('/dashboard/pipeline') || p.startsWith('/dashboard/leads') },
+  { key: 'follow', label: 'Follow-up', icon: 'ti-repeat',   to: '/dashboard/followup',  match: (p: string) => p.startsWith('/dashboard/followup'), badge: overdueCount.value },
+  { key: 'act',    label: 'Atividade', icon: 'ti-activity', to: '/dashboard/atividade', match: (p: string) => p.startsWith('/dashboard/atividade') },
+])
 
 function onToggleCollapse() {
   if (isMobile.value) { mobileOpen.value = false; return }  // no mobile, age como "fechar"
@@ -296,10 +321,11 @@ function openGlobalSearch() {
 }
 
 .sb-logo-icon {
-  width: 27px;
-  height: 27px;
-  border-radius: 7px;
-  background: var(--accent);
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: var(--grad-brand);
+  box-shadow: 0 3px 12px rgba(15,98,254,.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -503,11 +529,44 @@ function openGlobalSearch() {
 .mobile-burger:hover, .mobile-theme:hover { background: var(--bg-subtle); color: var(--text-1); }
 .mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--text-1); letter-spacing: -.01em; }
 .mobile-brand-icon {
-  width: 24px; height: 24px; border-radius: 6px; background: var(--accent);
+  width: 26px; height: 26px; border-radius: 8px; background: var(--grad-brand);
+  box-shadow: 0 2px 10px rgba(15,98,254,.4);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .mb-fade-enter-active, .mb-fade-leave-active { transition: opacity .2s ease; }
 .mb-fade-enter-from, .mb-fade-leave-to { opacity: 0; }
+
+/* ── Tab bar mobile (navegacao estilo app) ──────────── */
+.mobile-tabbar { display: none; }
+@media (max-width: 768px) {
+  .mobile-tabbar {
+    display: flex;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 65;
+    padding: 7px 6px calc(7px + env(safe-area-inset-bottom));
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--glass-brd);
+  }
+  .mtab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer; padding: 7px 2px 3px;
+    color: var(--text-3); font-family: inherit; font-size: 10px; font-weight: 600;
+    position: relative; -webkit-tap-highlight-color: transparent; transition: color .15s;
+  }
+  .mtab .ti { font-size: 24px; line-height: 1; transition: transform .18s var(--spring); }
+  .mtab:active .ti { transform: scale(.8); }
+  /* iOS: item ativo apenas na cor de tint (sem gradiente/indicador) */
+  .mtab.active { color: var(--accent); }
+  .mtab.active .ti, .mtab.active .mtab-lbl { color: var(--accent); }
+  .mtab-ic-wrap { position: relative; display: flex; }
+  .mtab-badge {
+    position: absolute; top: -5px; right: -10px;
+    min-width: 15px; height: 15px; padding: 0 4px;
+    background: var(--bad); color: #fff; font-size: 9px; font-weight: 700;
+    border-radius: 999px; display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--bg-card);
+  }
+}
 
 /* ── Layout toast ───────────────────────────────────── */
 .layout-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:500; padding:9px 16px; border-radius:8px; display:flex; align-items:center; gap:7px; box-shadow:0 2px 8px rgba(0,0,0,.14); z-index:9999; white-space:nowrap; pointer-events:none; letter-spacing:-.01em; }
