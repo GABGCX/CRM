@@ -1,9 +1,19 @@
 <template>
   <div class="dash">
     <header class="dash-head">
-      <div>
+      <div class="dash-head-l">
+        <div class="eyebrow dash-eyebrow">{{ todayLabel }} · Semana {{ currentWeek }} de 4</div>
         <h1 class="dash-greet">{{ greeting }}, <span class="text-gradient">{{ firstName }}</span></h1>
-        <p class="dash-date">{{ todayLabel }} · semana {{ currentWeek }} de 4</p>
+        <div class="dash-chips">
+          <span class="dash-chip" :class="streak > 0 ? 'is-streak' : ''">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2.5-1-4 2 1 3 3 3 5a6 6 0 0 1-12 0c0-5 6-6 6-10z"/></svg>
+            {{ streak }} dia{{ streak === 1 ? '' : 's' }} de ofensiva
+          </span>
+          <span class="dash-chip" :class="paceChip.cls">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            {{ paceChip.label }}
+          </span>
+        </div>
       </div>
       <div class="dash-head-right">
         <select v-if="canFilterUsers && orgMembers?.length" v-model="selectedUserId" class="dash-select">
@@ -319,6 +329,28 @@ function kpiSpark(key: 'ld'|'ce'|'rm'|'rr'|'fr') {
 // ── Pace ────────────────────────────────────────────────────────────────
 const ceNeededByToday = computed(() => cePerDay.value * daysGone)
 const ceDelta         = computed(() => monthTotals.value.ce - ceNeededByToday.value)
+
+// ── Gamificacao: ofensiva (streak de dias uteis produtivos) + ritmo ─────
+const streak = computed(() => {
+  const byDate = new Map((diaryRows.value || []).map(r => [r.date, r]))
+  const d = new Date(); let s = 0; let first = true
+  for (let guard = 0; guard < 60; guard++) {
+    const dow = d.getDay()
+    if (dow === 0 || dow === 6) { d.setDate(d.getDate() - 1); continue } // pula fim de semana
+    const e = byDate.get(localDateISO(d))
+    const active = !!e && (((e.ce || 0) > 0) || (((e as any).ld || 0) > 0))
+    if (active) { s++; first = false; d.setDate(d.getDate() - 1) }
+    else if (first) { first = false; d.setDate(d.getDate() - 1) } // hoje ainda pendente nao quebra
+    else break
+  }
+  return s
+})
+const paceChip = computed(() => {
+  const dv = ceDelta.value
+  if (dv >= 5) return { label: `${dv} CE acima do ritmo`, cls: 'is-ok' }
+  if (dv >= 0) return { label: 'No ritmo do mês', cls: 'is-warn' }
+  return { label: `${Math.abs(dv)} CE atrás do ritmo`, cls: 'is-bad' }
+})
 const focusTone       = computed(() => focusAction.value.tone)
 const focusToneLabel  = computed(() => ({ urgent:'urgente', today:'hoje', pace:'ritmo', hot:'oportunidade', clear:'em dia' }[focusAction.value.tone] || ''))
 
@@ -403,9 +435,18 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .skel { background:var(--bg-subtle); animation:pulse 1.5s infinite; }
 .dash { max-width: 1200px; }
 
-.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:20px; }
-.dash-greet { font-size:28px; font-weight:700; letter-spacing:-.03em; color:var(--text-1); line-height:1.05; }
+.dash-head { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:22px; }
+.dash-head-l { min-width:0; }
+.dash-eyebrow { text-transform:capitalize; margin-bottom:9px; }
+.dash-greet { font-size:30px; font-weight:700; letter-spacing:-.025em; color:var(--text-1); line-height:1.04; }
 .dash-date { font-size:13px; color:var(--text-3); margin-top:6px; text-transform:capitalize; }
+.dash-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:13px; }
+.dash-chip { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft); color:var(--text-2); box-shadow:var(--shadow-xs); }
+.dash-chip svg { opacity:.9; }
+.dash-chip.is-streak { color:#d97706; background:rgba(217,119,6,.09); border-color:rgba(217,119,6,.22); }
+.dash-chip.is-ok   { color:var(--ok);   background:var(--ok-bg);   border-color:var(--ok-bd); }
+.dash-chip.is-warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-bd); }
+.dash-chip.is-bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-bd); }
 .dash-head-right { display:flex; align-items:center; gap:18px; flex-shrink:0; }
 .dash-select { font-size:13px; padding:7px 11px; max-width:170px; width:auto; }
 .dash-days { display:flex; flex-direction:column; align-items:flex-end; line-height:1.1; }
