@@ -3,6 +3,7 @@
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px">
       <div>
+        <div class="eyebrow" style="margin-bottom:6px">Funil de vendas</div>
         <div class="page-title">Pipeline</div>
         <div class="page-sub">{{ totalLeads }} leads · {{ activeLeads.length }} ativos</div>
       </div>
@@ -555,7 +556,8 @@ async function onImported() {
   display: flex;
   gap: 3px;
   background: var(--bg-subtle, var(--border-soft));
-  border-radius: 9px;
+  border: 1px solid var(--border-soft);
+  border-radius: 11px;
   padding: 3px;
   flex-shrink: 0;
 }
@@ -564,7 +566,7 @@ async function onImported() {
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  border-radius: 7px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--text-2);
@@ -578,8 +580,9 @@ async function onImported() {
 .pipe-view.active {
   background: var(--bg-card, #fff);
   color: var(--text-1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
+.pipe-view.active svg { color: var(--accent); }
 .pipe-filters {
   display: flex;
   align-items: center;
