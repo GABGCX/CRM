@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:18px">
+      <div class="eyebrow" style="margin-bottom:6px">Cadência de retornos</div>
       <div class="page-title">Follow-up</div>
       <div class="page-sub">Protocolo 10 tentativas · trabalhe a fila de cima para baixo</div>
     </div>
@@ -410,7 +411,7 @@ const weekForecast = computed(() =>
 .fu-stats-sep { color:var(--border) }
 
 /* ── Log rapido ──────────────────────────────────────────── */
-.ql-bar { display:flex;align-items:center;gap:16px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap }
+.ql-bar { display:flex;align-items:center;gap:16px;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;box-shadow:var(--shadow-xs);margin-bottom:14px;flex-wrap:wrap }
 .ql-bar-head { display:flex;flex-direction:column;min-width:0;margin-right:4px }
 .ql-bar-title { font-size:12px;font-weight:600;color:var(--text-1) }
 .ql-bar-hint { font-size:11px;color:var(--text-3) }
@@ -430,9 +431,9 @@ const weekForecast = computed(() =>
 .ql-state--saving::before { background:var(--text-3);animation:pulse 1s infinite }
 
 /* ── Segmented switch ────────────────────────────────────── */
-.seg { display:flex;gap:3px;background:var(--bg-subtle);border-radius:10px;padding:3px;width:fit-content;margin-bottom:16px }
+.seg { display:flex;gap:3px;background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:11px;padding:3px;width:fit-content;margin-bottom:16px }
 .seg-btn { padding:6px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;background:transparent;color:var(--text-2);transition:all .12s }
-.seg-btn.active { background:var(--bg-card);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08) }
+.seg-btn.active { background:var(--bg-card);color:var(--text-1);box-shadow:var(--shadow-xs) }
 
 /* ── Cockpit (fila + painel) ─────────────────────────────── */
 .fu-cockpit { display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start }
@@ -448,7 +449,7 @@ const weekForecast = computed(() =>
   .fu-queue { max-height:none }
 }
 
-.fu-queue { display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-card);max-height:calc(100vh - 300px);overflow-y:auto }
+.fu-queue { display:flex;flex-direction:column;border:1px solid var(--border-soft);border-radius:16px;overflow:hidden;background:var(--bg-card);box-shadow:var(--shadow-xs);max-height:calc(100vh - 300px);overflow-y:auto }
 .fu-group-head { display:flex;align-items:center;gap:6px;padding:9px 12px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3) }
 .fu-group-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0 }
 .fu-group-count { margin-left:auto;font-size:10px;color:var(--text-3);background:var(--bg-subtle);border-radius:10px;padding:0 6px }
@@ -465,7 +466,7 @@ const weekForecast = computed(() =>
 .fu-qfu { font-size:10px;color:var(--text-3) }
 
 /* ── Painel de trabalho ──────────────────────────────────── */
-.fu-panel { border:1px solid var(--border);border-radius:12px;background:var(--bg-card);min-height:300px }
+.fu-panel { border:1px solid var(--border-soft);border-radius:16px;background:var(--bg-card);box-shadow:var(--shadow-xs);min-height:300px }
 .fu-panel-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:300px;color:var(--text-3);font-size:13px;text-align:center }
 .fu-work { padding:18px 20px }
 .fu-work-head { display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px }

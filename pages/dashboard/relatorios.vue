@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:18px">
+      <div class="eyebrow" style="margin-bottom:6px">Inteligência comercial</div>
       <div class="page-title">Relatórios</div>
       <div class="page-sub">Análise de desempenho do funil comercial · {{ periodLabel }}</div>
     </div>
@@ -636,14 +637,15 @@ function goToStatus(status: string) {
 </script>
 
 <style scoped>
-.seg { display:flex; gap:2px; background:var(--border-soft); border-radius:10px; padding:3px; }
+.seg { display:flex; gap:2px; background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:11px; padding:3px; }
 .seg-sm .seg-btn { padding:4px 10px; font-size:11px; }
 .seg-btn { padding:5px 14px; border-radius:8px; border:none; font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; background:transparent; color:var(--text-2); transition:all .12s; }
-.seg-btn.active { background:var(--bg-card); color:var(--text-1); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.seg-btn.active { background:var(--bg-card); color:var(--text-1); box-shadow:var(--shadow-xs); }
 
 .kpi-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px; }
 @media (max-width:900px){ .kpi-grid{ grid-template-columns:repeat(2,1fr); } }
-.kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:14px; }
+.kpi-card { background:var(--bg-card); border:1px solid var(--border-soft); border-radius:16px; padding:16px; box-shadow:var(--shadow-xs); transition:transform .18s var(--spring), box-shadow .18s var(--ease-out), border-color .18s; }
+.kpi-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:var(--border); }
 .kpi-label { font-size:12px; color:var(--text-2); margin-bottom:6px; }
 .kpi-value-row { display:flex; align-items:baseline; gap:8px; }
 .kpi-value { font-size:var(--num-hero); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; letter-spacing:-.01em; font-family:var(--font-mono); }
