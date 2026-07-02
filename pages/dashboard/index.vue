@@ -44,16 +44,16 @@
       </section>
 
       <!-- Gauge: meta de CE -->
-      <section class="tile t-gauge" v-tilt="6">
+      <section class="tile t-gauge" :class="{ 'is-goal': goalHit }" v-tilt="6">
         <div class="tile-head"><svg class="tile-ic" viewBox="0 0 24 24" v-html="ICON.gauge" /><span>Meta de CE</span></div>
         <div class="gauge-wrap">
           <svg viewBox="0 0 120 120" class="gauge-svg">
             <circle cx="60" cy="60" r="50" fill="none" style="stroke:var(--bg-subtle)" stroke-width="10" />
             <circle cx="60" cy="60" r="50" fill="none" stroke-width="10" stroke-linecap="round"
-              :stroke-dasharray="GAUGE_C" :stroke-dashoffset="gaugeOffset" transform="rotate(-90 60 60)"
-              :style="{ stroke: paceColor, transition:'stroke-dashoffset .5s' }" />
-            <text x="60" y="58" text-anchor="middle" class="gauge-pct">{{ gaugePct }}%</text>
-            <text x="60" y="76" text-anchor="middle" class="gauge-cap">da meta</text>
+              :stroke-dasharray="GAUGE_C" :stroke-dashoffset="ringOffset" transform="rotate(-90 60 60)"
+              :style="{ stroke: goalHit ? 'var(--ok)' : paceColor }" class="gauge-ring" />
+            <text x="60" y="58" text-anchor="middle" class="gauge-pct">{{ Math.round(ringPct) }}%</text>
+            <text x="60" y="76" text-anchor="middle" class="gauge-cap">{{ goalHit ? 'meta batida' : 'da meta' }}</text>
           </svg>
         </div>
         <div class="gauge-foot">
@@ -178,6 +178,7 @@
       </section>
     </div>
 
+    <UiConfetti :run="confettiKey" />
     <Transition name="toast"><div v-if="toast" class="toast">{{ toast }}</div></Transition>
   </div>
 </template>
@@ -357,8 +358,31 @@ const focusToneLabel  = computed(() => ({ urgent:'urgente', today:'hoje', pace:'
 // ── Gauge ───────────────────────────────────────────────────────────────
 const GAUGE_C = 2 * Math.PI * 50
 const gaugePct = computed(() => Math.min(100, Math.round(monthTotals.value.ce / Math.max(ceNec.value, 1) * 100)))
-const gaugeOffset = computed(() => GAUGE_C * (1 - gaugePct.value / 100))
 const paceColor = computed(() => ceDelta.value >= 5 ? 'var(--ok)' : ceDelta.value >= 0 ? 'var(--warn)' : 'var(--bad)')
+
+// Anel animado (ease de 0 ao alvo) + celebracao ao bater a meta
+const ringPct = ref(0)
+let ringRaf = 0
+function animateRing(to: number) {
+  if (typeof window === 'undefined' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { ringPct.value = to; return }
+  cancelAnimationFrame(ringRaf)
+  const from = ringPct.value, t0 = performance.now(), dur = 900
+  const step = (t: number) => {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3)
+    ringPct.value = from + (to - from) * e
+    if (p < 1) ringRaf = requestAnimationFrame(step); else ringPct.value = to
+  }
+  ringRaf = requestAnimationFrame(step)
+}
+const ringOffset = computed(() => GAUGE_C * (1 - ringPct.value / 100))
+const goalHit = computed(() => gaugePct.value >= 100)
+const confettiKey = ref(0)
+watch(gaugePct, (v, old) => {
+  animateRing(v)
+  if (v >= 100 && (old ?? 0) < 100) confettiKey.value++
+})
+onMounted(() => { animateRing(gaugePct.value); if (goalHit.value) confettiKey.value++ })
+onUnmounted(() => cancelAnimationFrame(ringRaf))
 
 // ── Funil ────────────────────────────────────────────────────────────────
 const funnelRows = computed(() => {
@@ -485,6 +509,14 @@ const todayTasks = computed(() => (urgentLeadsData.value||[]).map(l => {
 .t-gauge { align-items:center; }
 .gauge-wrap { display:flex; justify-content:center; padding:4px 0; }
 .gauge-svg { width:120px; height:120px; }
+.gauge-ring { filter:drop-shadow(0 0 5px rgba(15,98,254,.30)); transition:stroke .3s; }
+.t-gauge.is-goal { border-color:var(--ok-bd); animation:goal-pulse 2.4s ease-in-out infinite; }
+.t-gauge.is-goal .gauge-ring { filter:drop-shadow(0 0 9px rgba(36,161,72,.55)); }
+@keyframes goal-pulse {
+  0%,100% { box-shadow:0 0 0 1px var(--ok-bd), var(--shadow-xs); }
+  50%     { box-shadow:0 0 0 3px var(--ok-bg), 0 8px 22px rgba(36,161,72,.18); }
+}
+@media (prefers-reduced-motion: reduce) { .t-gauge.is-goal { animation:none; } }
 .gauge-pct { font-family:var(--font-mono); font-size:var(--num-hero); font-weight:600; fill:var(--text-1); }
 .gauge-cap { font-size:9px; fill:var(--text-3); text-transform:uppercase; letter-spacing:.08em; }
 .gauge-foot { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center; }
