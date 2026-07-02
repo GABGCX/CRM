@@ -659,17 +659,20 @@ function goToStatus(status: string) {
 .r-empty { height:100px; display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:13px; text-align:center; }
 .r-sublabel { font-size:11px; color:var(--text-3); margin:-6px 0 10px; }
 
-.funbar-track { flex:1; height:9px; background:var(--border-soft); border-radius:99px; overflow:hidden; }
-.funbar-fill { height:100%; border-radius:99px; transition:width .35s; }
+.funbar-track { flex:1; height:9px; background:var(--border-soft); border-radius:99px; overflow:hidden; cursor:default; }
+.funbar-fill { height:100%; border-radius:99px; transition:width .35s, filter .15s; }
+.funbar-track:hover .funbar-fill { filter:brightness(1.09) saturate(1.05); }
 
 .gauge-track { height:10px; background:var(--bg-subtle); border-radius:99px; overflow:hidden; margin:6px 0 3px; }
-.gauge-fill { height:100%; border-radius:99px; transition:width .35s; }
+.gauge-fill { height:100%; border-radius:99px; transition:width .35s, filter .15s; }
+.gauge-track:hover .gauge-fill { filter:brightness(1.07); }
 .rev-row { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
 .rev-k { font-size:12px; color:var(--text-2); }
 .rev-v { font-size:18px; font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; font-family:var(--font-mono); letter-spacing:-.01em; }
 .rev-hint { font-size:11px; color:var(--text-3); }
 
-.vol-item  { background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:10px; padding:12px 14px; }
+.vol-item  { background:var(--bg-subtle); border:1px solid var(--border-soft); border-radius:12px; padding:14px; transition:transform .18s var(--spring), box-shadow .18s var(--ease-out), border-color .18s, background .18s; }
+.vol-item:hover { transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:var(--border); background:var(--bg-card); }
 .vol-label { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; font-weight:600; margin-bottom:6px; }
 .vol-value { font-size:var(--num-lg); font-weight:600; color:var(--text-1); font-variant-numeric:tabular-nums; line-height:1; font-family:var(--font-mono); letter-spacing:-.01em; }
 .vol-hint  { font-size:11px; color:var(--text-3); margin-top:5px; }
@@ -677,7 +680,8 @@ function goToStatus(status: string) {
 .bars-row { display:flex; align-items:flex-end; gap:3px; height:90px; }
 .bar-col { flex:1; min-width:8px; display:flex; flex-direction:column; align-items:center; height:100%; }
 .bar-wrap { flex:1; width:100%; display:flex; align-items:flex-end; }
-.bar { width:100%; min-height:2px; border-radius:3px 3px 0 0; transition:height .3s; }
+.bar { width:100%; min-height:2px; border-radius:4px 4px 0 0; transition:height .3s, filter .15s; }
+.bar-col:hover .bar { filter:brightness(1.14) saturate(1.05); }
 .bar-x { font-size:9px; color:var(--text-3); margin-top:4px; white-space:nowrap; }
 
 .heat-cell { height:46px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-1); border:1px solid var(--border-soft); }
